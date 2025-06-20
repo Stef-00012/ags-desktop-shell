@@ -1,3 +1,5 @@
+import type Battery from "gi://AstalBattery"
+
 export type CoreInfo = {
     idle: number;
     total: number;
@@ -26,3 +28,16 @@ export type DiskStat = {
     usagePercent: string;
     path: string;
 };
+
+export type BatteryStat = {
+    isPresent: boolean;
+    isCharging: boolean;
+    percentage: number;
+    timeToFull: number;
+    timeToEmpty: number;
+    capacity: number;
+    energyRate: number;
+    temperature: number;
+    warningLevel: Battery.WarningLevel;
+    voltage: number;
+}

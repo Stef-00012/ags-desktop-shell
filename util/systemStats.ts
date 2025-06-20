@@ -3,6 +3,7 @@
 	https://github.com/Mabi19/desktop-shell/blob/d70189b2355a4173a8ea6d5699f340fe73497945/utils/system-stats.ts
 */
 
+import Battery from "gi://AstalBattery"
 import { readFileAsync } from "ags/file";
 import { exec } from "ags/process";
 import { interval } from "ags/time";
@@ -12,10 +13,54 @@ import type {
 	CPUInfo,
 	NetworkStat,
 	MemoryStat,
-	DiskStat
+	DiskStat,
+	BatteryStat
 } from "@/types/systemStats"
 
+export const [batteryStat, setBatteryStat] = createState<BatteryStat>({
+	isPresent: false,
+	capacity: 0,
+	isCharging: false,
+	percentage: 0,
+	timeToFull: 0,
+	timeToEmpty: 0,
+	energyRate: 0,
+	temperature: 0,
+	warningLevel: Battery.WarningLevel.NONE,
+	voltage: 0,
+})
 
+const battery = Battery.get_default()
+
+battery.connect("notify::charging", (bat) => {
+	setBatteryStat({
+		isPresent: bat.isPresent,
+		isCharging: bat.charging,
+		percentage: bat.percentage,
+		timeToFull: bat.timeToFull,
+		timeToEmpty: bat.timeToEmpty,
+		capacity: bat.capacity,
+		energyRate: bat.energyRate,
+		temperature: bat.temperature,
+		warningLevel: bat.warningLevel,
+		voltage: bat.voltage,
+	})
+})
+
+battery.connect("notify::percentage", (bat) => {
+	setBatteryStat({
+		isPresent: bat.isPresent,
+		isCharging: bat.charging,
+		percentage: bat.percentage,
+		timeToFull: bat.timeToFull,
+		timeToEmpty: bat.timeToEmpty,
+		capacity: bat.capacity,
+		energyRate: bat.energyRate,
+		temperature: bat.temperature,
+		warningLevel: bat.warningLevel,
+		voltage: bat.voltage,
+	})
+})
 
 const UPDATE_INTERVAL = 1000;
 
