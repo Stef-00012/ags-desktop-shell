@@ -5,6 +5,7 @@
 
 import Battery from "gi://AstalBattery";
 import Wp from "gi://AstalWp";
+// import Network from "gi://AstalNetwork"
 
 import { readFileAsync } from "ags/file";
 import { exec } from "ags/process";
