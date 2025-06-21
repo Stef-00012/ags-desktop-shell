@@ -7,33 +7,35 @@ export interface TokenData {
 }
 
 export interface Metadata {
-    track?: string;
-    album?: string;
-    length?: number;
-    artist?: string;
-    trackId?: string;
+	track?: string;
+	album?: string;
+	length?: number;
+	artist?: string;
+	trackId?: string;
 }
 
 // This is not the full response, just the data used by my script
-export type UsertokenResponse = {
-    message: {
-        header: {
-            status_code: number;
-            hint: never;
-        };
-        body: {
-            user_token: string;
-        };
-    };
-} | {
-    message: {
-        header: {
-            status_code: number;
-            hint: string;
-        };
-        body: never;
-    };
-}
+export type UsertokenResponse =
+	| {
+			message: {
+				header: {
+					status_code: number;
+					hint: never;
+				};
+				body: {
+					user_token: string;
+				};
+			};
+	  }
+	| {
+			message: {
+				header: {
+					status_code: number;
+					hint: string;
+				};
+				body: never;
+			};
+	  };
 
 export interface MusixmatchSearchResult {
 	hasLineSyncedLyrics: boolean;
@@ -55,12 +57,12 @@ export interface FormattedLyric {
 }
 
 export interface SongData {
-    artist: string;
-    track: string;
-    album: string;
-    trackId: string;
-    lyrics?: FormattedLyric[];
-    source: string;
-    length: number;
-    cover?: string;
+	artist: string;
+	track: string;
+	album: string;
+	trackId: string;
+	lyrics?: FormattedLyric[];
+	source: string;
+	length: number;
+	cover?: string;
 }

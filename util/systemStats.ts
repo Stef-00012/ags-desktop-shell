@@ -3,7 +3,9 @@
 	https://github.com/Mabi19/desktop-shell/blob/d70189b2355a4173a8ea6d5699f340fe73497945/utils/system-stats.ts
 */
 
-import Battery from "gi://AstalBattery"
+import Battery from "gi://AstalBattery";
+import Wp from "gi://AstalWp";
+
 import { readFileAsync } from "ags/file";
 import { exec } from "ags/process";
 import { interval } from "ags/time";
@@ -14,29 +16,33 @@ import type {
 	NetworkStat,
 	MemoryStat,
 	DiskStat,
-	BatteryStat
-} from "@/types/systemStats"
+	BatteryStat,
+	SpeakerStat,
+	MicrophoneStat,
+} from "@/types/systemStats";
+
+const UPDATE_INTERVAL = 2000;
+
+const battery = Battery.get_default();
 
 export const [batteryStat, setBatteryStat] = createState<BatteryStat>({
-	isPresent: false,
-	capacity: 0,
-	isCharging: false,
-	percentage: 0,
-	timeToFull: 0,
-	timeToEmpty: 0,
-	energyRate: 0,
-	temperature: 0,
-	warningLevel: Battery.WarningLevel.NONE,
-	voltage: 0,
-})
+	isPresent: battery.isPresent,
+	capacity: battery.capacity,
+	isCharging: battery.charging,
+	percentage: battery.percentage * 100,
+	timeToFull: battery.timeToFull,
+	timeToEmpty: battery.timeToEmpty,
+	energyRate: battery.energyRate,
+	temperature: battery.temperature,
+	warningLevel: battery.warningLevel,
+	voltage: battery.voltage,
+});
 
-const battery = Battery.get_default()
-
-battery.connect("notify::charging", (bat) => {
+function updateBatteryStat(bat: Battery.Device) {
 	setBatteryStat({
 		isPresent: bat.isPresent,
 		isCharging: bat.charging,
-		percentage: bat.percentage,
+		percentage: bat.percentage * 100,
 		timeToFull: bat.timeToFull,
 		timeToEmpty: bat.timeToEmpty,
 		capacity: bat.capacity,
@@ -44,38 +50,88 @@ battery.connect("notify::charging", (bat) => {
 		temperature: bat.temperature,
 		warningLevel: bat.warningLevel,
 		voltage: bat.voltage,
-	})
-})
+	});
+}
 
-battery.connect("notify::percentage", (bat) => {
-	setBatteryStat({
-		isPresent: bat.isPresent,
-		isCharging: bat.charging,
-		percentage: bat.percentage,
-		timeToFull: bat.timeToFull,
-		timeToEmpty: bat.timeToEmpty,
-		capacity: bat.capacity,
-		energyRate: bat.energyRate,
-		temperature: bat.temperature,
-		warningLevel: bat.warningLevel,
-		voltage: bat.voltage,
-	})
-})
+battery.connect("notify::charging", updateBatteryStat);
+battery.connect("notify::percentage", updateBatteryStat);
+battery.connect("notify::energy-rate", updateBatteryStat);
 
-const UPDATE_INTERVAL = 1000;
+const wp = Wp.get_default();
+
+export const [speakerStat, setSpeakerStat] = createState<SpeakerStat>({
+	name: wp?.audio.defaultSpeaker.name || "Unknown",
+	muted: wp?.audio.defaultSpeaker.mute || false,
+	volume: Math.round((wp?.audio.defaultSpeaker.volume || 0) * 100),
+	api: wp?.audio.defaultSpeaker.get_pw_property("device.api") || "Unknown",
+	isBluetooth: wp?.audio.defaultSpeaker.get_pw_property("device.api") === "bluez5",
+});
+
+export const [microphoneStat, setMicrophoneStat] = createState<MicrophoneStat>({
+	name: wp?.defaultMicrophone.description || "Unknown",
+	muted: wp?.defaultMicrophone.mute || false,
+	volume: Math.round((wp?.defaultMicrophone.volume || 0) * 100),
+	api: wp?.defaultMicrophone.get_pw_property("device.api") || "Unknown",
+	isBluetooth: wp?.defaultMicrophone.get_pw_property("device.api") === "bluez5",
+});
+
+function updateSpeakerStat(speaker: Wp.Endpoint) {
+	const api = speaker.get_pw_property("device.api");
+
+	setSpeakerStat({
+		name: speaker.description,
+		muted: speaker.mute,
+		volume: Math.round(speaker.volume * 100),
+		api,
+		isBluetooth: api === "bluez5",
+	});
+}
+
+function updateMicrophoneStat(microphone: Wp.Endpoint) {
+	const api = microphone.get_pw_property("device.api");
+
+	setMicrophoneStat({
+		name: microphone.description,
+		muted: microphone.mute,
+		volume: Math.round(microphone.volume * 100),
+		api,
+		isBluetooth: api === "bluez5",
+	});
+}
+
+const defaultSpeaker = wp?.audio.defaultSpeaker;
+const defaultMicrophone = wp?.audio.defaultMicrophone;
+
+defaultSpeaker?.connect("notify::mute", updateSpeakerStat);
+defaultSpeaker?.connect("notify::volume", updateSpeakerStat);
+defaultSpeaker?.connect("notify::device-id", updateSpeakerStat);
+
+defaultMicrophone?.connect("notify::mute", updateMicrophoneStat);
+defaultMicrophone?.connect("notify::volume", updateMicrophoneStat);
+defaultMicrophone?.connect("notify::device-id", updateMicrophoneStat);
 
 export const [cpuUsage, setCpuUsage] = createState<CPUInfo>({
 	total: {
 		idle: 0,
 		total: 0,
 		percentage: 0,
-	}
+	},
 });
 
 export const [memoryUsage, setMemoryUsage] = createState<MemoryStat>({
-	available: 0,
-	total: 0,
-	usage: 0,
+	memory: {
+		available: "0B",
+		total: "0B",
+		free: "0B",
+		used: "0B",
+		usage: 0,
+	},
+	swap: {
+		total: "0B",
+		free: "0B",
+		used: "0B",
+		usage: 0,
+	},
 });
 
 /// A device name -> total network received / transmitted bytes per second
@@ -109,7 +165,8 @@ function getCoreInfo(core: string, coreData: number[]): CoreInfo | null {
 		return {
 			idle: deltaIdle,
 			total: deltaTotal,
-			percentage: ((deltaTotal - deltaIdle) / deltaTotal) * 100,
+			// percentage: ((deltaTotal - deltaIdle) / deltaTotal) * 100,
+			percentage: 100 * (1 - deltaIdle / deltaTotal),
 		};
 	}
 
@@ -148,46 +205,41 @@ async function recalculateCpuUsage() {
 }
 
 async function recalculateMemoryUsage() {
-	const memoryInfo = await readFileAsync("/proc/meminfo");
+	const memoryInfo = exec("free -h");
 
-	let total = null;
-	let available = null;
+	const [
+		,
+		totalRam,
+		usedRam,
+		freeRam,
+		sharedRam,
+		bufferCacheRam,
+		availableRam,
+	] = memoryInfo.split("\n")[1].split(/\s+/);
+	const [, totalSwap, usedSwap, freeSwap] = memoryInfo
+		.split("\n")[2]
+		.split(/\s+/);
 
-	for (const line of memoryInfo.split("\n")) {
-		if (!line) continue;
-
-		if (total && available) {
-			// we have everything
-			break;
-		}
-
-		let [label, rest] = line.split(":");
-		rest = rest.trim();
-
-		console.assert(
-			rest.endsWith("kB"),
-			`memory stat has unexpected unit ${rest}`,
-		);
-
-		rest = rest.slice(0, -3);
-		const amount = parseInt(rest);
-
-		if (label === "MemTotal") {
-			total = amount;
-		} else if (label === "MemAvailable") {
-			available = amount;
-		}
-	}
-
-	if (!total || !available) {
-		console.error("couldn't parse /proc/meminfo");
-		return;
-	}
-	// KiB
 	setMemoryUsage({
-		available, // KiB
-		total, // KiB
-		usage: (1 - available / total) * 100,
+		memory: {
+			available: availableRam.replace(",", "."),
+			total: totalRam.replace(",", "."),
+			free: freeRam.replace(",", "."),
+			used: usedRam.replace(",", "."),
+			usage:
+				(parseFloat(usedRam.replace(",", ".")) /
+					parseFloat(totalRam.replace(",", "."))) *
+				100,
+		},
+		swap: {
+			total: totalSwap.replace(",", "."),
+			used: usedSwap.replace(",", "."),
+			free: freeSwap.replace(",", "."),
+			usage:
+				(parseFloat(usedSwap.replace(",", ".")) /
+					parseFloat(totalSwap.replace(",", "."))) *
+				100,
+		},
 	});
 }
 
@@ -302,11 +354,7 @@ async function recalculateDiskUsage() {
 	const rawDiskData = exec("df -h /");
 
 	const [device, totalSize, usedSize, availableSize, usagePercent, path] =
-		rawDiskData
-			.split("\n")[1]
-			.split(" ")
-			.map((x) => x.trim())
-			.filter(Boolean);
+		rawDiskData.split("\n")[1].split(/\s+/g);
 
 	setDiskUsage({
 		device,

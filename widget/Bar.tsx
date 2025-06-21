@@ -2,7 +2,14 @@ import app from "ags/gtk4/app";
 import { Astal, Gtk, type Gdk } from "ags/gtk4";
 import { execAsync } from "ags/process";
 import { createPoll } from "ags/time";
-import { diskUsage } from "@/util/systemStats";
+// import { diskUsage } from "@/util/systemStats";
+import Cpu from "@/components/Cpu";
+import Disk from "@/components/Disk";
+import Memory from "@/components/Memory";
+import Battery from "@/components/Battery";
+import Time from "@/components/Time";
+import Microphone from "@/components/Microphone";
+import Speaker from "@/components/Speaker";
 
 export default async function Bar(gdkmonitor: Gdk.Monitor) {
 	const time = createPoll("", 1000, "date");
@@ -32,7 +39,15 @@ export default async function Bar(gdkmonitor: Gdk.Monitor) {
 					<label label="Welcome to AGS!" />
 				</button>
 
-				<label $type="center" label={diskUsage(d => d.totalSize)} />
+				<box $type="center">
+					<Cpu />
+					<Disk />
+					<Memory />
+					<Battery />
+					<Time />
+					<Microphone />
+					<Speaker />
+				</box>
 
 				<menubutton $type="end" hexpand halign={Gtk.Align.CENTER}>
 					<label label={time} />
