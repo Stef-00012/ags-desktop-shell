@@ -1,4 +1,4 @@
-This is my linux custom bar, to run it you need [`AGS`](https://github.com/aylur/ags).
+This is my linux custom bar, to run it you need [`AGS`](https://github.com/aylur/ags/tree/v3).
 
 Currently those plugins are required:
 - Battery
