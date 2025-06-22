@@ -5,7 +5,7 @@
 
 import Battery from "gi://AstalBattery";
 import Wp from "gi://AstalWp";
-// import Network from "gi://AstalNetwork"
+import Network from "gi://AstalNetwork";
 
 import { readFileAsync } from "ags/file";
 import { exec } from "ags/process";
@@ -22,7 +22,7 @@ import type {
 	MicrophoneStat,
 } from "@/types/systemStats";
 
-const UPDATE_INTERVAL = 2000;
+const UPDATE_INTERVAL = 1000;
 
 const battery = Battery.get_default();
 
@@ -65,7 +65,8 @@ export const [speakerStat, setSpeakerStat] = createState<SpeakerStat>({
 	muted: wp?.audio.defaultSpeaker.mute || false,
 	volume: Math.round((wp?.audio.defaultSpeaker.volume || 0) * 100),
 	api: wp?.audio.defaultSpeaker.get_pw_property("device.api") || "Unknown",
-	isBluetooth: wp?.audio.defaultSpeaker.get_pw_property("device.api") === "bluez5",
+	isBluetooth:
+		wp?.audio.defaultSpeaker.get_pw_property("device.api") === "bluez5",
 });
 
 export const [microphoneStat, setMicrophoneStat] = createState<MicrophoneStat>({
@@ -135,11 +136,12 @@ export const [memoryUsage, setMemoryUsage] = createState<MemoryStat>({
 	},
 });
 
-/// A device name -> total network received / transmitted bytes per second
 export const [networkUsage, setNetworkUsage] = createState<NetworkStat>({
 	rx: 0,
 	tx: 0,
 	interface: "Unknown",
+	isWifi: false,
+	isWired: false,
 });
 
 export const [diskUsage, setDiskUsage] = createState<DiskStat>({
@@ -286,44 +288,96 @@ function getMainNetworkInterface(): string | undefined {
 	return undefined;
 }
 
+// async function recalculateNetworkUsage() {
+// 	const netFile = await readFileAsync("/proc/net/dev");
+// 	const mainInterface = getMainNetworkInterface();
+
+// 	if (!mainInterface) return;
+
+// 	const lines = netFile.split("\n").slice(1, -1);
+// 	const [rxLabels, txLabels] = lines[0]
+// 		.split("|")
+// 		.slice(1)
+// 		.map((str) => str.trim().split(/\W+/));
+
+// 	const rxBytesIdx = rxLabels.indexOf("bytes");
+// 	const txBytesIdx = rxLabels.length + txLabels.indexOf("bytes");
+
+// 	const rawStat = lines
+// 		.slice(1)
+// 		.map((line) => line.trim().split(/\W+/))
+// 		.filter((data) => data[0] === mainInterface)[0];
+
+// 	const networkInfo: NetworkStat = {
+// 		rx: parseInt(rawStat[rxBytesIdx + 1]),
+// 		tx: parseInt(rawStat[txBytesIdx + 1]),
+// 		interface: mainInterface,
+// 	};
+
+// 	if (lastNetworkInfo && mainInterface === lastInterface) {
+// 		const newNetStats: NetworkStat = {
+// 			rx: (networkInfo.rx - lastNetworkInfo.rx) / (UPDATE_INTERVAL / 1000),
+// 			tx: (networkInfo.tx - lastNetworkInfo.tx) / (UPDATE_INTERVAL / 1000),
+// 			interface: mainInterface,
+// 		};
+
+// 		setNetworkUsage(newNetStats);
+// 	}
+
+// 	lastNetworkInfo = networkInfo;
+// 	lastInterface = mainInterface ?? null;
+// }
+
+/* using waybar-like code to calculate network usage */
 async function recalculateNetworkUsage() {
 	const netFile = await readFileAsync("/proc/net/dev");
 	const mainInterface = getMainNetworkInterface();
+	const network = Network.get_default();
 
 	if (!mainInterface) return;
 
-	const lines = netFile.split("\n").slice(1, -1);
-	const [rxLabels, txLabels] = lines[0]
-		.split("|")
-		.slice(1)
-		.map((str) => str.trim().split(/\W+/));
+	const lines = netFile.split("\n").slice(2);
+	for (const line of lines) {
+		if (!line.trim()) continue;
 
-	const rxBytesIdx = rxLabels.indexOf("bytes");
-	const txBytesIdx = rxLabels.length + txLabels.indexOf("bytes");
+		const [iface, ...fields] = line.trim().split(/:|\s+/).filter(Boolean);
 
-	const rawStat = lines
-		.slice(1)
-		.map((line) => line.trim().split(/\W+/))
-		.filter((data) => data[0] === mainInterface)[0];
+		if (iface === mainInterface) {
+			const rx = parseInt(fields[0], 10);
+			const tx = parseInt(fields[8], 10);
 
-	const networkInfo: NetworkStat = {
-		rx: parseInt(rawStat[rxBytesIdx + 1]),
-		tx: parseInt(rawStat[txBytesIdx + 1]),
-		interface: mainInterface,
-	};
+			const networkInfo: NetworkStat = {
+				rx,
+				tx,
+				interface: mainInterface,
+				isWifi: !!network.wifi,
+				isWired: !!network.wired,
+				ssid: network.wifi?.ssid,
+				frequency: network.wifi?.frequency,
+				strength: network.wifi?.strength,
+			};
 
-	if (lastNetworkInfo && mainInterface === lastInterface) {
-		const newNetStats: NetworkStat = {
-			rx: (networkInfo.rx - lastNetworkInfo.rx) / (UPDATE_INTERVAL / 1000),
-			tx: (networkInfo.tx - lastNetworkInfo.tx) / (UPDATE_INTERVAL / 1000),
-			interface: mainInterface,
-		};
+			if (lastNetworkInfo && mainInterface === lastInterface) {
+				const newNetStats: NetworkStat = {
+					rx: networkInfo.rx - lastNetworkInfo.rx,
+					tx: networkInfo.tx - lastNetworkInfo.tx,
+					interface: mainInterface,
+					isWifi: network.primary === Network.Primary.WIFI,
+					isWired: network.primary === Network.Primary.WIRED,
+					ssid: network.wifi?.ssid,
+					frequency: network.wifi?.frequency,
+					strength: network.wifi?.strength,
+				};
 
-		setNetworkUsage(newNetStats);
+				setNetworkUsage(newNetStats);
+			}
+
+			lastNetworkInfo = networkInfo;
+			lastInterface = mainInterface ?? null;
+
+			break;
+		}
 	}
-
-	lastNetworkInfo = networkInfo;
-	lastInterface = mainInterface ?? null;
 }
 
 export function formatNetworkThroughput(value: number, unitIndex = 0) {

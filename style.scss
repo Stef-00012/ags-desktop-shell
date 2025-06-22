@@ -2,6 +2,13 @@
 $fg-color: #{"@theme_fg_color"};
 $bg-color: #{"@theme_bg_color"};
 
+* {
+    font-size: 14px;
+    font-family: FiraCodeNerdFont, MapleMono, JetBrainsMono NFM, Font Awesome, sans-serif;
+    // font-weight: bold;
+    color: #fff;
+}
+
 window.Bar {
   background: transparent;
   color: $fg-color;

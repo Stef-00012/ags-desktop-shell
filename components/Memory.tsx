@@ -1,9 +1,10 @@
 import type { MemoryStat } from "@/types/systemStats";
+import { getMemoryIcon } from "@/util/icons";
 import { memoryUsage } from "@/util/systemStats";
 
 export default function Memory() {
     function formatLabel(usage: MemoryStat) {
-        return `${usage.memory.usage.toFixed(1)}%`
+        return `${getMemoryIcon()} ${usage.memory.usage.toFixed(1)}%`
     }
 
     function formatTooltip(usage: MemoryStat) {

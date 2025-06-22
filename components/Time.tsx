@@ -1,6 +1,7 @@
 import { Gdk, Gtk } from "ags/gtk4";
 import { createPoll } from "ags/time";
 import { createComputed, createState } from "ags";
+import { getClockIcon } from "@/util/icons";
 
 export default function Time() {
 	const [showAlt, setShowAlt] = createState<boolean>(false);
@@ -19,8 +20,8 @@ export default function Time() {
 			timeData.split(" | ");
 
 		return showAlt
-			? `${hours}:${minutes} ${ampm} | ${year}, ${monthDay} ${month}, ${day}`
-			: `${hours}:${minutes} ${ampm}`;
+			? `${getClockIcon("clock")} ${hours}:${minutes} ${ampm} ${getClockIcon("calendar")} ${year}, ${monthDay} ${month}, ${day}`
+			: `${getClockIcon("clock")} ${hours}:${minutes} ${ampm}`;
 	}
 
 	function leftClickHandler() {

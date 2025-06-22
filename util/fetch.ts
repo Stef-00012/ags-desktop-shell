@@ -208,19 +208,19 @@ export class URL {
             url = GLib.Uri.resolve_relative(
                 base instanceof URL ? base.toString() : base,
                 url instanceof URL ? url.toString() : url,
-                GLib.UriFlags.HAS_PASSWORD,
+                GLib.UriFlags.HAS_PASSWORD | GLib.UriFlags.ENCODED,
             )
         }
         this.uri = GLib.Uri.parse(
             url instanceof URL ? url.toString() : url,
-            GLib.UriFlags.HAS_PASSWORD,
+            GLib.UriFlags.HAS_PASSWORD | GLib.UriFlags.ENCODED,
         )
         this.searchParams = new URLSearchParams(this.uri.get_query() ?? "")
     }
 
     get href(): string {
         const uri = GLib.Uri.build_with_user(
-            GLib.UriFlags.HAS_PASSWORD,
+            GLib.UriFlags.HAS_PASSWORD | GLib.UriFlags.ENCODED,
             this.uri.get_scheme(),
             this.uri.get_user(),
             this.uri.get_password(),
@@ -381,13 +381,17 @@ export async function fetch(url: string | URL, { method, headers, body, flags }:
 
     const message = new Soup.Message({
         method: method || "GET",
-        uri: url instanceof URL ? url.uri : GLib.Uri.parse(url, GLib.UriFlags.NONE),
+        uri: url instanceof URL ? url.uri : GLib.Uri.parse(url, GLib.UriFlags.ENCODED),
     })
-
+    
     if (flags) message.set_flags(flags)
 
     if (headers) {
-        for (const [name, value] of headers.entries()) {
+        // for (const [name, value] of headers.entries()) {
+        //     message.request_headers.append(name, String(value))
+        // }
+
+        for (const [name, value] of Object.entries(headers)) {
             message.request_headers.append(name, String(value))
         }
     }

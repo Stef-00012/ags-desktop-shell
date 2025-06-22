@@ -1,5 +1,6 @@
 import type { BatteryStat } from "@/types/systemStats";
 import { formatSeconds } from "@/util/formatTime";
+import { getBatteryIcon } from "@/util/icons";
 import { batteryStat } from "@/util/systemStats";
 import { createState, createComputed } from "ags";
 import { Gdk, Gtk } from "ags/gtk4";
@@ -13,10 +14,10 @@ export default function Battery() {
 		return showAlt
 			? batteryStat.isCharging
 				? batteryStat.percentage === 100
-					? "Full"
-					: formatSeconds(batteryStat.timeToFull)
-				: formatSeconds(batteryStat.timeToEmpty)
-			: `${batteryStat.percentage}%`;
+					? `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} Full`
+					: `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${formatSeconds(batteryStat.timeToFull)}`
+				: `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${formatSeconds(batteryStat.timeToEmpty)}`
+			: `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${batteryStat.percentage}%`;
 	}
 
 	function transformTooltip(batteryStat: BatteryStat) {

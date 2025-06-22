@@ -43,14 +43,6 @@ export interface MusixmatchSearchResult {
 	trackId: string;
 }
 
-export interface LyricsOutput {
-	artist: string | undefined;
-	track: string | undefined;
-	album: string | undefined;
-	trackId: string;
-	lyrics: { source: string; lineSynced: string };
-}
-
 export interface FormattedLyric {
 	time: number;
 	text: string;
@@ -62,7 +54,28 @@ export interface SongData {
 	album: string;
 	trackId: string;
 	lyrics?: FormattedLyric[];
-	source: string;
+	source: "Musixmatch" | "lrclib.net"; // | "Netease";
 	length: number;
 	cover?: string;
+	volume: number;
+	position: number;
+	cached: boolean;
+}
+
+export interface LyricsOutput {
+	source: SongData["source"];
+	lineSynced: string;
+}
+
+export interface FormattedLyrics {
+	source: SongData["source"];
+	lyrics: FormattedLyric[];
+	trackId: string;
+}
+
+export interface ParsedLyrics {
+	previous: string[];
+	current: string;
+	next: string[];
+	source: SongData["source"];
 }

@@ -10,6 +10,8 @@ import Battery from "@/components/Battery";
 import Time from "@/components/Time";
 import Microphone from "@/components/Microphone";
 import Speaker from "@/components/Speaker";
+import Network from "@/components/Network";
+import Media from "@/components/Media";
 
 export default async function Bar(gdkmonitor: Gdk.Monitor) {
 	const time = createPoll("", 1000, "date");
@@ -47,14 +49,34 @@ export default async function Bar(gdkmonitor: Gdk.Monitor) {
 					<Time />
 					<Microphone />
 					<Speaker />
+					<Network />
+					<Media />
 				</box>
 
-				<menubutton $type="end" hexpand halign={Gtk.Align.CENTER}>
-					<label label={time} />
-					<popover>
-						<Gtk.Calendar />
-					</popover>
-				</menubutton>
+				<box $type="end">
+					{/* <menubutton hexpand halign={Gtk.Align.CENTER}>
+						<label label={time} />
+						<popover>
+							<Gtk.Calendar />
+						</popover>
+					</menubutton> */}
+					<label
+						label={[
+							"󰂎",
+							"󰁺",
+							"󰁻",
+							"󰁼",
+							"󰁽",
+							"󰁾",
+							"󰁿",
+							"󰂀",
+							"󰂁",
+							"󰂂",
+							"󰁹",
+							"󱘖"
+						].join("; ")}
+					/>
+				</box>
 			</centerbox>
 		</window>
 	);

@@ -1,9 +1,10 @@
 import type { CPUInfo } from "@/types/systemStats";
+import { getCPUIcon } from "@/util/icons";
 import { cpuUsage } from "@/util/systemStats";
 
 export default function Cpu() {
 	function transformLabel(usage: CPUInfo) {
-		return `${usage.total.percentage.toFixed(2)}%`;
+		return `${getCPUIcon()} ${usage.total.percentage.toFixed(2)}%`;
 	}
 
 	function transformTooltip(usage: CPUInfo) {

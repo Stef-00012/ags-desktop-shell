@@ -1,9 +1,10 @@
 import type { DiskStat } from "@/types/systemStats";
+import { getDiskIcon } from "@/util/icons";
 import { diskUsage } from "@/util/systemStats";
 
 export default function Disk() {
 	function transformLabel(usage: DiskStat) {
-		return usage.availableSize;
+		return `${getDiskIcon()} ${usage.availableSize}`;
 	}
 
 	function transformTooltip(usage: DiskStat) {

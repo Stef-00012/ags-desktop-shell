@@ -15,7 +15,19 @@ export type NetworkStat = {
 	rx: number;
 	tx: number;
 	interface: string;
-};
+	isWifi: boolean;
+	isWired: boolean;
+} & (
+	| {
+		isWifi: true;
+		ssid: string;
+		frequency: number;
+		strength: number;
+	}
+	| {
+		isWifi: false;
+	}
+);
 
 export type MemoryStat = {
 	memory: RAMStat;
