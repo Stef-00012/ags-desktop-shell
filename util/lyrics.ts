@@ -15,7 +15,7 @@ import Soup from "gi://Soup?version=3.0";
 import { timeout } from "ags/time";
 import { createState, onCleanup } from "ags";
 import type Mpris from "gi://AstalMpris";
-import { escapeMarkup } from "@/util/text";
+import { colorText, escapeMarkup } from "@/util/text";
 import { sapphire, tooltipCurrentSong } from "@/constants/colors";
 
 const MUSIXMATCH_TOKEN_PATH = "/tmp/musixmatch_token.json";
@@ -678,7 +678,7 @@ export function formatLyricsTooltip(
 	const nextLyrics =
 		data.next.length > 0 ? `\n${escapeMarkup(data.next.join("\n"))}` : "";
 
-	const tooltip = `${previousLyrics}<span color="${tooltipCurrentSong}"><i>${escapeMarkup(data.current)}</i></span>${nextLyrics}\n\n<span color="${sapphire}">[Source: ${song.source}]</span>`;
+	const tooltip = `${previousLyrics}${colorText(`<i>${escapeMarkup(data.current)}</i>`, tooltipCurrentSong)}${nextLyrics}\n\n${colorText(`[Source: ${song.source}]`, sapphire)}`;
 
 	return tooltip;
 }
