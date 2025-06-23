@@ -7,3 +7,8 @@ Currently those plugins are required:
 - WirePlumber
 
 to try it just run `ags run app.ts` using AGS v3
+
+# TO-DO
+- [ ] Show a popup for notifications
+- [ ] Show a notification center to list all previous notifications
+- [ ] Create an app launcher
