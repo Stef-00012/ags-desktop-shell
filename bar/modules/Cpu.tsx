@@ -1,8 +1,13 @@
 import type { CPUInfo } from "@/types/systemStats";
 import { getCPUIcon } from "@/util/icons";
 import { cpuUsage } from "@/util/systemStats";
+import type { Accessor } from "ags";
 
-export default function Cpu() {
+interface Props {
+	class?: string | Accessor<string>;
+}
+
+export default function Cpu({ class: className }: Props) {
 	function transformLabel(usage: CPUInfo) {
 		return `${getCPUIcon()} ${usage.total.percentage.toFixed(2)}%`;
 	}
@@ -21,7 +26,7 @@ export default function Cpu() {
 	}
 
 	return (
-		<box>
+		<box class={className}>
 			<label
 				label={cpuUsage(transformLabel)}
 				tooltipMarkup={cpuUsage(transformTooltip)}

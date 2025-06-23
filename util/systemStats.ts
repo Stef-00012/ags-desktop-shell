@@ -57,6 +57,8 @@ function updateBatteryStat(bat: Battery.Device) {
 battery.connect("notify::charging", updateBatteryStat);
 battery.connect("notify::percentage", updateBatteryStat);
 battery.connect("notify::energy-rate", updateBatteryStat);
+battery.connect("notify::time-to-empty", updateBatteryStat);
+battery.connect("notify::time-to-full", updateBatteryStat);
 
 const wp = Wp.get_default();
 
@@ -168,7 +170,6 @@ function getCoreInfo(core: string, coreData: number[]): CoreInfo | null {
 		return {
 			idle: deltaIdle,
 			total: deltaTotal,
-			// percentage: ((deltaTotal - deltaIdle) / deltaTotal) * 100,
 			percentage: 100 * (1 - deltaIdle / deltaTotal),
 		};
 	}
@@ -288,47 +289,6 @@ function getMainNetworkInterface(): string | undefined {
 	return undefined;
 }
 
-// async function recalculateNetworkUsage() {
-// 	const netFile = await readFileAsync("/proc/net/dev");
-// 	const mainInterface = getMainNetworkInterface();
-
-// 	if (!mainInterface) return;
-
-// 	const lines = netFile.split("\n").slice(1, -1);
-// 	const [rxLabels, txLabels] = lines[0]
-// 		.split("|")
-// 		.slice(1)
-// 		.map((str) => str.trim().split(/\W+/));
-
-// 	const rxBytesIdx = rxLabels.indexOf("bytes");
-// 	const txBytesIdx = rxLabels.length + txLabels.indexOf("bytes");
-
-// 	const rawStat = lines
-// 		.slice(1)
-// 		.map((line) => line.trim().split(/\W+/))
-// 		.filter((data) => data[0] === mainInterface)[0];
-
-// 	const networkInfo: NetworkStat = {
-// 		rx: parseInt(rawStat[rxBytesIdx + 1]),
-// 		tx: parseInt(rawStat[txBytesIdx + 1]),
-// 		interface: mainInterface,
-// 	};
-
-// 	if (lastNetworkInfo && mainInterface === lastInterface) {
-// 		const newNetStats: NetworkStat = {
-// 			rx: (networkInfo.rx - lastNetworkInfo.rx) / (UPDATE_INTERVAL / 1000),
-// 			tx: (networkInfo.tx - lastNetworkInfo.tx) / (UPDATE_INTERVAL / 1000),
-// 			interface: mainInterface,
-// 		};
-
-// 		setNetworkUsage(newNetStats);
-// 	}
-
-// 	lastNetworkInfo = networkInfo;
-// 	lastInterface = mainInterface ?? null;
-// }
-
-/* using waybar-like code to calculate network usage */
 async function recalculateNetworkUsage() {
 	const netFile = await readFileAsync("/proc/net/dev");
 	const mainInterface = getMainNetworkInterface();

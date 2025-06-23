@@ -1,6 +1,6 @@
 // https://gitlab.gnome.org/GNOME/gtk/-/blob/gtk-3-24/gtk/theme/Adwaita/_colors-public.scss
-$fg-color: #{"@theme_fg_color"};
-$bg-color: #{"@theme_bg_color"};
+// $fg-color: #{"@theme_fg_color"};
+// $bg-color: #{"@theme_bg_color"};
 
 $rosewater-color: #f4dbd6;
 $flamingo-color: #f0c6c6;
@@ -27,20 +27,18 @@ $mantle-color: #1e2030;
 $crust-color: #181926;
 
 * {
+    font-family: Lexend, FiraCodeNerdFont, MapleMono, JetBrainsMono NFM, Font Awesome, sans-serif;
     font-size: 14px;
-    font-family: FiraCodeNerdFont, MapleMono, JetBrainsMono NFM, Font Awesome, sans-serif;
     color: $text-color;
 }
 
 window.Bar {
-    background: transparent;
-    color: $fg-color;
+    background: $base-color;
+    color: $text-color;
     font-weight: bold;
 
-    > centerbox {
-        background: $bg-color;
+    >centerbox {
         border-radius: 10px;
-        margin: 8px;
     }
 
     tooltip {
@@ -55,5 +53,38 @@ window.Bar {
     button {
         border-radius: 8px;
         margin: 2px;
+    }
+
+    .resources,
+    .battery,
+    .media-module,
+    .audio,
+    .misc,
+    .microphone,
+    .speaker {
+        margin: 6px;
+        border-radius: 8px;
+        padding: 8px;
+        background-color: $mantle-color;
+        margin-right: 2px;
+
+        .cpu-module,
+        .disk-module,
+        .speaker-module,
+        .network-module {
+            margin-right: 12px;
+        }
+    }
+
+    .misc {
+        margin-right: 6px;
+    }
+
+    .time,
+    .lyrics-module {
+        margin: 6px;
+        border-radius: 8px;
+        padding: 8px;
+        background-color: $mantle-color;
     }
 }

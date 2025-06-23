@@ -22,4 +22,4 @@ export const base = "#24273a";
 export const mantle = "#1e2030";
 export const crust = "#181926";
 
-export const tooltipCurrentSong = mauvre
+export const tooltipCurrentSong = mauvre;

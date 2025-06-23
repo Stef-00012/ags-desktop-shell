@@ -4,8 +4,11 @@ import {
 	clockIcons,
 	cpuIcon,
 	diskIcon,
+	lyricsIcons,
+	mediaIcons,
 	memoryIcon,
 	networkIcons,
+	notificationIcons,
 } from "@/constants/icons";
 
 export function getBatteryIcon(percent: number, isCharging?: boolean): string {
@@ -80,6 +83,23 @@ export function getMicrohponeIcon(isMuted: boolean): string {
 	if (isMuted) return audioIcons.microphoneMuted;
 
 	return audioIcons.microphone;
+}
+
+export function getMediaIcon(isPlaying: boolean): string {
+	return isPlaying ? mediaIcons.playing : mediaIcons.notPlaying;
+}
+
+export function getLyricsIcon(isAvailable: boolean): string {
+	return isAvailable ? lyricsIcons.available : lyricsIcons.unavailable;
+}
+
+export function getNotificationIcon(
+	hasNotifications: boolean,
+	isDnd: boolean,
+): string {
+	if (hasNotifications)
+		return isDnd ? notificationIcons.dndNotif : notificationIcons.notif;
+	return isDnd ? notificationIcons.dndNone : notificationIcons.none;
 }
 
 export function getCPUIcon(): string {

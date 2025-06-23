@@ -4,8 +4,13 @@ import { getBatteryIcon } from "@/util/icons";
 import { batteryStat } from "@/util/systemStats";
 import { createState, createComputed } from "ags";
 import { Gdk, Gtk } from "ags/gtk4";
+import type { Accessor } from "ags";
 
-export default function Battery() {
+interface Props {
+	class?: string | Accessor<string>;
+}
+
+export default function Battery({ class: className }: Props) {
 	const [showAlt, setShowAlt] = createState<boolean>(false);
 
 	const label = createComputed([showAlt, batteryStat], transformLabel);
@@ -33,17 +38,17 @@ export default function Battery() {
 		].join("\n");
 	}
 
-    function leftClickHandler() {
-        setShowAlt((prev) => !prev)
-    }
+	function leftClickHandler() {
+		setShowAlt((prev) => !prev);
+	}
 
 	return (
-		<box>
+		<box class={className} cursor={Gdk.Cursor.new_from_name("pointer", null)}>
 			<box>
-                <Gtk.GestureClick
-                    button={Gdk.BUTTON_PRIMARY}
-                    onPressed={leftClickHandler}
-                />
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_PRIMARY}
+					onPressed={leftClickHandler}
+				/>
 
 				<label label={label} tooltipMarkup={batteryStat(transformTooltip)} />
 			</box>

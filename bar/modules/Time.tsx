@@ -1,9 +1,13 @@
 import { Gdk, Gtk } from "ags/gtk4";
 import { createPoll } from "ags/time";
-import { createComputed, createState } from "ags";
+import { createComputed, createState, type Accessor } from "ags";
 import { getClockIcon } from "@/util/icons";
 
-export default function Time() {
+interface Props {
+	class?: string | Accessor<string>;
+}
+
+export default function Time({ class: className }: Props) {
 	const [showAlt, setShowAlt] = createState<boolean>(false);
 	const [isPopoverOpen, setIsPopoverOpen] = createState<boolean>(false);
 	let popover: Gtk.Popover | null = null;
@@ -15,7 +19,7 @@ export default function Time() {
 
 	const label = createComputed([showAlt, timeData], transformLabel);
 
-    function transformLabel(showAlt: boolean, timeData: string) {
+	function transformLabel(showAlt: boolean, timeData: string) {
 		const [day, month, monthDay, year, hours, minutes, ampm] =
 			timeData.split(" | ");
 
@@ -41,7 +45,7 @@ export default function Time() {
 	}
 
 	return (
-		<box halign={Gtk.Align.CENTER}>
+		<box class={className} cursor={Gdk.Cursor.new_from_name("pointer", null)}>
 			<Gtk.GestureClick
 				button={Gdk.BUTTON_PRIMARY}
 				onPressed={leftClickHandler}

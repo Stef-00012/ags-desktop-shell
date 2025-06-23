@@ -30,16 +30,33 @@ export const networkIcons = {
 };
 
 export const audioIcons = {
-    speaker: [
-        "", // 0-30%
-        "", // 30-65%
-        "" // 65-150%
-    ],
-    bluetooth: "",
-    speakerMuted: "",
-    microphone: "",
-    microphoneMuted: "",
-}
+	speaker: [
+		"", // 0-30%
+		"", // 30-65%
+		" ", // 65-150%
+	],
+	bluetooth: "",
+	speakerMuted: " ",
+	microphone: "",
+	microphoneMuted: " ",
+};
+
+export const mediaIcons = {
+	playing: "󰎇",
+	notPlaying: "󰎊",
+};
+
+export const lyricsIcons = {
+	available: "󰲹",
+	unavailable: "󰐓",
+};
+
+export const notificationIcons = {
+	none: "",
+	notif: "<span foreground='red'><sup></sup></span>",
+	dndNone: "",
+	dndNotif: "<span foreground='red'><sup></sup></span>",
+};
 
 export const clockIcons = {
 	clock: "",

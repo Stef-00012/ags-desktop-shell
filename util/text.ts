@@ -1,30 +1,30 @@
 import { createState } from "ags";
 
 const [currentMarquee, setCurrentMarquee] = createState<{
-    text: string;
-    index: number;
+	text: string;
+	index: number;
 }>({
-    text: "",
-    index: 0,
-})
+	text: "",
+	index: 0,
+});
 
 export function marquee(text: string, width: number): string {
-    if (text.length <= width) return text;
+	if (text.length <= width) return text;
 
-    const marqueeData = currentMarquee.get();
+	const marqueeData = currentMarquee.get();
 
-    if (marqueeData.text !== text) {
-        setCurrentMarquee({
-            text,
-            index: 0,
-        });
-    }
+	if (marqueeData.text !== text) {
+		setCurrentMarquee({
+			text,
+			index: 0,
+		});
+	}
 
 	if (text.length < marqueeData.index) {
 		setCurrentMarquee({
-            text,
-            index: 0,
-        })
+			text,
+			index: 0,
+		});
 	}
 
 	const dividedText = `${text}  `;
@@ -33,56 +33,59 @@ export function marquee(text: string, width: number): string {
 		dividedText.slice(0, marqueeData.index);
 
 	setCurrentMarquee((marqueeData) => {
-        return {
-            text: marqueeData.text,
-            index: (marqueeData.index + 1) % dividedText.length
-        }
-    });
+		return {
+			text: marqueeData.text,
+			index: (marqueeData.index + 1) % dividedText.length,
+		};
+	});
 
 	return marqueeText.slice(0, width);
 }
 
 export function centerText(inputString: string, returnLength?: false): string;
 export function centerText(inputString: string, returnLength: true): number;
-export function centerText(inputString: string, returnLength?: boolean): number | string {
-    const lines = inputString.split("\n");
+export function centerText(
+	inputString: string,
+	returnLength?: boolean,
+): number | string {
+	const lines = inputString.split("\n");
 
-    let maxLength = 0;
+	let maxLength = 0;
 
-    for (const line of lines) {
-        const textContent = line.replace(/<[^>]*>/g, "");
+	for (const line of lines) {
+		const textContent = line.replace(/<[^>]*>/g, "");
 
-        if (textContent.length > maxLength) maxLength = textContent.length;
-    }
+		if (textContent.length > maxLength) maxLength = textContent.length;
+	}
 
-    if (returnLength) return maxLength;
+	if (returnLength) return maxLength;
 
-    const centeredLines = lines.map((line) => {
-        const textContent = line.replace(/<[^>]*>/g, "");
-        const paddingBefore = " ".repeat(
-            Math.floor((maxLength - textContent.length) / 2),
-        );
-        const paddingAfter = " ".repeat(
-            Math.ceil((maxLength - textContent.length) / 2),
-        );
-        const centeredLine = `${paddingBefore}${textContent}${paddingAfter}`;
+	const centeredLines = lines.map((line) => {
+		const textContent = line.replace(/<[^>]*>/g, "");
+		const paddingBefore = " ".repeat(
+			Math.floor((maxLength - textContent.length) / 2),
+		);
+		const paddingAfter = " ".repeat(
+			Math.ceil((maxLength - textContent.length) / 2),
+		);
+		const centeredLine = `${paddingBefore}${textContent}${paddingAfter}`;
 
-        const htmlTagMatch = line.match(/<[^>]*>/);
+		const htmlTagMatch = line.match(/<[^>]*>/);
 
-        if (htmlTagMatch) {
-            const paddedContent = `${paddingBefore}${textContent}${paddingAfter}`;
-            
-            return line.replace(textContent, paddedContent);
-        }
+		if (htmlTagMatch) {
+			const paddedContent = `${paddingBefore}${textContent}${paddingAfter}`;
 
-        return centeredLine;
-    });
+			return line.replace(textContent, paddedContent);
+		}
 
-    return centeredLines.join("\n");
+		return centeredLine;
+	});
+
+	return centeredLines.join("\n");
 }
 
 export function colorText(text: string, color: string): string {
-    return `<span color="${color}">${text}</span>`;
+	return `<span color="${color}">${text}</span>`;
 }
 
 export function escapeMarkup(text: string): string {

@@ -19,14 +19,14 @@ export type NetworkStat = {
 	isWired: boolean;
 } & (
 	| {
-		isWifi: true;
-		ssid: string;
-		frequency: number;
-		strength: number;
-	}
+			isWifi: true;
+			ssid: string;
+			frequency: number;
+			strength: number;
+	  }
 	| {
-		isWifi: false;
-	}
+			isWifi: false;
+	  }
 );
 
 export type MemoryStat = {
@@ -75,14 +75,14 @@ export type MicrophoneStat = {
 	name: string;
 	muted: boolean;
 	volume: number;
-    api: string;
-    isBluetooth: boolean;
+	api: string;
+	isBluetooth: boolean;
 };
 
 export type SpeakerStat = {
 	name: string;
 	muted: boolean;
 	volume: number;
-    api: string;
-    isBluetooth: boolean;
+	api: string;
+	isBluetooth: boolean;
 };
