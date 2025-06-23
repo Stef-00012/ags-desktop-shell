@@ -1,7 +1,9 @@
-import type { SongData } from "@/types/lyrics";
 import { formatLyricsTooltip, parseLyricsData, useSong } from "@/util/lyrics";
-import Mpris from "gi://AstalMpris";
+import { getLyricsIcon, getMediaIcon } from "@/util/icons";
 import { escapeMarkup, marquee } from "@/util/text";
+import type { SongData } from "@/types/lyrics";
+import { Gdk, Gtk } from "ags/gtk4";
+import Mpris from "gi://AstalMpris";
 import {
 	createBinding,
 	createComputed,
@@ -9,8 +11,6 @@ import {
 	jsx,
 	type Accessor,
 } from "ags";
-import { Gdk, Gtk } from "ags/gtk4";
-import { getLyricsIcon, getMediaIcon } from "@/util/icons";
 
 interface Props {
 	class?: string | Accessor<string>;

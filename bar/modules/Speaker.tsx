@@ -1,10 +1,10 @@
-import { audioIcons } from "@/constants/icons";
 import type { SpeakerStat } from "@/types/systemStats";
-import { getSpeakerIcon } from "@/util/icons";
 import { speakerStat } from "@/util/systemStats";
+import { audioIcons } from "@/constants/icons";
+import { getSpeakerIcon } from "@/util/icons";
+import type { Accessor } from "ags";
 import { Gtk } from "ags/gtk4";
 import Wp from "gi://AstalWp";
-import type { Accessor } from "ags";
 
 interface Props {
 	class?: string | Accessor<string>;

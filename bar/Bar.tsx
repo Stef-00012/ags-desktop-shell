@@ -1,15 +1,15 @@
-import app from "ags/gtk4/app";
-import { Astal, type Gdk } from "ags/gtk4";
-import Cpu from "@/bar/modules/Cpu";
-import Disk from "@/bar/modules/Disk";
-import Memory from "@/bar/modules/Memory";
-import Battery from "@/bar/modules/Battery";
-import Time from "@/bar/modules/Time";
+import Notifications from "@/bar/modules/Notifications";
 import Microphone from "@/bar/modules/Microphone";
+import Battery from "@/bar/modules/Battery";
 import Speaker from "@/bar/modules/Speaker";
 import Network from "@/bar/modules/Network";
+import { Astal, type Gdk } from "ags/gtk4";
+import Memory from "@/bar/modules/Memory";
 import Media from "@/bar/modules/Media";
-import Notifications from "@/bar/modules/Notifications";
+import Disk from "@/bar/modules/Disk";
+import Time from "@/bar/modules/Time";
+import Cpu from "@/bar/modules/Cpu";
+import app from "ags/gtk4/app";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;

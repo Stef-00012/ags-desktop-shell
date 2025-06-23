@@ -1,13 +1,13 @@
 import {
-	audioIcons,
-	batteryIcons,
-	clockIcons,
 	cpuIcon,
 	diskIcon,
-	lyricsIcons,
+	audioIcons,
 	mediaIcons,
+	clockIcons,
 	memoryIcon,
+	lyricsIcons,
 	networkIcons,
+	batteryIcons,
 	notificationIcons,
 } from "@/constants/icons";
 

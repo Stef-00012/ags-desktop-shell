@@ -1,6 +1,6 @@
-import Notifd from "gi://AstalNotifd";
 import { createBinding, type Accessor } from "ags";
 import { getNotificationIcon } from "@/util/icons";
+import Notifd from "gi://AstalNotifd";
 import { Gdk, Gtk } from "ags/gtk4";
 
 interface Props {

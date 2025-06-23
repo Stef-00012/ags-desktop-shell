@@ -1,6 +1,6 @@
 import type { CPUInfo } from "@/types/systemStats";
-import { getCPUIcon } from "@/util/icons";
 import { cpuUsage } from "@/util/systemStats";
+import { getCPUIcon } from "@/util/icons";
 import type { Accessor } from "ags";
 
 interface Props {

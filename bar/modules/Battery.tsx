@@ -1,10 +1,10 @@
 import type { BatteryStat } from "@/types/systemStats";
-import { formatSeconds } from "@/util/formatTime";
-import { getBatteryIcon } from "@/util/icons";
-import { batteryStat } from "@/util/systemStats";
 import { createState, createComputed } from "ags";
-import { Gdk, Gtk } from "ags/gtk4";
+import { formatSeconds } from "@/util/formatTime";
+import { batteryStat } from "@/util/systemStats";
+import { getBatteryIcon } from "@/util/icons";
 import type { Accessor } from "ags";
+import { Gdk, Gtk } from "ags/gtk4";
 
 interface Props {
 	class?: string | Accessor<string>;

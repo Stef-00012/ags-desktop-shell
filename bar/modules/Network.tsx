@@ -1,6 +1,6 @@
+import { formatNetworkThroughput, networkUsage } from "@/util/systemStats";
 import type { NetworkStat } from "@/types/systemStats";
 import { getNetworkIcon } from "@/util/icons";
-import { formatNetworkThroughput, networkUsage } from "@/util/systemStats";
 import type { Accessor } from "ags";
 
 interface Props {

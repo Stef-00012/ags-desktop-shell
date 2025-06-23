@@ -1,6 +1,6 @@
 import type { MemoryStat } from "@/types/systemStats";
-import { getMemoryIcon } from "@/util/icons";
 import { memoryUsage } from "@/util/systemStats";
+import { getMemoryIcon } from "@/util/icons";
 import type { Accessor } from "ags";
 
 interface Props {

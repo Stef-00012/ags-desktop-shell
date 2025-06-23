@@ -1,7 +1,7 @@
-import { Gdk, Gtk } from "ags/gtk4";
-import { createPoll } from "ags/time";
 import { createComputed, createState, type Accessor } from "ags";
 import { getClockIcon } from "@/util/icons";
+import { createPoll } from "ags/time";
+import { Gdk, Gtk } from "ags/gtk4";
 
 interface Props {
 	class?: string | Accessor<string>;

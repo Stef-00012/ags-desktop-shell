@@ -1,6 +1,6 @@
 import type { DiskStat } from "@/types/systemStats";
-import { getDiskIcon } from "@/util/icons";
 import { diskUsage } from "@/util/systemStats";
+import { getDiskIcon } from "@/util/icons";
 import type { Accessor } from "ags";
 
 interface Props {

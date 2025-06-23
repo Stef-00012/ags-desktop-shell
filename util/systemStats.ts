@@ -3,23 +3,22 @@
 	https://github.com/Mabi19/desktop-shell/blob/d70189b2355a4173a8ea6d5699f340fe73497945/utils/system-stats.ts
 */
 
-import Battery from "gi://AstalBattery";
-import Wp from "gi://AstalWp";
-import Network from "gi://AstalNetwork";
-
 import { readFileAsync } from "ags/file";
-import { exec } from "ags/process";
+import Network from "gi://AstalNetwork";
+import Battery from "gi://AstalBattery";
 import { interval } from "ags/time";
+import { exec } from "ags/process";
 import { createState } from "ags";
+import Wp from "gi://AstalWp";
 import type {
-	CoreInfo,
-	CPUInfo,
+	MicrophoneStat,
+	SpeakerStat,
+	BatteryStat,
 	NetworkStat,
 	MemoryStat,
+	CoreInfo,
 	DiskStat,
-	BatteryStat,
-	SpeakerStat,
-	MicrophoneStat,
+	CPUInfo,
 } from "@/types/systemStats";
 
 const UPDATE_INTERVAL = 1000;

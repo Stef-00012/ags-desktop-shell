@@ -1,8 +1,8 @@
-import app from "ags/gtk4/app";
-import style from "./style.scss";
-import Bar from "@/bar/Bar";
 import { createBinding, For } from "ags";
 import type { Gtk } from "ags/gtk4";
+import style from "./style.scss";
+import app from "ags/gtk4/app";
+import Bar from "@/bar/Bar";
 
 app.start({
 	css: style,

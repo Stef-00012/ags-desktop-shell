@@ -1,22 +1,22 @@
 import { fetch, Headers, URL, URLSearchParams } from "@/util/fetch";
-import type {
-	FormattedLyric,
-	FormattedLyrics,
-	LyricsOutput,
-	MusixmatchSearchResult,
-	ParsedLyrics,
-	SongData,
-	Sources,
-	TokenData,
-	UsertokenResponse,
-} from "@/types/lyrics";
+import { sapphire, tooltipCurrentSong } from "@/constants/colors";
+import { colorText, escapeMarkup } from "@/util/text";
 import { readFile, writeFile } from "ags/file";
-import Soup from "gi://Soup?version=3.0";
-import { timeout } from "ags/time";
 import { createState, onCleanup } from "ags";
 import type Mpris from "gi://AstalMpris";
-import { colorText, escapeMarkup } from "@/util/text";
-import { sapphire, tooltipCurrentSong } from "@/constants/colors";
+import Soup from "gi://Soup?version=3.0";
+import { timeout } from "ags/time";
+import type {
+	MusixmatchSearchResult,
+	UsertokenResponse,
+	FormattedLyrics,
+	FormattedLyric,
+	LyricsOutput,
+	ParsedLyrics,
+	TokenData,
+	SongData,
+	Sources,
+} from "@/types/lyrics";
 
 const MUSIXMATCH_TOKEN_PATH = "/tmp/musixmatch_token.json";
 
