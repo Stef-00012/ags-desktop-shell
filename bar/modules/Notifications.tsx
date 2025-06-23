@@ -1,4 +1,4 @@
-import { createBinding, type Accessor } from "ags";
+import { createBinding, createComputed, type Accessor } from "ags";
 import { getNotificationIcon } from "@/util/icons";
 import Notifd from "gi://AstalNotifd";
 import { Gdk, Gtk } from "ags/gtk4";
@@ -11,9 +11,12 @@ export default function Notifications({ class: className }: Props) {
 	const notifd = Notifd.get_default();
 
 	const notifs = createBinding(notifd, "notifications");
+	const dontDisturb = createBinding(notifd, "dontDisturb");
 
-	function transformLabel(notifications: Notifd.Notification[]) {
-		return `${getNotificationIcon(notifications.length > 0, notifd.dontDisturb)} ${notifications.length}`;
+	const notifLabel = createComputed([notifs, dontDisturb]);
+
+	function transformLabel([notifications, dontDisturb]: [Notifd.Notification[], boolean]) {
+		return `${getNotificationIcon(notifications.length > 0, dontDisturb)} ${notifications.length}`;
 	}
 
 	function handleLeftClick() {
@@ -49,7 +52,7 @@ export default function Notifications({ class: className }: Props) {
 				onPressed={handleMiddleClick}
 			/>
 
-			<label label={notifs(transformLabel)} useMarkup />
+			<label label={notifLabel(transformLabel)} useMarkup />
 		</box>
 	);
 }

@@ -17,11 +17,11 @@ export const batteryIcons = {
 
 export const networkIcons = {
 	wifiIcons: [
-		"󰤯", // 0-20
-		"󰤟", // 20-40
-		"󰤢", // 40-60
-		"󰤥", // 60-80
-		"󰤨", // 80-100
+		"󰤯 ", // 0-20
+		"󰤟 ", // 20-40
+		"󰤢 ", // 40-60
+		"󰤥 ", // 60-80
+		"󰤨 ", // 80-100
 	],
 	ethernetIcon: "󰈁",
 	wifiDisconnected: "󰤮",
@@ -32,37 +32,37 @@ export const networkIcons = {
 export const audioIcons = {
 	speaker: [
 		"", // 0-30%
-		"", // 30-65%
-		" ", // 65-150%
+		" ", // 30-65%
+		"  ", // 65-150%
 	],
 	bluetooth: "",
 	speakerMuted: " ",
-	microphone: "",
-	microphoneMuted: " ",
+	microphone: " ",
+	microphoneMuted: "  ",
 };
 
 export const mediaIcons = {
-	playing: "󰎇",
-	notPlaying: "󰎊",
+	playing: "󰎇 ",
+	notPlaying: "󰎊 ",
 };
 
 export const lyricsIcons = {
-	available: "󰲹",
-	unavailable: "󰐓",
+	available: "󰲹 ",
+	unavailable: "󰐓 ",
 };
 
 export const notificationIcons = {
-	none: "",
-	notif: "<span foreground='red'><sup></sup></span>",
-	dndNone: "",
-	dndNotif: "<span foreground='red'><sup></sup></span>",
+	none: " ",
+	notif: "<span foreground='red'><sup></sup></span> ",
+	dndNone: "  ",
+	dndNotif: "<span foreground='red'><sup></sup></span> ",
 };
 
 export const clockIcons = {
-	clock: "",
-	calendar: "",
+	clock: " ",
+	calendar: "  ",
 };
 
-export const cpuIcon = "";
-export const diskIcon = "";
-export const memoryIcon = "";
+export const cpuIcon = " ";
+export const diskIcon = " ";
+export const memoryIcon = " ";
