@@ -1,12 +1,11 @@
 import type { SongData } from "@/types/lyrics";
 import { formatLyricsTooltip, parseLyricsData, useSong } from "@/util/lyrics";
 import Mpris from "gi://AstalMpris";
-import { centerText, escapeMarkup, marquee } from "@/util/text";
+import { escapeMarkup, marquee } from "@/util/text";
 import {
 	createBinding,
 	createComputed,
 	createRoot,
-	getScope,
 	jsx,
 	type Accessor,
 } from "ags";
