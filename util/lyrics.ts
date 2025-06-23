@@ -4,7 +4,6 @@ import type {
 	FormattedLyric,
 	FormattedLyrics,
 	LyricsOutput,
-	Metadata,
 	MusixmatchSearchResult,
 	ParsedLyrics,
 	SongData,
@@ -15,24 +14,16 @@ import type {
 import { readFile, writeFile } from "ags/file";
 import Soup from "gi://Soup?version=3.0";
 import { timeout } from "ags/time";
-import { createState } from "ags";
+import {
+	createBinding,
+	createState,
+	onCleanup,
+} from "ags";
 import Mpris from "gi://AstalMpris";
 import { centerText, escapeMarkup } from "./text";
+import { tooltipCurrentSong } from "@/constants/colors";
 
 const spotify = Mpris.Player.new("spotify");
-
-export const [currentSong, setCurrentSong] = createState<SongData>({
-	artist: spotify.artist,
-	track: spotify.title,
-	album: spotify.album,
-	trackId: "__unknown__",
-	source: "Musixmatch",
-	length: spotify.length,
-	volume: spotify.volume,
-	position: spotify.position,
-	cached: false,
-});
-const [isFetching, setIsFetching] = createState<boolean>(false);
 
 const MUSIXMATCH_TOKEN_PATH = "/tmp/musixmatch_token.json";
 
@@ -114,22 +105,22 @@ async function getMusixmatchUsertoken(
 }
 
 async function _searchLyricsMusixmatch(
-	metadata: Metadata,
+	player: Mpris.Player,
 	tokenData: TokenData,
 ): Promise<MusixmatchSearchResult | null> {
-	if (!metadata || !tokenData) return null;
+	if (!player.available || !tokenData) return null;
 
-	const duration = metadata.length ? metadata.length / 1000 : null;
+	const duration = player.length / 1000;
 
 	const searchParams = new URLSearchParams({
 		app_id: "web-desktop-app-v1.0",
 		usertoken: tokenData.usertoken,
-		q_track: metadata.track || "",
-		q_artist: metadata.artist || "",
-		q_album: metadata.album || "",
+		q_track: player.title,
+		q_artist: player.artist,
+		q_album: player.album,
 		page_size: "20",
 		page: "1",
-		q_duration: duration?.toString() || "",
+		q_duration: duration.toString(),
 		s_track_rating: "asc",
 	});
 
@@ -159,10 +150,10 @@ async function _searchLyricsMusixmatch(
 		const track = data?.message?.body?.track_list?.find(
 			(listItem: any) =>
 				listItem.track.track_name?.toLowerCase() ===
-					metadata.track?.toLowerCase() &&
+					player.title.toLowerCase() &&
 				listItem.track.artist_name
 					?.toLowerCase()
-					.includes(metadata.artist?.toLowerCase()),
+					.includes(player.artist.toLowerCase()),
 		);
 
 		if (!track) return null;
@@ -227,14 +218,14 @@ async function _fetchLineSyncedLyricsMusixmatch(
 }
 
 async function _fetchLyricsMusixmatch(
-	metadata: Metadata,
+	player: Mpris.Player,
 	tokenData: TokenData,
 	trackId: string,
 	commonTrackId: string,
 	hasLineSyncedLyrics: boolean,
 ): Promise<string | null> {
 	if (
-		!metadata ||
+		!player.available ||
 		(!commonTrackId && !trackId) ||
 		!tokenData ||
 		!hasLineSyncedLyrics
@@ -300,100 +291,102 @@ async function _fetchLyricsMusixmatch(
 // 	}
 // }
 
-async function _fetchLyricsNetease(
-	metadata: Metadata,
-	trackId: string,
-): Promise<string | null> {
-	if (!metadata || !trackId) return null;
+// async function _fetchLyricsNetease(
+// 	metadata: Metadata,
+// 	trackId: string,
+// ): Promise<string | null> {
+// 	if (!metadata || !trackId) return null;
 
-	const searchParams: URLSearchParams = new URLSearchParams({
-		id: trackId,
-	});
+// 	const searchParams: URLSearchParams = new URLSearchParams({
+// 		id: trackId,
+// 	});
 
-	const url = new URL(
-		`https://music.xianqiao.wang/neteaseapiv2/lyric?${searchParams}`,
-	);
+// 	const url = new URL(
+// 		`https://music.xianqiao.wang/neteaseapiv2/lyric?${searchParams}`,
+// 	);
 
-	try {
-		const res = await fetch(url, {
-			headers: {
-				"User-Agent":
-					"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/93.0",
-			},
-		});
+// 	try {
+// 		const res = await fetch(url, {
+// 			headers: {
+// 				"User-Agent":
+// 					"Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:93.0) Gecko/20100101 Firefox/93.0",
+// 			},
+// 		});
 
-		if (!res.ok) return null;
+// 		if (!res.ok) return null;
 
-		const data = await res.json();
+// 		const data = await res.json();
 
-		let lyrics = data?.lrc?.lyric;
+// 		let lyrics = data?.lrc?.lyric;
 
-		if (!lyrics) return null;
+// 		if (!lyrics) return null;
 
-		lyrics = _parseNeteaseLyrics(lyrics);
+// 		lyrics = _parseNeteaseLyrics(lyrics);
 
-		return lyrics;
-	} catch (e) {
-		return null;
-	}
-}
+// 		return lyrics;
+// 	} catch (e) {
+// 		return null;
+// 	}
+// }
 
-function _parseNeteaseLyrics(slyrics: string): string {
-	const lines = slyrics.split(/\r?\n/).map((line) => line.trim());
-	const lyrics: Array<string> = [];
+// function _parseNeteaseLyrics(slyrics: string): string {
+// 	const lines = slyrics.split(/\r?\n/).map((line) => line.trim());
+// 	const lyrics: Array<string> = [];
 
-	const creditInfo: Array<string> = [
-		"\\s?作?\\s*词|\\s?作?\\s*曲|\\s?编\\s*曲?|\\s?监\\s*制?",
-		".*编写|.*和音|.*和声|.*合声|.*提琴|.*录|.*工程|.*工作室|.*设计|.*剪辑|.*制作|.*发行|.*出品|.*后期|.*混音|.*缩混",
-		"原唱|翻唱|题字|文案|海报|古筝|二胡|钢琴|吉他|贝斯|笛子|鼓|弦乐| 人声 ",
-		"lrc|publish|vocal|guitar|program|produce|write|mix",
-	];
-	const creditInfoRegExp: RegExp = new RegExp(
-		`^(${creditInfo.join("|")}).*(:|：)`,
-		"i",
-	);
+// 	const creditInfo: Array<string> = [
+// 		"\\s?作?\\s*词|\\s?作?\\s*曲|\\s?编\\s*曲?|\\s?监\\s*制?",
+// 		".*编写|.*和音|.*和声|.*合声|.*提琴|.*录|.*工程|.*工作室|.*设计|.*剪辑|.*制作|.*发行|.*出品|.*后期|.*混音|.*缩混",
+// 		"原唱|翻唱|题字|文案|海报|古筝|二胡|钢琴|吉他|贝斯|笛子|鼓|弦乐| 人声 ",
+// 		"lrc|publish|vocal|guitar|program|produce|write|mix",
+// 	];
+// 	const creditInfoRegExp: RegExp = new RegExp(
+// 		`^(${creditInfo.join("|")}).*(:|：)`,
+// 		"i",
+// 	);
 
-	for (let i = 0; i < lines.length; i++) {
-		const line: string = lines[i];
-		const matchResult = line.match(/(\[.*?\])|([^\[\]]+)/g);
+// 	for (let i = 0; i < lines.length; i++) {
+// 		const line: string = lines[i];
+// 		const matchResult = line.match(/(\[.*?\])|([^\[\]]+)/g);
 
-		if (!matchResult || matchResult.length === 1) {
-			continue;
-		}
+// 		if (!matchResult || matchResult.length === 1) {
+// 			continue;
+// 		}
 
-		let textIndex = -1;
-		for (let j = 0; j < matchResult.length; j++) {
-			if (!matchResult[j].endsWith("]")) {
-				textIndex = j;
-				break;
-			}
-		}
+// 		let textIndex = -1;
+// 		for (let j = 0; j < matchResult.length; j++) {
+// 			if (!matchResult[j].endsWith("]")) {
+// 				textIndex = j;
+// 				break;
+// 			}
+// 		}
 
-		let text = "";
+// 		let text = "";
 
-		if (textIndex > -1) {
-			text = matchResult.splice(textIndex, 1)[0];
-			text = text.charAt(0).toUpperCase() + normalize(text.slice(1));
-		}
+// 		if (textIndex > -1) {
+// 			text = matchResult.splice(textIndex, 1)[0];
+// 			text = text.charAt(0).toUpperCase() + normalize(text.slice(1));
+// 		}
 
-		const time = matchResult[0];
+// 		const time = matchResult[0];
 
-		if (!creditInfoRegExp.test(text)) {
-			lyrics.push(`${time} ${text || ""}`);
-		}
-	}
+// 		if (!creditInfoRegExp.test(text)) {
+// 			lyrics.push(`${time} ${text || ""}`);
+// 		}
+// 	}
 
-	return lyrics.join("\n");
-}
+// 	return lyrics.join("\n");
+// }
 
-async function fetchLyricsLrclib(metadata: Metadata): Promise<LyricsOutput | null> {
-	if (!metadata) return null;
+async function fetchLyricsLrclib(
+	player: Mpris.Player,
+): Promise<LyricsOutput | null> {
+	if (!player.available) return null;
 
 	const searchParams = new URLSearchParams({
-		track_name: metadata.track || "",
-		artist_name: metadata.artist || "",
-		album_name: metadata.album || "",
-		q: metadata.track || "",
+		track_name: player.title,
+		artist_name: player.artist,
+		album_name: player.album,
+		q: player.title,
 	});
 
 	const url = new URL(`https://lrclib.net/api/search?${searchParams}`);
@@ -414,8 +407,8 @@ async function fetchLyricsLrclib(metadata: Metadata): Promise<LyricsOutput | nul
 
 		const match = data.find(
 			(d: any) =>
-				d.artistName?.toLowerCase().includes(metadata.artist?.toLowerCase()) &&
-				d.trackName?.toLowerCase() === metadata.track?.toLowerCase(),
+				d.artistName?.toLowerCase().includes(player.artist.toLowerCase()) &&
+				d.trackName?.toLowerCase() === player.title.toLowerCase(),
 		);
 
 		if (!match || !match.syncedLyrics || match.syncedLyrics?.length <= 0)
@@ -430,14 +423,16 @@ async function fetchLyricsLrclib(metadata: Metadata): Promise<LyricsOutput | nul
 	}
 }
 
-async function fetchLyricsMusixmatch(metadata: Metadata): Promise<LyricsOutput | null> {
-	if (!metadata) return null;
+async function fetchLyricsMusixmatch(
+	player: Mpris.Player,
+): Promise<LyricsOutput | null> {
+	if (!player.available) return null;
 
 	const tokenData = await getMusixmatchUsertoken();
 
 	if (!tokenData) return null;
 
-	const trackData = await _searchLyricsMusixmatch(metadata, tokenData);
+	const trackData = await _searchLyricsMusixmatch(player, tokenData);
 
 	if (
 		!trackData ||
@@ -447,7 +442,7 @@ async function fetchLyricsMusixmatch(metadata: Metadata): Promise<LyricsOutput |
 		return null;
 
 	const lyrics = await _fetchLyricsMusixmatch(
-		metadata,
+		player,
 		tokenData,
 		trackData.trackId,
 		trackData.commonTrackId,
@@ -477,7 +472,7 @@ async function fetchLyricsMusixmatch(metadata: Metadata): Promise<LyricsOutput |
 // 	};
 // }
 
-async function _getLyrics(metadata: Metadata): Promise<LyricsOutput | null> {
+async function _getLyrics(player: Mpris.Player): Promise<LyricsOutput | null> {
 	const avaibleSources = {
 		musixmatch: fetchLyricsMusixmatch,
 		lrclib: fetchLyricsLrclib,
@@ -490,18 +485,12 @@ async function _getLyrics(metadata: Metadata): Promise<LyricsOutput | null> {
 		// "netease",
 	];
 
-	if (isFetching.get()) return null;
-
 	for (const source of sources) {
-		setIsFetching(true);
-
-		const lyrics = await avaibleSources[source](metadata);
+		const lyrics = await avaibleSources[source](player);
 
 		if (!lyrics) continue;
 
 		if (lyrics?.lineSynced) {
-			setIsFetching(false);
-
 			return {
 				source: lyrics.source,
 				lineSynced: lyrics.lineSynced,
@@ -512,12 +501,12 @@ async function _getLyrics(metadata: Metadata): Promise<LyricsOutput | null> {
 	return null;
 }
 
-async function getLyrics(metadata: Metadata): Promise<FormattedLyrics | null> {
-	if (!metadata) return null;
+async function getLyrics(
+	player: Mpris.Player,
+): Promise<FormattedLyrics | null> {
+	if (!player.available) return null;
 
-	const lyrics = await _getLyrics(metadata);
-
-	console.log("gl", lyrics, metadata)
+	const lyrics = await _getLyrics(player);
 
 	if (!lyrics) return null;
 
@@ -528,7 +517,7 @@ async function getLyrics(metadata: Metadata): Promise<FormattedLyrics | null> {
 	return {
 		source: lyrics.source,
 		lyrics: parsedLyrics,
-		trackId: metadata.trackId || "__unknown__"
+		trackId: player.trackid,
 	};
 }
 
@@ -590,29 +579,31 @@ function parseLyrics(
 	return formattedLyrics;
 }
 
-function normalize(string: string): string {
-	return string
-		.replace(/（/g, "(")
-		.replace(/）/g, ")")
-		.replace(/【/g, "[")
-		.replace(/】/g, "]")
-		.replace(/。/g, ". ")
-		.replace(/；/g, "; ")
-		.replace(/：/g, ": ")
-		.replace(/？/g, "? ")
-		.replace(/！/g, "! ")
-		.replace(/、|，/g, ", ")
-		.replace(/‘|’|′|＇/g, "'")
-		.replace(/“|”/g, '"')
-		.replace(/〜/g, "~")
-		.replace(/·|・/g, "•")
-		.replace(/\s+/g, " ")
-		.trim();
-}
+// function normalize(string: string): string {
+// 	return string
+// 		.replace(/（/g, "(")
+// 		.replace(/）/g, ")")
+// 		.replace(/【/g, "[")
+// 		.replace(/】/g, "]")
+// 		.replace(/。/g, ". ")
+// 		.replace(/；/g, "; ")
+// 		.replace(/：/g, ": ")
+// 		.replace(/？/g, "? ")
+// 		.replace(/！/g, "! ")
+// 		.replace(/、|，/g, ", ")
+// 		.replace(/‘|’|′|＇/g, "'")
+// 		.replace(/“|”/g, '"')
+// 		.replace(/〜/g, "~")
+// 		.replace(/·|・/g, "•")
+// 		.replace(/\s+/g, " ")
+// 		.trim();
+// }
 
-export function parseLyricsData(song: SongData): ParsedLyrics | null {
-	const lyrics = song.lyrics
-
+export function parseLyricsData(
+	lyrics: FormattedLyric[],
+	position: number,
+	source: Sources,
+): ParsedLyrics | null {
 	if (!lyrics || lyrics.length === 0) return null;
 
 	let firstLyric: string | null = null;
@@ -628,7 +619,7 @@ export function parseLyricsData(song: SongData): ParsedLyrics | null {
 		if (!firstLyric) firstLyric = text;
 		if (!firstTimestamp && firstTimestamp !== 0) firstTimestamp = timestamp;
 
-		if (song.position >= timestamp) {
+		if (position >= timestamp) {
 			lastLyric = text;
 			lastTimestamp = timestamp;
 		}
@@ -666,15 +657,14 @@ export function parseLyricsData(song: SongData): ParsedLyrics | null {
 		previous: previousLines,
 		current: searchLyric,
 		next: nextLines,
-		source: song.source,
+		source: source,
 	};
-};
+}
 
-export function formatLyricsTooltip(song: SongData, data: ParsedLyrics): string {
-	const tooltipColor = "#cba6f7";
-
-	let tooltipMetadata = "";
-
+export function formatLyricsTooltip(
+	song: SongData,
+	data: ParsedLyrics,
+): string {
 	if (!data) return "";
 
 	const previousLyrics =
@@ -685,121 +675,63 @@ export function formatLyricsTooltip(song: SongData, data: ParsedLyrics): string 
 	const nextLyrics =
 		data.next.length > 0 ? `\n${escapeMarkup(data.next.join("\n"))}` : "";
 
-	const sourceMsg = song.source
-		? `\n\n<span color="#89b4fa">[Source: ${song.source}${song.cached ? " - Cached" : ""}]</span>`
-		: "";
-
-	const maxLength = Math.max(
-		centerText(tooltipMetadata || "", true),
-		centerText(previousLyrics || "", true),
-		centerText(data.current || "", true),
-		centerText(nextLyrics || "", true),
-		centerText(sourceMsg || "", true),
-	);
-
-	const metadataDivider = "-".repeat(maxLength);
-
-	tooltipMetadata =
-		tooltipMetadata.length > 0
-			? `${tooltipMetadata}<span color="#ffffff">${metadataDivider}</span>\n\n`
-			: "";
-
-	const tooltip = `${tooltipMetadata}${previousLyrics}<span color="${
-		tooltipColor
-	}"><i>${escapeMarkup(data.current)}</i></span>${nextLyrics}${song.source}`;
+	const tooltip = `${previousLyrics}<span color="${tooltipCurrentSong}"><i>${escapeMarkup(data.current)}</i></span>${nextLyrics}\n\n<span color="#89b4fa">[Source: ${song.source}]</span>`;
 
 	return centerText(tooltip);
 }
 
-async function updateCurrentSong(source: Mpris.Player) {
-	console.log(1)
-	if (source.trackid === currentSong.get().trackId) {
-		console.log(2/*, currentSong.get()*/)
-		setCurrentSong((currentSong) => ({
-			...currentSong,
-			album: source.album,
-			artist: source.artist,
-			cover: source.artUrl,
-			length: source.length,
-			track: source.title,
-			trackId: source.trackid,
-			volume: source.volume,
-			position: source.position,
-			cached: true
-		}));
-		
-		return;
-	}
-	
-	console.log(3)
-	setCurrentSong({
-		album: source.album,
-		artist: source.artist,
-		cover: source.artUrl,
-		length: source.length,
-		lyrics: undefined,
-		source: "Musixmatch",
-		track: source.title,
-		trackId: source.trackid,
-		volume: source.volume,
-		position: source.position,
-		cached: false
-	});
+export const position = createBinding(spotify, "position");
 
-	console.log(4, {
-		album: source.album,
-		artist: source.artist,
-		length: source.length,
-		track: source.title,
-		trackId: source.trackid,
-	})
-	
-	const lyrics = await getLyrics({
-		album: source.album,
-		artist: source.artist,
-		length: source.length,
-		track: source.title,
-		trackId: source.trackid,
-	});
+export function useSong() {
+	const [song, setSong] = createState<SongData | null>(null);
 
-	if (lyrics?.trackId !== source.trackid) return;
-
-	console.log(4, lyrics)
-	if (!lyrics?.lyrics) {
-		console.log(5)
-		setCurrentSong({
-			lyrics: undefined,
-			source: "Musixmatch",
-			album: source.album,
-			artist: source.artist,
-			cover: source.artUrl,
-			length: source.length,
-			track: source.title,
-			trackId: source.trackid,
-			volume: source.volume,
-			position: source.position,
-			cached: false
+	getLyrics(spotify).then((lyrics) => {
+		setSong({
+			artist: spotify.artist,
+			track: spotify.title,
+			album: spotify.album,
+			trackId: spotify.trackid,
+			source: lyrics?.source || "Musixmatch",
+			length: spotify.length,
+			cover: spotify.artUrl,
+			volume: spotify.volume,
+			position: spotify.position,
+			lyrics: lyrics?.lyrics,
 		});
-		
-		return;
-	}
-	console.log(6)
-
-	setCurrentSong({
-		album: source.album,
-		artist: source.artist,
-		cover: source.artUrl,
-		length: source.length,
-		lyrics: lyrics.lyrics ?? undefined,
-		source: lyrics.source as SongData["source"],
-		track: source.title,
-		trackId: source.trackid,
-		volume: source.volume,
-		position: source.position,
-		cached: false
 	});
-}
 
-spotify.connect("notify::trackid", updateCurrentSong);
-spotify.connect("notify::volume", updateCurrentSong);
-spotify.connect("notify::position", updateCurrentSong);
+	const id = spotify.connect("notify::metadata", () => {
+		setSong({
+			artist: spotify.artist,
+			track: spotify.title,
+			album: spotify.album,
+			trackId: spotify.trackid,
+			source: "Musixmatch",
+			length: spotify.length,
+			cover: spotify.artUrl,
+			volume: spotify.volume,
+			position: spotify.position,
+		})
+
+		getLyrics(spotify).then((lyrics) => {
+			setSong({
+				artist: spotify.artist,
+				track: spotify.title,
+				album: spotify.album,
+				trackId: spotify.trackid,
+				source: lyrics?.source || "Musixmatch",
+				length: spotify.length,
+				cover: spotify.artUrl,
+				volume: spotify.volume,
+				position: spotify.position,
+				lyrics: lyrics?.lyrics,
+			});
+		});
+	});
+
+	onCleanup(() => {
+		spotify.disconnect(id);
+	});
+
+	return song;
+}

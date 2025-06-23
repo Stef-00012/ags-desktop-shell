@@ -1,0 +1,25 @@
+export const rosewater = "#f4dbd6";
+export const flamingo = "#f0c6c6";
+export const pink = "#f5bde6";
+export const mauvre = "#c6a0f6";
+export const red = "#ed8796";
+export const maroon = "#ee99a0";
+export const peach = "#f5a97f";
+export const yellow = "#eed49f";
+export const green = "#a6da95";
+export const teal = "#8bd5ca";
+export const sky = "#91d7e3";
+export const sapphire = "#7dc4e4";
+export const blue = "#8aadf4";
+export const lavender = "#b7bdf8";
+export const text = "#cad3f5";
+export const subtext1 = "#b8c0e0";
+export const subtext0 = "#a5adcb";
+export const overlay2 = "#939ab7";
+export const overlay1 = "#8087a2";
+export const overlay0 = "#6e738d";
+export const base = "#24273a";
+export const mantle = "#1e2030";
+export const crust = "#181926";
+
+export const tooltipCurrentSong = mauvre

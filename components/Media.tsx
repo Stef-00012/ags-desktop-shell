@@ -1,39 +1,64 @@
 import type { SongData } from "@/types/lyrics";
-import { currentSong, formatLyricsTooltip, parseLyricsData } from "@/util/lyrics";
+import {
+	position,
+	formatLyricsTooltip,
+	parseLyricsData,
+	useSong,
+} from "@/util/lyrics";
 import { centerText, colorText, marquee } from "@/util/text";
+import { createComputed } from "ags";
 
 export default function Media() {
-	function transformMediaLabel(song: SongData) {
-		return marquee(`${song.artist} - ${song.track}`, 20);
+	const song = useSong();
+
+	function transformMediaLabel(song: SongData | null) {
+		if (!song) return "No Media Playing";
+
+		return marquee(`${song?.artist} - ${song?.track}`, 20);
 	}
 
-	function transformMediaTooltip(song: SongData) {
+	function transformMediaTooltip(song: SongData | null) {
+		if (!song) return "";
+
 		return centerText(
-			[colorText(`${song.artist} - ${song.track}`, "#abcdef"), `Volume: ${song.volume}%`].join("\n"),
+			[
+				colorText(`${song.artist} - ${song.track}`, "#abcdef"),
+				`Volume: ${song.volume}%`,
+			].join("\n"),
 		);
 	}
 
-	function transformLyricsLabel(song: SongData) {
-		return parseLyricsData(song)?.current || "No Lyrics Available";
+	function transformLyricsLabel([song, position]: [SongData | null, number]) {
+		if (!song || !song.lyrics || !song.source) return "No Lyrics Available";
+
+		return (
+			parseLyricsData(song.lyrics, position, song.source)?.current ||
+			"No Lyrics Available"
+		);
 	}
 
-	function transformLyricsTooltip(song: SongData) {
-		const lyrics = parseLyricsData(song);
-		if (!lyrics) return "";
+	function transformLyricsTooltip([song, position]: [SongData | null, number]) {
+		if (!song || !song.lyrics || !song.source) return "";
 
-		return formatLyricsTooltip(song, lyrics);
+		const lyricsData = parseLyricsData(song.lyrics, position, song.source);
+
+		if (!lyricsData) return "";
+
+		return formatLyricsTooltip(song, lyricsData);
 	}
+
+	const lyricsState = createComputed([song, position]);
 
 	return (
 		<box>
 			<label
-				label={currentSong(transformMediaLabel)}
-				tooltipMarkup={currentSong(transformMediaTooltip)}
+				label={song(transformMediaLabel)}
+				tooltipMarkup={song(transformMediaTooltip)}
 			/>
 
 			<label
-				label={currentSong(transformLyricsLabel)}
-				tooltipMarkup={currentSong(transformLyricsTooltip)}
+				label={lyricsState(transformLyricsLabel)}
+				tooltipMarkup={lyricsState(transformLyricsTooltip)}
 			/>
 		</box>
 	);

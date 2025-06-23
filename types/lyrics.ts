@@ -1,4 +1,4 @@
-export type Sources = ("musixmatch" | "lrclib" | "netease")[];
+export type Sources = "Musixmatch" | "lrclib.net"; // | "netease";
 
 export interface TokenData {
 	cookies: string | undefined;
@@ -54,12 +54,11 @@ export interface SongData {
 	album: string;
 	trackId: string;
 	lyrics?: FormattedLyric[];
-	source: "Musixmatch" | "lrclib.net"; // | "Netease";
+	source: Sources;
 	length: number;
 	cover?: string;
 	volume: number;
 	position: number;
-	cached: boolean;
 }
 
 export interface LyricsOutput {
