@@ -10,6 +10,7 @@ import {
 	batteryIcons,
 	notificationIcons,
 } from "@/constants/icons";
+import { Gdk, Gtk } from "ags/gtk4";
 
 export function getBatteryIcon(percent: number, isCharging?: boolean): string {
 	if (isCharging) return batteryIcons.charging;
@@ -116,4 +117,10 @@ export function getMemoryIcon(): string {
 
 export function getClockIcon(type: "clock" | "calendar"): string {
 	return clockIcons[type];
+}
+
+export function isIcon(icon?: string | null) {
+	const iconTheme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default()!);
+	
+	return icon && iconTheme.has_icon(icon);
 }

@@ -288,10 +288,22 @@ function getMainNetworkInterface(): string | undefined {
 	return undefined;
 }
 
+const network = Network.get_default();
+
+network.connect("notify::primary", (source) => {
+	setNetworkUsage((prev) => ({
+		...prev,
+		isWifi: source.primary === Network.Primary.WIFI,
+		isWired: source.primary === Network.Primary.WIRED,
+		ssid: source.wifi?.ssid,
+		frequency: source.wifi?.frequency,
+		strength: source.wifi?.strength,
+	}));
+});
+
 async function recalculateNetworkUsage() {
 	const netFile = await readFileAsync("/proc/net/dev");
 	const mainInterface = getMainNetworkInterface();
-	const network = Network.get_default();
 
 	if (!mainInterface) return;
 
@@ -309,8 +321,8 @@ async function recalculateNetworkUsage() {
 				rx,
 				tx,
 				interface: mainInterface,
-				isWifi: !!network.wifi,
-				isWired: !!network.wired,
+				isWifi: network.primary === Network.Primary.WIFI,
+				isWired: network.primary === Network.Primary.WIRED,
 				ssid: network.wifi?.ssid,
 				frequency: network.wifi?.frequency,
 				strength: network.wifi?.strength,

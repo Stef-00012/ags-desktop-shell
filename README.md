@@ -9,6 +9,7 @@ Currently those plugins are required:
 to try it just run `ags run app.ts` using AGS v3
 
 # TO-DO
-- [ ] Show a popup for notifications
+- [x] Show a popup for notifications
+    - [ ] Fix the notif overlay taking too more space then needed when there aren't enough notifs to scroll (and try to find a way to resize it dynamically with a max height of half screen)
 - [ ] Show a notification center to list all previous notifications
 - [ ] Create an app launcher

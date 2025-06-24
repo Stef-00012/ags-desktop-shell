@@ -1,3 +1,5 @@
+import GLib from "gi://GLib";
+
 export function formatSeconds(seconds: number): string {
 	if (!Number.isFinite(seconds) || seconds < 0) return "0s";
 
@@ -11,4 +13,8 @@ export function formatSeconds(seconds: number): string {
 	if (s > 0 || parts.length === 0) parts.push(`${s}s`);
 
 	return parts.join(" ");
+}
+
+export function time(time: number, format = "%H:%M") {
+	return GLib.DateTime.new_from_unix_local(time).format(format)!;
 }

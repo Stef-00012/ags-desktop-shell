@@ -16,13 +16,19 @@ export default function Battery({ class: className }: Props) {
 	const label = createComputed([showAlt, batteryStat], transformLabel);
 
 	function transformLabel(showAlt: boolean, batteryStat: BatteryStat) {
-		return showAlt
-			? batteryStat.isCharging
-				? batteryStat.percentage === 100
+		if (showAlt) {
+			if (batteryStat.isCharging) {
+				return batteryStat.percentage === 100
 					? `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} Full`
 					: `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${formatSeconds(batteryStat.timeToFull)}`
-				: `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${formatSeconds(batteryStat.timeToEmpty)}`
-			: `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${batteryStat.percentage}%`;
+			} 
+			
+			return `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${formatSeconds(batteryStat.timeToEmpty)}`
+		}
+
+		return batteryStat.percentage === 100
+			? `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} Full`
+			: `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${Math.round(batteryStat.percentage)}%`;
 	}
 
 	function transformTooltip(batteryStat: BatteryStat) {

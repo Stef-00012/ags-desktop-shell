@@ -22,7 +22,7 @@ export default function Bar({ gdkmonitor }: Props) {
 		<window
 			visible
 			name="bar"
-			class="Bar"
+			class="bar"
 			gdkmonitor={gdkmonitor}
 			exclusivity={Astal.Exclusivity.EXCLUSIVE}
 			anchor={TOP | LEFT | RIGHT}
