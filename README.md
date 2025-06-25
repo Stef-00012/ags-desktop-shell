@@ -13,3 +13,4 @@ to try it just run `ags run app.ts` using AGS v3
     - [ ] Fix the notif overlay taking too more space then needed when there aren't enough notifs to scroll (and try to find a way to resize it dynamically with a max height of half screen)
 - [ ] Show a notification center to list all previous notifications
 - [ ] Create an app launcher
+- [ ] Create an OSD (On Screen Display) for volume, brightness and microphone
