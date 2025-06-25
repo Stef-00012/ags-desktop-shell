@@ -94,6 +94,10 @@ window.bar {
     }
 }
 
+// .test {
+//     background-color: red;
+// }
+
 window.notification-popups {
     all: unset;
 
@@ -137,12 +141,6 @@ window.notification-popups {
 
             .time {
                 margin: 0 0.4rem;
-            }
-
-            button {
-                padding: 0.2rem;
-                min-width: 0;
-                min-height: 0;
             }
         }
 
@@ -195,6 +193,22 @@ window.notification-popups {
                 &:last-child {
                     margin-right: 0;
                 }
+            }
+        }
+
+        .progress-bar {
+            progress {
+                border-color: $overlay0-color;
+                background-color: $overlay0-color;
+            }
+
+            trough {
+                border-color: $crust-color;
+                background-color: $crust-color;
+            }
+
+            progress, trough {
+                min-height: 2px;
             }
         }
     }

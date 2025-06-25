@@ -1,18 +1,80 @@
 import Gtk from "gi://Gtk?version=4.0";
 import Adw from "gi://Adw";
-import type AstalNotifd from "gi://AstalNotifd";
+import type Notifd from "gi://AstalNotifd";
 import Pango from "gi://Pango";
 import { isIcon } from "@/util/icons";
 import { time } from "@/util/formatTime";
 import { urgency } from "@/util/notif";
 import { fileExists } from "@/util/file";
 import { Gdk } from "ags/gtk4";
+import { Timer } from "@/util/timer";
+import { createState } from "ags";
+// import { timeout } from "ags/time";
+
+const DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT = 5000; // 5 seconds
 
 export default function Notification({
 	notification,
+	onTimeout,
 }: {
-	notification: AstalNotifd.Notification;
+	notification: Notifd.Notification;
+	onTimeout: (notification: Notifd.Notification) => void;
 }) {
+	const notificationActions = notification.actions.filter(
+		(action) => action.id !== "default",
+	);
+	const defaultAction = notification.actions.find(
+		(action) => action.id === "default",
+	);
+
+	const expireTimeout =
+		notification.expireTimeout === -1
+			? DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT
+			: notification.expireTimeout;
+
+	const timer = new Timer(expireTimeout);
+
+	const [progressBarFraction, setProgressBarFraction] = createState<number>(1);
+
+	timer.subscribe(() => {
+		setProgressBarFraction(1 - timer.timeLeft / timer.timeout);
+
+		if (timer.timeLeft <= 0) {
+			onTimeout(notification);
+		}
+	});
+
+	function handleLeftClick() {
+		if (defaultAction) notification.invoke(defaultAction.id);
+	}
+
+	function handleRightClick() {
+		notification.dismiss();
+	}
+
+	function handleHoverEnter() {
+		timer.isPaused = true;
+	}
+
+	function handleHoverLeave() {
+		timer.isPaused = false;
+	}
+
+	/*
+		not the best looking thing but it's the only workaround i found because with
+		just 1 Gtk.GestureClick it'd take precedence over the button so i had to
+		create 1 main + many secondary in each subtree except the button one
+	*/
+	function getLeftClickComponent(main?: boolean) {
+		return (
+			<Gtk.GestureClick
+				button={Gdk.BUTTON_PRIMARY}
+				onPressed={handleLeftClick}
+				propagationPhase={main ? Gtk.PropagationPhase.TARGET : undefined}
+			/>
+		);
+	}
+
 	return (
 		<Adw.Clamp maximumSize={530}>
 			<box
@@ -20,12 +82,21 @@ export default function Notification({
 				class={`notification ${urgency(notification.urgency)}`}
 				orientation={Gtk.Orientation.VERTICAL}
 			>
+				<Gtk.EventControllerMotion
+					onEnter={handleHoverEnter}
+					onLeave={handleHoverLeave}
+				/>
+
+				{getLeftClickComponent(true)}
+
 				<Gtk.GestureClick
 					button={Gdk.BUTTON_SECONDARY}
-					onPressed={() => notification.dismiss()}
+					onPressed={handleRightClick}
 				/>
 
 				<box class="header">
+					{getLeftClickComponent()}
+
 					{(notification.appIcon || isIcon(notification.desktopEntry)) && (
 						<image
 							class="app-icon"
@@ -54,6 +125,8 @@ export default function Notification({
 				<Gtk.Separator visible />
 
 				<box class="content">
+					{getLeftClickComponent()}
+
 					{notification.image && fileExists(notification.image) && (
 						<image
 							valign={Gtk.Align.START}
@@ -95,15 +168,29 @@ export default function Notification({
 					</box>
 				</box>
 
-				{notification.actions.length > 0 && (
+				{notificationActions.length > 0 && (
 					<box class="actions">
-						{notification.actions.map(({ label, id }) => (
-							<button hexpand onClicked={() => notification.invoke(id)}>
+						{notificationActions.map(({ label, id }) => (
+							<button
+								name="actionButton"
+								hexpand
+								onClicked={() => notification.invoke(id)}
+							>
 								<label label={label} halign={Gtk.Align.CENTER} hexpand />
 							</button>
 						))}
 					</box>
 				)}
+
+				<box>
+					<Gtk.ProgressBar
+						class="progress-bar"
+						hexpand
+						fraction={progressBarFraction}
+						widthRequest={491} // width - (border-radius * 3)
+						halign={Gtk.Align.CENTER}
+					/>
+				</box>
 			</box>
 		</Adw.Clamp>
 	);

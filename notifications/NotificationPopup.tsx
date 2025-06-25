@@ -2,40 +2,36 @@ import { Astal, type Gdk, Gtk } from "ags/gtk4";
 import Notifd from "gi://AstalNotifd";
 import Notification from "./components/Notification";
 import { For, createState, onCleanup } from "ags";
-import { timeout } from "ags/time";
+// import { timeout } from "ags/time";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
 }
 
-const DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT = 5000; // 5 seconds
-
 export default function NotificationPopups({ gdkmonitor }: Props) {
 	const notifd = Notifd.get_default();
 
+	notifd.set_ignore_timeout(true);
+
+	const maxHeight = gdkmonitor.geometry.height * 0.5;
+
+	// const [boxHeight, setBoxHeight] = createState(0);
+
 	const [notifications, setNotifications] = createState(
-		new Array<Notifd.Notification>(),
+		[] as Notifd.Notification[],
 	);
 
 	const notifiedHandler = notifd.connect("notified", (_, id, replaced) => {
 		const notification = notifd.get_notification(id);
 
-		const expireTimeout =
-			notification.expireTimeout >= 0
-				? notification.expireTimeout
-				: DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT;
-
-		// TODO: pause timeout when the notif is hovered
-		timeout(expireTimeout, () => {
-			setNotifications((ns) =>
-				ns.filter((n) => n.id !== notification.id),
-			)
-		});
-
 		if (replaced) {
-			setNotifications((notifs) =>
-				notifs.map((notif) => (notif.id === id ? notification : notif)),
-			);
+			setNotifications((notifs) => {
+				if (notifs.find((notif) => notif.id === id))
+					return notifs.map((notif) =>
+						notif.id === id ? notification : notif,
+					);
+				return [notification, ...notifs];
+			});
 		} else {
 			setNotifications((notifs) => [notification, ...notifs]);
 		}
@@ -50,7 +46,21 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 		notifd.disconnect(resolvedHandler);
 	});
 
-	// console.log(gdkmonitor.geometry.height * 0.5)
+	function handleNotificationTimeout(notification: Notifd.Notification) {
+		if (notification.transient) return notification.dismiss();
+
+		setNotifications((notifications) =>
+			notifications.filter((notif) => notif.id !== notification.id),
+		);
+	}
+
+	// let win: Gtk.Box;
+
+	// const height = notifications(() => (win ? win.get_allocated_height() : 0));
+
+	// height.subscribe(() => {
+	// 	console.log("height", height.get());
+	// });
 
 	return (
 		<window
@@ -58,17 +68,29 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 			gdkmonitor={gdkmonitor}
 			visible={notifications((ns) => ns.length > 0)}
 			anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT}
+			defaultHeight={1}
 		>
 			<scrolledwindow
 				propagateNaturalHeight
 				propagateNaturalWidth
 				hscrollbarPolicy={Gtk.PolicyType.NEVER}
-				maxContentHeight={gdkmonitor.geometry.height * 0.5}
-				heightRequest={gdkmonitor.geometry.height * 0.5} // tmp, till i find a way to make its height half the screen without occuping useless space
+				maxContentHeight={maxHeight}
+				heightRequest={maxHeight} // tmp, till i find a way to make its height half the screen without occuping useless space
 			>
-				<box orientation={Gtk.Orientation.VERTICAL}>
+				<box
+					// class="test"
+					orientation={Gtk.Orientation.VERTICAL}
+					// $={(self) => {
+					// 	win = self;
+					// }}
+				>
 					<For each={notifications}>
-						{(notification) => <Notification notification={notification} />}
+						{(notification) => (
+							<Notification
+								notification={notification}
+								onTimeout={handleNotificationTimeout}
+							/>
+						)}
 					</For>
 				</box>
 			</scrolledwindow>
