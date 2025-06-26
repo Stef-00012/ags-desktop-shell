@@ -1,17 +1,22 @@
-import { createBinding, For, onCleanup } from "ags";
+import { createBinding, createState, For, onCleanup } from "ags";
 import { Gtk } from "ags/gtk4";
 import style from "./style.scss";
 import app from "ags/gtk4/app";
 import Bar from "@/bar/Bar";
 import NotificationPopups from "@/notifications/NotificationPopup";
 import GObject, { register } from "ags/gobject";
+import NotificationCenter from "@/notifications/NotificationCenter";
+import GLib from "gi://GLib";
 
 @register({ Implements: [Gtk.Buildable] })
 class WindowTracker extends GObject.Object {
-    vfunc_add_child(_: Gtk.Builder, child: Gtk.Window): void {
-        onCleanup(() => child.destroy())
-    }
+	vfunc_add_child(_: Gtk.Builder, child: Gtk.Window): void {
+		onCleanup(() => child.destroy());
+	}
 }
+
+export const [isNotificationCenterVisible, setIsNotificationCenterVisible] =
+	createState(false);
 
 app.start({
 	css: style,
@@ -24,10 +29,34 @@ app.start({
 				{(monitor) => (
 					<WindowTracker>
 						<Bar gdkmonitor={monitor} />
-						<NotificationPopups gdkmonitor={monitor} />
+
+						<NotificationPopups
+							gdkmonitor={monitor}
+							hidden={isNotificationCenterVisible}
+						/>
+
+						<NotificationCenter
+							gdkmonitor={monitor}
+							visible={isNotificationCenterVisible}
+							setVisible={setIsNotificationCenterVisible}
+						/>
 					</WindowTracker>
 				)}
 			</For>
-		)
+		);
+	},
+	requestHandler(request, res) {
+		const [, argv] = GLib.shell_parse_argv(request);
+
+		if (!argv) return res("argv parse error");
+
+		switch (argv[0]) {
+			case "toggle-notif":
+				setIsNotificationCenterVisible((prev) => !prev);
+
+				return res("ok");
+			default:
+				return res("unknown command");
+		}
 	},
 });

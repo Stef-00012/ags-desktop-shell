@@ -1,15 +1,22 @@
 import { Astal, type Gdk, Gtk } from "ags/gtk4";
 import Notifd from "gi://AstalNotifd";
 import Notification from "@/notifications/components/Notification";
-import { For, createState, onCleanup } from "ags";
+import {
+	type Accessor,
+	For,
+	createComputed,
+	createState,
+	onCleanup,
+} from "ags";
 import giCairo from "gi://cairo";
 import { timeout } from "ags/time";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
+	hidden: Accessor<boolean>;
 }
 
-export default function NotificationPopups({ gdkmonitor }: Props) {
+export default function NotificationPopups({ gdkmonitor, hidden }: Props) {
 	const notifd = Notifd.get_default();
 
 	notifd.set_ignore_timeout(true);
@@ -46,7 +53,7 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 		notifd.disconnect(resolvedHandler);
 	});
 
-	function handleNotificationTimeout(notification: Notifd.Notification) {
+	function handleHideNotification(notification: Notifd.Notification) {
 		if (notification.transient) return notification.dismiss();
 
 		setNotifications((notifications) =>
@@ -58,19 +65,16 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 	let window: Gtk.Window | null;
 
 	notifications.subscribe(() => {
-		timeout(10, () => {
+		timeout(100, () => {
 			if (!window || !notificationContainer) return;
 
-			const [_success, bounds] = notificationContainer.compute_bounds(
-				notificationContainer,
-			);
+			const [_success, bounds] =
+				notificationContainer.compute_bounds(window);
 
 			const height = bounds.get_height();
 			const width = bounds.get_width();
 			const x = bounds.get_x();
 			const y = bounds.get_y();
-
-			console.log(height);
 
 			const surface = window.get_surface();
 
@@ -90,11 +94,18 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 		});
 	});
 
+	const windowVisibility = createComputed(
+		[hidden, notifications],
+		(hidden, notifications) => {
+			return !hidden && notifications.length > 0;
+		},
+	);
+
 	return (
 		<window
 			class="notification-popups"
 			gdkmonitor={gdkmonitor}
-			visible={notifications((ns) => ns.length > 0)}
+			visible={windowVisibility}
 			anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT}
 			defaultHeight={1}
 			$={(self) => {
@@ -109,7 +120,6 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 				heightRequest={maxHeight}
 			>
 				<box
-					class="test"
 					orientation={Gtk.Orientation.VERTICAL}
 					$={(self) => {
 						notificationContainer = self;
@@ -121,7 +131,7 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 						{(notification) => (
 							<Notification
 								notification={notification}
-								onTimeout={handleNotificationTimeout}
+								onHide={handleHideNotification}
 							/>
 						)}
 					</For>

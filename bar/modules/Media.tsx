@@ -11,6 +11,9 @@ import {
 	jsx,
 	type Accessor,
 } from "ags";
+import { fileExists } from "@/util/file";
+// import fetch, { URL } from "@/util/fetch";
+// import Soup from "gi://Soup";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -37,8 +40,17 @@ export default function Media({
 	const artist = createBinding(spotify, "artist");
 	const track = createBinding(spotify, "title");
 	const album = createBinding(spotify, "album");
+	const coverArt = createBinding(spotify, "cover_art");
 
-	const mainMetadata = createComputed([track, artist, album, volume, position]);
+	const mainMetadata = createComputed([
+		track,
+		artist,
+		album,
+		volume,
+		position,
+	]);
+
+	const lyricsState = createComputed([song, position]);
 
 	function transformMediaLabel([track, artist]: [
 		string,
@@ -85,7 +97,10 @@ export default function Media({
 		return `${getLyricsIcon(true)} ${parsedLyrics}`;
 	}
 
-	function transformLyricsTooltip([song, position]: [SongData | null, number]) {
+	function transformLyricsTooltip([song, position]: [
+		SongData | null,
+		number,
+	]) {
 		if (!song || !song.lyrics || !song.source) return "";
 
 		const lyricsData = parseLyricsData(song.lyrics, position, song.source);
@@ -95,11 +110,9 @@ export default function Media({
 		return formatLyricsTooltip(song, lyricsData);
 	}
 
-	const lyricsState = createComputed([song, position]);
-
 	function handleScroll(
-		event: Gtk.EventControllerScroll,
-		deltaX: number,
+		_event: Gtk.EventControllerScroll,
+		_deltaX: number,
 		deltaY: number,
 	) {
 		if (deltaY < 0) {
@@ -115,12 +128,20 @@ export default function Media({
 
 	return (
 		<box class={className}>
+			<image
+				valign={Gtk.Align.CENTER}
+				class="image-cover-art"
+				visible={coverArt((path) => fileExists(path))}
+				file={coverArt}
+				overflow={Gtk.Overflow.HIDDEN}
+			/>
+
 			<label
 				cursor={Gdk.Cursor.new_from_name("pointer", null)}
 				class={mediaClass}
 				label={mainMetadata(transformMediaLabel)}
 				hasTooltip
-				onQueryTooltip={(label, x, y, k, tooltip) => {
+				onQueryTooltip={(_label, _x, _y, _keyboardMode, tooltip) => {
 					if (mediaDispose) mediaDispose();
 
 					createRoot((dispose) => {
@@ -153,7 +174,7 @@ export default function Media({
 				class={lyricsClass}
 				label={lyricsState(transformLyricsLabel)}
 				hasTooltip
-				onQueryTooltip={(label, x, y, k, tooltip) => {
+				onQueryTooltip={(_label, _x, _y, _keyboardMode, tooltip) => {
 					if (lyricsDispose) lyricsDispose();
 
 					createRoot((dispose) => {

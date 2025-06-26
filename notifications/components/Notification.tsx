@@ -9,16 +9,17 @@ import { fileExists } from "@/util/file";
 import { Gdk } from "ags/gtk4";
 import { Timer } from "@/util/timer";
 import { createState } from "ags";
-// import { timeout } from "ags/time";
 
 const DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT = 5000; // 5 seconds
 
 export default function Notification({
 	notification,
-	onTimeout,
+	onHide,
+	isNotificationCenter = false,
 }: {
 	notification: Notifd.Notification;
-	onTimeout: (notification: Notifd.Notification) => void;
+	onHide: (notification: Notifd.Notification) => void;
+	isNotificationCenter?: boolean;
 }) {
 	const notificationActions = notification.actions.filter(
 		(action) => action.id !== "default",
@@ -40,17 +41,33 @@ export default function Notification({
 		setProgressBarFraction(1 - timer.timeLeft / timer.timeout);
 
 		if (timer.timeLeft <= 0) {
-			onTimeout(notification);
+			onHide(notification);
 		}
 	});
 
+	if (isNotificationCenter) {
+		timer.cancel();
+	}
+
 	function handleLeftClick() {
-		if (defaultAction) notification.invoke(defaultAction.id);
+		if (!defaultAction) return;
+
+		notification.invoke(defaultAction.id);
+
+		if (!isNotificationCenter) timer.cancel();
 	}
 
 	function handleRightClick() {
-		notification.dismiss();
+		onHide(notification);
+
+		if (!isNotificationCenter) timer.cancel();
 	}
+
+	function handleMiddleClick() {
+		notification.dismiss();
+
+		if (!isNotificationCenter) timer.cancel();
+	} 
 
 	function handleHoverEnter() {
 		timer.isPaused = true;
@@ -76,22 +93,31 @@ export default function Notification({
 	}
 
 	return (
+		// <Adw.Clamp maximumSize={isNotificationCenter ? 590 : 530}>
 		<Adw.Clamp maximumSize={530}>
 			<box
+				// widthRequest={isNotificationCenter ? 590 : 530}
 				widthRequest={530}
-				class={`notification ${urgency(notification.urgency)}`}
+				class={`notification ${urgency(notification.urgency)} ${isNotificationCenter ? "center" : ""}`}
 				orientation={Gtk.Orientation.VERTICAL}
 			>
-				<Gtk.EventControllerMotion
-					onEnter={handleHoverEnter}
-					onLeave={handleHoverLeave}
-				/>
+				{!isNotificationCenter && (
+					<Gtk.EventControllerMotion
+						onEnter={handleHoverEnter}
+						onLeave={handleHoverLeave}
+					/>
+				)}
 
 				{getLeftClickComponent(true)}
 
 				<Gtk.GestureClick
 					button={Gdk.BUTTON_SECONDARY}
 					onPressed={handleRightClick}
+				/>
+
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_MIDDLE}
+					onPressed={handleMiddleClick}
 				/>
 
 				<box class="header">
@@ -184,6 +210,7 @@ export default function Notification({
 
 				<box>
 					<Gtk.ProgressBar
+						visible={!isNotificationCenter}
 						class="progress-bar"
 						hexpand
 						fraction={progressBarFraction}

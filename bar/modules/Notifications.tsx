@@ -2,6 +2,7 @@ import { createBinding, createComputed, type Accessor } from "ags";
 import { getNotificationIcon } from "@/util/icons";
 import Notifd from "gi://AstalNotifd";
 import { Gdk, Gtk } from "ags/gtk4";
+import { setIsNotificationCenterVisible } from "@/app";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -20,7 +21,7 @@ export default function Notifications({ class: className }: Props) {
 	}
 
 	function handleLeftClick() {
-		// oopen notification viewer
+		setIsNotificationCenterVisible((prev) => !prev);
 	}
 
 	function handleRightClick() {

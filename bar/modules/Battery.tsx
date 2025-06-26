@@ -20,10 +20,10 @@ export default function Battery({ class: className }: Props) {
 			if (batteryStat.isCharging) {
 				return batteryStat.percentage === 100
 					? `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} Full`
-					: `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${formatSeconds(batteryStat.timeToFull)}`
-			} 
-			
-			return `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${formatSeconds(batteryStat.timeToEmpty)}`
+					: `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${formatSeconds(batteryStat.timeToFull)}`;
+			}
+
+			return `${getBatteryIcon(batteryStat.percentage, batteryStat.isCharging)} ${formatSeconds(batteryStat.timeToEmpty)}`;
 		}
 
 		return batteryStat.percentage === 100
@@ -49,14 +49,20 @@ export default function Battery({ class: className }: Props) {
 	}
 
 	return (
-		<box class={className} cursor={Gdk.Cursor.new_from_name("pointer", null)}>
+		<box
+			class={className}
+			cursor={Gdk.Cursor.new_from_name("pointer", null)}
+		>
 			<box>
 				<Gtk.GestureClick
 					button={Gdk.BUTTON_PRIMARY}
 					onPressed={leftClickHandler}
 				/>
 
-				<label label={label} tooltipMarkup={batteryStat(transformTooltip)} />
+				<label
+					label={label}
+					tooltipMarkup={batteryStat(transformTooltip)}
+				/>
 			</box>
 		</box>
 	);
