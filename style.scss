@@ -339,14 +339,10 @@ window.app-launcher {
         .search-entry {
             background-color: $mantle-color;
             border-radius: 8px;
-            padding: 4px, 8px;
+            padding: 4px 8px;
             color: $text-color;
-            font-size: 16px;
+            font-size: 20px;
             margin-bottom: 12px;
-
-            &::placeholder {
-                color: gtkalpha($text-color, 0.5);
-            }
 
             &:focus {
                 background-color: gtkalpha($mantle-color, 0.8);

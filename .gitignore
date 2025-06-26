@@ -2,3 +2,7 @@ node_modules/
 @girs/
 
 __devlog.txt
+
+# === TMP ===
+/osd
+# === TMP ===
