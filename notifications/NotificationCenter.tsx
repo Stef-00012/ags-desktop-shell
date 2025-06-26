@@ -23,6 +23,8 @@ export default function NotificationCenter({
 		"notifications",
 	)(transformNotifications);
 
+    const doNotDisturb = createBinding(notifd, "dont_disturb")
+
 	function transformNotifications(notifs: Notifd.Notification[]) {
 		const notificationList: {
 			icon: string | null;
@@ -84,6 +86,10 @@ export default function NotificationCenter({
 		if (keyval === Gdk.KEY_Escape) setVisible(false);
 	}
 
+    function handleDndSwitch(_switch: Gtk.Switch, state: boolean) {
+        notifd.set_dont_disturb(state)
+    }
+
 	return (
 		<window
 			class="notification-center"
@@ -112,19 +118,31 @@ export default function NotificationCenter({
 				halign={Gtk.Align.END}
 			>
                 <box orientation={Gtk.Orientation.VERTICAL} widthRequest={540}>
-                    <box visible orientation={Gtk.Orientation.HORIZONTAL}>
-                        <label label="Notifications" class="title" />
+                    <box class="header" orientation={Gtk.Orientation.VERTICAL}>
+                        <box class="title-container" orientation={Gtk.Orientation.HORIZONTAL}>
+                            <label label="Notifications" class="title" />
 
-                        <box hexpand />
+                            <box hexpand />
 
-                        <button label="Clear All" class="dismiss-all" onClicked={() => {
-                            for (const category of notificationCategories.get()) {
-                                for (const notif of category.notifications) {
-                                    notif.dismiss();
+                            <button label="Clear All" class="dismiss-all" onClicked={() => {
+                                for (const category of notificationCategories.get()) {
+                                    for (const notif of category.notifications) {
+                                        notif.dismiss();
+                                    }
                                 }
-                            }
-                        }} />
+                            }} />
+                        </box>
+
+                        <box class="dnd-container" orientation={Gtk.Orientation.HORIZONTAL}>
+                            <label label="Do not Disturb" class="dnd-title" />
+
+                            <box hexpand />
+
+                            <switch class="dnd-toggle" onStateSet={handleDndSwitch} state={doNotDisturb} active={doNotDisturb} />
+                        </box>
                     </box>
+
+                    <Gtk.Separator class="header-separator" visible />
 
                     <scrolledwindow
                         propagateNaturalHeight

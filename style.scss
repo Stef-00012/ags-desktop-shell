@@ -27,6 +27,9 @@ $subtext0-color: #a5adcb;
 $overlay2-color: #939ab7;
 $overlay1-color: #8087a2;
 $overlay0-color: #6e738d;
+$surface2-color: #5b6078;
+$surface1-color: #494d64;
+$surface0-color: #363a4f;
 $base-color: #24273a;
 $mantle-color: #1e2030;
 $crust-color: #181926;
@@ -234,15 +237,51 @@ window.notification-center {
         padding: 1rem;
         margin: 1rem;
         box-shadow: 2px 3px 8px 0 gtkalpha(black, 0.4);
-        
-        .dismiss-all {
-            background-image: unset;
-            background-color: $base-color;
+
+        .header {
+            .title-container {
+                .dismiss-all {
+                    background-image: unset;
+                    background-color: $base-color;
+                }
+
+                .title {
+                    font-size: 30px;
+                    font-weight: bold;
+                }
+            }
+
+            .dnd-container {
+                margin-top: 10px;
+                margin-bottom: 10px;
+
+                .dnd-title {
+                    font-size: 20px;
+                    font-weight: bold;
+                }
+
+                .dnd-toggle {
+                    background-color: $base-color;
+
+                    &:checked {
+                        background-color: $overlay0-color;
+
+                        slider {
+                            background-color: $surface1-color;
+                        }
+                    }
+
+                    slider {
+                        background-image: unset;
+                        background-color: $overlay0-color;
+                    }
+                }
+            }
         }
 
-        .title {
-            font-size: 30px;
-            font-weight: bold;
+        .header-separator {
+            background-color: gtkalpha($overlay0-color, 0.5);
+            margin-bottom: 6px;
         }
 
         .category {
