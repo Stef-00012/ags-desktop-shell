@@ -24,8 +24,8 @@ export default function Speaker({ class: className }: Props) {
 	}
 
 	function handleScroll(
-		event: Gtk.EventControllerScroll,
-		deltaX: number,
+		_event: Gtk.EventControllerScroll,
+		_deltaX: number,
 		deltaY: number,
 	) {
 		const wp = Wp.get_default();

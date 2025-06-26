@@ -7,6 +7,7 @@ import NotificationPopups from "@/notifications/NotificationPopup";
 import GObject, { register } from "ags/gobject";
 import NotificationCenter from "@/notifications/NotificationCenter";
 import GLib from "gi://GLib";
+import AppLauncher from "@/appLauncher/AppLauncher";
 
 @register({ Implements: [Gtk.Buildable] })
 class WindowTracker extends GObject.Object {
@@ -16,6 +17,9 @@ class WindowTracker extends GObject.Object {
 }
 
 export const [isNotificationCenterVisible, setIsNotificationCenterVisible] =
+	createState(false);
+
+export const [isAppLauncherVisible, setIsAppLauncherVisible] =
 	createState(false);
 
 app.start({
@@ -40,6 +44,12 @@ app.start({
 							visible={isNotificationCenterVisible}
 							setVisible={setIsNotificationCenterVisible}
 						/>
+
+						<AppLauncher
+							gdkmonitor={monitor}
+							visible={isAppLauncherVisible}
+							setVisible={setIsAppLauncherVisible}
+						/>
 					</WindowTracker>
 				)}
 			</For>
@@ -51,12 +61,23 @@ app.start({
 		if (!argv) return res("argv parse error");
 
 		switch (argv[0]) {
-			case "toggle-notif":
+			case "toggle-notif": {
 				setIsNotificationCenterVisible((prev) => !prev);
+				setIsAppLauncherVisible(false);
 
 				return res("ok");
-			default:
+			}
+
+			case "toggle-applauncher": {
+				setIsAppLauncherVisible((prev) => !prev);
+				setIsNotificationCenterVisible(false);
+
+				return res("ok");
+			}
+
+			default: {
 				return res("unknown command");
+			}
 		}
 	},
 });

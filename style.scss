@@ -325,3 +325,52 @@ window.notification-center {
         }
     }
 }
+
+window.app-launcher {
+    background-color: gtkalpha(#000000, 0.2);
+
+    .applauncher-container {
+        background-color: gtkalpha($crust-color, 0.95);
+        border-radius: 15px;
+        padding: 1rem;
+        margin: 1rem;
+        box-shadow: 2px 3px 8px 0 gtkalpha(black, 0.4);
+
+        .search-entry {
+            background-color: $mantle-color;
+            border-radius: 8px;
+            padding: 4px, 8px;
+            color: $text-color;
+            font-size: 16px;
+            margin-bottom: 12px;
+
+            &::placeholder {
+                color: gtkalpha($text-color, 0.5);
+            }
+
+            &:focus {
+                background-color: gtkalpha($mantle-color, 0.8);
+            }
+        }
+
+        .app-container {
+            padding: 6px;
+            margin-top: 3px;
+            margin-bottom: 3px;
+            background-color: $mantle-color;
+            border-radius: 8px;
+
+            &:first-child {
+                margin-top: 6px;
+            }
+
+            &:last-child {
+                margin-bottom: 0;
+            }
+
+            .app-icon {
+                margin-right: 12px;
+            }
+        }
+    }
+}

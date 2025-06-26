@@ -131,7 +131,7 @@ export default function Media({
 			<image
 				valign={Gtk.Align.CENTER}
 				class="image-cover-art"
-				visible={coverArt((path) => fileExists(path))}
+				visible={coverArt((path) => (!!path && fileExists(path)))}
 				file={coverArt}
 				overflow={Gtk.Overflow.HIDDEN}
 			/>
