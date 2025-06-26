@@ -13,6 +13,7 @@ import {
 import { Gdk, Gtk } from "ags/gtk4";
 
 export function getBatteryIcon(percent: number, isCharging?: boolean): string {
+	if (percent === 100) return batteryIcons.percents[batteryIcons.percents.length - 1]
 	if (isCharging) return batteryIcons.charging;
 
 	const perc = Math.max(0, Math.min(100, percent));
