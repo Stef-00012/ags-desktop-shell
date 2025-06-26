@@ -1,8 +1,9 @@
 import { Astal, type Gdk, Gtk } from "ags/gtk4";
 import Notifd from "gi://AstalNotifd";
-import Notification from "./components/Notification";
+import Notification from "@/notifications/components/Notification";
 import { For, createState, onCleanup } from "ags";
-// import { timeout } from "ags/time";
+import giCairo from "gi://cairo";
+import { timeout } from "ags/time";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -14,8 +15,6 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 	notifd.set_ignore_timeout(true);
 
 	const maxHeight = gdkmonitor.geometry.height * 0.5;
-
-	// const [boxHeight, setBoxHeight] = createState(0);
 
 	const [notifications, setNotifications] = createState(
 		[] as Notifd.Notification[],
@@ -30,6 +29,7 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 					return notifs.map((notif) =>
 						notif.id === id ? notification : notif,
 					);
+
 				return [notification, ...notifs];
 			});
 		} else {
@@ -54,13 +54,41 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 		);
 	}
 
-	// let win: Gtk.Box;
+	let notificationContainer: Gtk.Box | null;
+	let window: Gtk.Window | null;
 
-	// const height = notifications(() => (win ? win.get_allocated_height() : 0));
+	notifications.subscribe(() => {
+		timeout(10, () => {
+			if (!window || !notificationContainer) return;
 
-	// height.subscribe(() => {
-	// 	console.log("height", height.get());
-	// });
+			const [_success, bounds] = notificationContainer.compute_bounds(
+				notificationContainer,
+			);
+
+			const height = bounds.get_height();
+			const width = bounds.get_width();
+			const x = bounds.get_x();
+			const y = bounds.get_y();
+
+			console.log(height);
+
+			const surface = window.get_surface();
+
+			const region = new giCairo.Region();
+
+			// @ts-ignore
+			region.unionRectangle(
+				new giCairo.Rectangle({
+					x,
+					y,
+					height,
+					width,
+				}),
+			);
+
+			surface?.set_input_region(region);
+		});
+	});
 
 	return (
 		<window
@@ -69,20 +97,25 @@ export default function NotificationPopups({ gdkmonitor }: Props) {
 			visible={notifications((ns) => ns.length > 0)}
 			anchor={Astal.WindowAnchor.TOP | Astal.WindowAnchor.RIGHT}
 			defaultHeight={1}
+			$={(self) => {
+				window = self;
+			}}
 		>
 			<scrolledwindow
 				propagateNaturalHeight
 				propagateNaturalWidth
 				hscrollbarPolicy={Gtk.PolicyType.NEVER}
 				maxContentHeight={maxHeight}
-				heightRequest={maxHeight} // tmp, till i find a way to make its height half the screen without occuping useless space
+				heightRequest={maxHeight}
 			>
 				<box
-					// class="test"
+					class="test"
 					orientation={Gtk.Orientation.VERTICAL}
-					// $={(self) => {
-					// 	win = self;
-					// }}
+					$={(self) => {
+						notificationContainer = self;
+					}}
+					vexpand={false}
+					valign={Gtk.Align.START}
 				>
 					<For each={notifications}>
 						{(notification) => (

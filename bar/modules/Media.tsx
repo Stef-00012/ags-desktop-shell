@@ -47,7 +47,7 @@ export default function Media({
 		number,
 		number,
 	]) {
-		if (!song) return `${getMediaIcon(false)} No Media Playing`;
+		if (!track || !artist) return `${getMediaIcon(false)} No Media Playing`;
 
 		return `${getMediaIcon(true)} ${marquee(`${artist} - ${track}`, MEDIA_MAX_LENGTH)}`;
 	}
