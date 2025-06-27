@@ -1,11 +1,11 @@
+import { monitorFile, readFileAsync } from "ags/file";
 import { type Gdk, Gtk } from "ags/gtk4";
+import type AstalIO from "gi://AstalIO";
+import { timeout } from "ags/time";
 import { createState } from "ags";
+import giCairo from "gi://cairo";
 import Wp from "gi://AstalWp";
 import GLib from "gi://GLib";
-import { monitorFile, readFileAsync } from "ags/file";
-import { timeout } from "ags/time";
-import type AstalIO from "gi://AstalIO";
-import giCairo from "gi://cairo";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -75,46 +75,6 @@ export default function OSD({ gdkmonitor }: Props) {
 		});
 	}
 
-    let osdContainer: Gtk.Box | null;
-	let window: Gtk.Window | null;
-
-    isVisible.subscribe(() => {
-		timeout(100, () => {
-			if (!window || !osdContainer) return;
-
-			const [_success, bounds] =
-				osdContainer.compute_bounds(window);
-
-			const height = bounds.get_height();
-			const width = bounds.get_width();
-			const x = bounds.get_x();
-			const y = bounds.get_y();
-
-			// console.log({
-			// 	x,
-			// 	y,
-			// 	height,
-			// 	width,
-			// })
-
-			const surface = window.get_surface();
-
-			const region = new giCairo.Region();
-
-			// @ts-ignore
-			region.unionRectangle(
-				new giCairo.Rectangle({
-					x,
-					y,
-					height,
-					width,
-				}),
-			);
-
-			surface?.set_input_region(region);
-		});
-	})
-
 	function updateSpeakerState(speaker: Wp.Endpoint) {
 		let icon = speaker.volumeIcon;
 
@@ -140,7 +100,8 @@ export default function OSD({ gdkmonitor }: Props) {
 	function updateMicrophoneState(microphone: Wp.Endpoint) {
 		let icon = microphone.volumeIcon;
 
-		if (microphone.volume === 0) icon = "microphone-sensitivity-muted-symbolic";
+		if (microphone.volume === 0)
+			icon = "microphone-sensitivity-muted-symbolic";
 
 		setOsdState({
 			type: "microphone",
@@ -148,8 +109,6 @@ export default function OSD({ gdkmonitor }: Props) {
 			mute: microphone.mute,
 			icon: icon,
 		});
-
-		// console.log(icon)
 
 		setIsVisible(true);
 
@@ -165,29 +124,40 @@ export default function OSD({ gdkmonitor }: Props) {
 			visible={isVisible}
 			class="osd"
 			css={`margin-top: ${marginTop}px;`}
-            $={(self) => {
-                window = self;
-            }}
+			$={(self) => {
+				self.get_surface()?.set_input_region(new giCairo.Region());
+
+				self.connect("map", () => {
+					console.log("mapping surface");
+					self.get_surface()?.set_input_region(new giCairo.Region());
+				});
+			}}
 		>
 			<box
 				heightRequest={maxHeight}
 				widthRequest={maxWidth}
 				class="osd-container"
-                $={(self) => {
-                    osdContainer = self;
-                }}
 			>
-				<image iconName={osdState((state) => state.icon)} class="icon" />
+				<image
+					iconName={osdState((state) => state.icon)}
+					class="icon"
+				/>
 
 				<Gtk.ProgressBar
 					hexpand
 					valign={Gtk.Align.CENTER}
 					class={osdState((state) =>
-						Math.round(state.percentage * 100) > 100 && !state.mute
+						Math.round(state.percentage * 100) > 100
 							? "progress overfilled"
 							: "progress",
 					)}
 					fraction={osdState((state) => state.percentage)}
+				/>
+
+				<label
+					label={osdState(
+						(state) => `${Math.round(state.percentage * 100)}%`,
+					)}
 				/>
 			</box>
 		</window>

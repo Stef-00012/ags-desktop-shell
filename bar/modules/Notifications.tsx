@@ -1,8 +1,8 @@
 import { createBinding, createComputed, type Accessor } from "ags";
+import { setIsNotificationCenterVisible } from "@/app";
 import { getNotificationIcon } from "@/util/icons";
 import Notifd from "gi://AstalNotifd";
 import { Gdk, Gtk } from "ags/gtk4";
-import { setIsNotificationCenterVisible } from "@/app";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -16,7 +16,10 @@ export default function Notifications({ class: className }: Props) {
 
 	const notifLabel = createComputed([notifs, dontDisturb]);
 
-	function transformLabel([notifications, dontDisturb]: [Notifd.Notification[], boolean]) {
+	function transformLabel([notifications, dontDisturb]: [
+		Notifd.Notification[],
+		boolean,
+	]) {
 		return `${getNotificationIcon(notifications.length > 0, dontDisturb)} ${notifications.length}`;
 	}
 
@@ -37,7 +40,10 @@ export default function Notifications({ class: className }: Props) {
 	}
 
 	return (
-		<box class={className} cursor={Gdk.Cursor.new_from_name("pointer", null)}>
+		<box
+			class={className}
+			cursor={Gdk.Cursor.new_from_name("pointer", null)}
+		>
 			<Gtk.GestureClick
 				button={Gdk.BUTTON_PRIMARY}
 				onPressed={handleLeftClick}

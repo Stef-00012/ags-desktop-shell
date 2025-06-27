@@ -1,8 +1,8 @@
-import { Astal, Gdk, Gtk } from "ags/gtk4";
 import { createState, For, type Accessor, type Setter } from "ags";
+import { Astal, Gdk, Gtk } from "ags/gtk4";
+import App from "./components/App";
 import Apps from "gi://AstalApps";
 import Adw from "gi://Adw";
-import App from "./components/App";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -66,14 +66,14 @@ export default function AppLauncher({
 		setSearchValue(text.length > 0 ? text : null);
 	}
 
-    function handleInputEnter() {
-        const apps = appList.get()
+	function handleInputEnter() {
+		const apps = appList.get();
 
-        if (apps.length <= 0) return close();
+		if (apps.length <= 0) return close();
 
-        apps[0].launch();
-        close();
-    }
+		apps[0].launch();
+		close();
+	}
 
 	return (
 		<window
@@ -107,9 +107,9 @@ export default function AppLauncher({
 						orientation={Gtk.Orientation.VERTICAL}
 					>
 						<entry
-                            class="search-entry"
+							class="search-entry"
 							onNotifyCursorPosition={handleInputChange}
-                            onActivate={handleInputEnter}
+							onActivate={handleInputEnter}
 							$={(self) => {
 								entry = self;
 							}}

@@ -3,71 +3,75 @@
 	https://github.com/Mabi19/desktop-shell/blob/d70189b2355a4173a8ea6d5699f340fe73497945/utils/timer.ts
 */
 
-import { interval } from "ags/time";
 import type AstalIO from "gi://AstalIO";
+import { interval } from "ags/time";
 import GLib from "gi://GLib";
 
 export class Timer {
-    public isPaused: boolean;
-    public timeout: number;
-    public timeLeft: number;
-    private lastTickTime: number;
-    private interval: AstalIO.Time | null;
-    protected subscriptions = new Set<() => void>();
+	public isPaused: boolean;
+	public timeout: number;
+	public timeLeft: number;
+	private lastTickTime: number;
+	private interval: AstalIO.Time | null;
+	protected subscriptions = new Set<() => void>();
 
-    constructor(timeout: number) {
-        this.isPaused = false;
-        this.timeout = timeout;
-        this.timeLeft = timeout;
-        this.lastTickTime = GLib.get_monotonic_time();
+	constructor(timeout: number) {
+		this.isPaused = false;
+		this.timeout = timeout;
+		this.timeLeft = timeout;
+		this.lastTickTime = GLib.get_monotonic_time();
 
-        this.interval = interval(20, () => this.tick());
-    }
+		this.interval = interval(20, () => this.tick());
+	}
 
-    notify() {
-        for (const sub of this.subscriptions) {
-            sub();
-        }
-    }
+	notify() {
+		for (const sub of this.subscriptions) {
+			sub();
+		}
+	}
 
-    protected unsubscribe(callback: () => void) {
-        this.subscriptions.delete(callback);
+	protected unsubscribe(callback: () => void) {
+		this.subscriptions.delete(callback);
 
-        if (this.subscriptions.size === 0 && this.isPaused && this.interval != null) {
-            console.warn("Timer was disconnected while paused");
-            // clean it up anyway
-            this.isPaused = false;
-        }
-    }
+		if (
+			this.subscriptions.size === 0 &&
+			this.isPaused &&
+			this.interval != null
+		) {
+			console.warn("Timer was disconnected while paused");
+			// clean it up anyway
+			this.isPaused = false;
+		}
+	}
 
-    subscribe(callback: () => void) {
-        this.subscriptions.add(callback);
+	subscribe(callback: () => void) {
+		this.subscriptions.add(callback);
 
-        return () => this.unsubscribe(callback);
-    }
+		return () => this.unsubscribe(callback);
+	}
 
-    tick() {
-        const now = GLib.get_monotonic_time();
+	tick() {
+		const now = GLib.get_monotonic_time();
 
-        if (this.isPaused) {
-            this.lastTickTime = now;
-            return;
-        }
+		if (this.isPaused) {
+			this.lastTickTime = now;
+			return;
+		}
 
-        const delta = (now - this.lastTickTime) / 1000;
-        this.timeLeft -= delta;
+		const delta = (now - this.lastTickTime) / 1000;
+		this.timeLeft -= delta;
 
-        if (this.timeLeft <= 0) {
-            this.timeLeft = 0;
-            this.cancel();
-        }
+		if (this.timeLeft <= 0) {
+			this.timeLeft = 0;
+			this.cancel();
+		}
 
-        this.notify();
-        this.lastTickTime = now;
-    }
+		this.notify();
+		this.lastTickTime = now;
+	}
 
-    cancel() {
-        this.interval?.cancel();
-        this.interval = null;
-    }
+	cancel() {
+		this.interval?.cancel();
+		this.interval = null;
+	}
 }

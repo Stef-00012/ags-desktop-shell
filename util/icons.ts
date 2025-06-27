@@ -13,7 +13,8 @@ import {
 import { Gdk, Gtk } from "ags/gtk4";
 
 export function getBatteryIcon(percent: number, isCharging?: boolean): string {
-	if (percent === 100) return batteryIcons.percents[batteryIcons.percents.length - 1]
+	if (percent === 100)
+		return batteryIcons.percents[batteryIcons.percents.length - 1];
 	if (isCharging) return batteryIcons.charging;
 
 	const perc = Math.max(0, Math.min(100, percent));
@@ -122,6 +123,6 @@ export function getClockIcon(type: "clock" | "calendar"): string {
 
 export function isIcon(icon?: string | null) {
 	const iconTheme = Gtk.IconTheme.get_for_display(Gdk.Display.get_default()!);
-	
+
 	return icon && iconTheme.has_icon(icon);
 }

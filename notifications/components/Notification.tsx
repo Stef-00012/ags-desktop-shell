@@ -1,14 +1,15 @@
-import Gtk from "gi://Gtk?version=4.0";
-import Adw from "gi://Adw";
+import { escapeMarkup, parseMarkdown } from "@/util/text";
 import type Notifd from "gi://AstalNotifd";
-import Pango from "gi://Pango";
-import { isIcon } from "@/util/icons";
+import { fileExists } from "@/util/file";
 import { time } from "@/util/formatTime";
 import { urgency } from "@/util/notif";
-import { fileExists } from "@/util/file";
-import { Gdk } from "ags/gtk4";
+import Gtk from "gi://Gtk?version=4.0";
+import { isIcon } from "@/util/icons";
 import { Timer } from "@/util/timer";
 import { createState } from "ags";
+import Pango from "gi://Pango";
+import { Gdk } from "ags/gtk4";
+import Adw from "gi://Adw";
 
 const DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT = 5000; // 5 seconds
 
@@ -35,7 +36,8 @@ export default function Notification({
 
 	const timer = new Timer(expireTimeout);
 
-	const [progressBarFraction, setProgressBarFraction] = createState<number>(1);
+	const [progressBarFraction, setProgressBarFraction] =
+		createState<number>(1);
 
 	timer.subscribe(() => {
 		setProgressBarFraction(1 - timer.timeLeft / timer.timeout);
@@ -67,7 +69,7 @@ export default function Notification({
 		notification.dismiss();
 
 		if (!isNotificationCenter) timer.cancel();
-	} 
+	}
 
 	function handleHoverEnter() {
 		timer.isPaused = true;
@@ -87,16 +89,16 @@ export default function Notification({
 			<Gtk.GestureClick
 				button={Gdk.BUTTON_PRIMARY}
 				onPressed={handleLeftClick}
-				propagationPhase={main ? Gtk.PropagationPhase.TARGET : undefined}
+				propagationPhase={
+					main ? Gtk.PropagationPhase.TARGET : undefined
+				}
 			/>
 		);
 	}
 
 	return (
-		// <Adw.Clamp maximumSize={isNotificationCenter ? 590 : 530}>
 		<Adw.Clamp maximumSize={530}>
 			<box
-				// widthRequest={isNotificationCenter ? 590 : 530}
 				widthRequest={530}
 				class={`notification ${urgency(notification.urgency)} ${isNotificationCenter ? "center" : ""}`}
 				orientation={Gtk.Orientation.VERTICAL}
@@ -123,13 +125,18 @@ export default function Notification({
 				<box class="header">
 					{getLeftClickComponent()}
 
-					{(notification.appIcon || isIcon(notification.desktopEntry)) && (
+					{(notification.appIcon ||
+						isIcon(notification.desktopEntry)) && (
 						<image
 							class="app-icon"
 							visible={Boolean(
-								notification.appIcon || notification.desktopEntry,
+								notification.appIcon ||
+									notification.desktopEntry,
 							)}
-							iconName={notification.appIcon || notification.desktopEntry}
+							iconName={
+								notification.appIcon ||
+								notification.desktopEntry
+							}
 						/>
 					)}
 
@@ -176,8 +183,12 @@ export default function Notification({
 							class="summary"
 							halign={Gtk.Align.START}
 							xalign={0}
-							label={notification.summary}
+							label={parseMarkdown(
+								escapeMarkup(notification.summary),
+							)}
+							useMarkup
 							ellipsize={Pango.EllipsizeMode.END}
+							wrapMode={Pango.WrapMode.CHAR}
 						/>
 
 						{notification.body && (
@@ -188,7 +199,10 @@ export default function Notification({
 								halign={Gtk.Align.START}
 								xalign={0}
 								justify={Gtk.Justification.FILL}
-								label={notification.body}
+								label={parseMarkdown(
+									escapeMarkup(notification.body),
+								)}
+								wrapMode={Pango.WrapMode.CHAR}
 							/>
 						)}
 					</box>
@@ -202,7 +216,11 @@ export default function Notification({
 								hexpand
 								onClicked={() => notification.invoke(id)}
 							>
-								<label label={label} halign={Gtk.Align.CENTER} hexpand />
+								<label
+									label={label}
+									halign={Gtk.Align.CENTER}
+									hexpand
+								/>
 							</button>
 						))}
 					</box>

@@ -1,14 +1,14 @@
-import Notifications from "@/bar/modules/Notifications";
-import Microphone from "@/bar/modules/Microphone";
-import Battery from "@/bar/modules/Battery";
-import Speaker from "@/bar/modules/Speaker";
-import Network from "@/bar/modules/Network";
+import Notifications from "./modules/Notifications";
+import Microphone from "./modules/Microphone";
 import { Astal, type Gdk } from "ags/gtk4";
-import Memory from "@/bar/modules/Memory";
-import Media from "@/bar/modules/Media";
-import Disk from "@/bar/modules/Disk";
-import Time from "@/bar/modules/Time";
-import Cpu from "@/bar/modules/Cpu";
+import Battery from "./modules/Battery";
+import Speaker from "./modules/Speaker";
+import Network from "./modules/Network";
+import Memory from "./modules/Memory";
+import Media from "./modules/Media";
+import Disk from "./modules/Disk";
+import Time from "./modules/Time";
+import Cpu from "./modules/Cpu";
 import app from "ags/gtk4/app";
 
 interface Props {
@@ -46,7 +46,10 @@ export default function Bar({ gdkmonitor }: Props) {
 				</box>
 
 				<box $type="center">
-					<Media mediaClass="media-module" lyricsClass="lyrics-module" />
+					<Media
+						mediaClass="media-module"
+						lyricsClass="lyrics-module"
+					/>
 				</box>
 
 				<box $type="end">

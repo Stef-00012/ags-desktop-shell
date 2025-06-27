@@ -1,6 +1,8 @@
+import Notification from "./components/Notification";
 import { Astal, type Gdk, Gtk } from "ags/gtk4";
 import Notifd from "gi://AstalNotifd";
-import Notification from "@/notifications/components/Notification";
+import { timeout } from "ags/time";
+import giCairo from "gi://cairo";
 import {
 	type Accessor,
 	For,
@@ -8,8 +10,6 @@ import {
 	createState,
 	onCleanup,
 } from "ags";
-import giCairo from "gi://cairo";
-import { timeout } from "ags/time";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;

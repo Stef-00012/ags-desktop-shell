@@ -2,6 +2,7 @@ import { formatLyricsTooltip, parseLyricsData, useSong } from "@/util/lyrics";
 import { getLyricsIcon, getMediaIcon } from "@/util/icons";
 import { escapeMarkup, marquee } from "@/util/text";
 import type { SongData } from "@/types/lyrics";
+import { fileExists } from "@/util/file";
 import { Gdk, Gtk } from "ags/gtk4";
 import Mpris from "gi://AstalMpris";
 import {
@@ -11,9 +12,6 @@ import {
 	jsx,
 	type Accessor,
 } from "ags";
-import { fileExists } from "@/util/file";
-// import fetch, { URL } from "@/util/fetch";
-// import Soup from "gi://Soup";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -131,7 +129,7 @@ export default function Media({
 			<image
 				valign={Gtk.Align.CENTER}
 				class="image-cover-art"
-				visible={coverArt((path) => (!!path && fileExists(path)))}
+				visible={coverArt((path) => !!path && fileExists(path))}
 				file={coverArt}
 				overflow={Gtk.Overflow.HIDDEN}
 			/>

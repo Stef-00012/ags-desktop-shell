@@ -32,9 +32,13 @@ export default function Microphone({ class: className }: Props) {
 		const microphone = wp?.audio.defaultMicrophone;
 
 		if (deltaY < 0) {
-			microphone?.set_volume(Math.min(microphone.volume + VOLUME_STEP, 1.5));
+			microphone?.set_volume(
+				Math.min(microphone.volume + VOLUME_STEP, 1.5),
+			);
 		} else if (deltaY > 0) {
-			microphone?.set_volume(Math.max(microphone.volume - VOLUME_STEP, 0));
+			microphone?.set_volume(
+				Math.max(microphone.volume - VOLUME_STEP, 0),
+			);
 		}
 	}
 

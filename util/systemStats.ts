@@ -75,7 +75,8 @@ export const [microphoneStat, setMicrophoneStat] = createState<MicrophoneStat>({
 	muted: wp?.defaultMicrophone.mute || false,
 	volume: Math.round((wp?.defaultMicrophone.volume || 0) * 100),
 	api: wp?.defaultMicrophone.get_pw_property("device.api") || "Unknown",
-	isBluetooth: wp?.defaultMicrophone.get_pw_property("device.api") === "bluez5",
+	isBluetooth:
+		wp?.defaultMicrophone.get_pw_property("device.api") === "bluez5",
 });
 
 function updateSpeakerStat(speaker: Wp.Endpoint) {
@@ -197,7 +198,9 @@ async function recalculateCpuUsage() {
 		const cpuData = cpuStat.split(" ");
 
 		const coreNumber = cpuData.shift()?.replace("cpu", "") || "total";
-		const coreValues = cpuData.filter(Boolean).map((value) => parseInt(value));
+		const coreValues = cpuData
+			.filter(Boolean)
+			.map((value) => parseInt(value));
 
 		const coreData = getCoreInfo(coreNumber, coreValues);
 
@@ -215,8 +218,8 @@ async function recalculateMemoryUsage() {
 		totalRam,
 		usedRam,
 		freeRam,
-		sharedRam,
-		bufferCacheRam,
+		_sharedRam,
+		_bufferCacheRam,
 		availableRam,
 	] = memoryInfo.split("\n")[1].split(/\s+/);
 	const [, totalSwap, usedSwap, freeSwap] = memoryInfo

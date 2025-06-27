@@ -26,3 +26,5 @@ export const mantle = "#1e2030";
 export const crust = "#181926";
 
 export const tooltipCurrentSong = mauvre;
+export const lyricsSourceColor = sapphire;
+export const url = blue;

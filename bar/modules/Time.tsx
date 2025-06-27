@@ -45,7 +45,10 @@ export default function Time({ class: className }: Props) {
 	}
 
 	return (
-		<box class={className} cursor={Gdk.Cursor.new_from_name("pointer", null)}>
+		<box
+			class={className}
+			cursor={Gdk.Cursor.new_from_name("pointer", null)}
+		>
 			<Gtk.GestureClick
 				button={Gdk.BUTTON_PRIMARY}
 				onPressed={leftClickHandler}

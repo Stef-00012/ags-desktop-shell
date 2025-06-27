@@ -1,11 +1,14 @@
 import { fetch, Headers, URL, URLSearchParams } from "@/util/fetch";
-import { sapphire, tooltipCurrentSong } from "@/constants/colors";
 import { colorText, escapeMarkup } from "@/util/text";
 import { readFile, writeFile } from "ags/file";
 import { createState, onCleanup } from "ags";
 import type Mpris from "gi://AstalMpris";
 import Soup from "gi://Soup?version=3.0";
 import { timeout } from "ags/time";
+import {
+	tooltipCurrentSong,
+	lyricsSourceColor,
+} from "@/constants/colors";
 import type {
 	MusixmatchSearchResult,
 	UsertokenResponse,
@@ -92,7 +95,7 @@ async function getMusixmatchUsertoken(
 		saveMusixmatchToken(json);
 
 		return json;
-	} catch (e) {
+	} catch (_e) {
 		return null;
 	}
 }
@@ -162,7 +165,7 @@ async function _searchLyricsMusixmatch(
 			commonTrackId,
 			trackId,
 		};
-	} catch (e) {
+	} catch (_e) {
 		return null;
 	}
 }
@@ -205,7 +208,7 @@ async function _fetchLineSyncedLyricsMusixmatch(
 		if (!lyrics) return null;
 
 		return lyrics;
-	} catch (e) {
+	} catch (_e) {
 		return null;
 	}
 }
@@ -406,7 +409,9 @@ async function fetchLyricsLrclib(
 
 		const match = data.find(
 			(d: any) =>
-				d.artistName?.toLowerCase().includes(player.artist.toLowerCase()) &&
+				d.artistName
+					?.toLowerCase()
+					.includes(player.artist.toLowerCase()) &&
 				d.trackName?.toLowerCase() === player.title.toLowerCase(),
 		);
 
@@ -417,7 +422,7 @@ async function fetchLyricsLrclib(
 			source: "lrclib.net",
 			lineSynced: match?.syncedLyrics,
 		};
-	} catch (e) {
+	} catch (_e) {
 		return null;
 	}
 }
@@ -678,7 +683,7 @@ export function formatLyricsTooltip(
 	const nextLyrics =
 		data.next.length > 0 ? `\n${escapeMarkup(data.next.join("\n"))}` : "";
 
-	const tooltip = `${previousLyrics}${colorText(`<i>${escapeMarkup(data.current)}</i>`, tooltipCurrentSong)}${nextLyrics}\n\n${colorText(`[Source: ${song.source}]`, sapphire)}`;
+	const tooltip = `${previousLyrics}${colorText(`<i>${escapeMarkup(data.current)}</i>`, tooltipCurrentSong)}${nextLyrics}\n\n${colorText(`[Source: ${song.source}]`, lyricsSourceColor)}`;
 
 	return tooltip;
 }

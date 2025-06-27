@@ -1,9 +1,9 @@
-import { Astal, Gtk, Gdk } from "ags/gtk4";
 import { type Accessor, createBinding, For, type Setter } from "ags";
+import Notification from "./components/Notification";
+import { Astal, Gtk, Gdk } from "ags/gtk4";
+import { isIcon } from "@/util/icons";
 import Notifd from "gi://AstalNotifd";
 import Adw from "gi://Adw";
-import Notification from "@/notifications/components/Notification";
-import { isIcon } from "@/util/icons";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;

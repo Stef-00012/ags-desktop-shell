@@ -1,14 +1,14 @@
-import { createBinding, createState, For, onCleanup } from "ags";
-import { Gtk } from "ags/gtk4";
-import style from "./style.scss";
-import app from "ags/gtk4/app";
-import Bar from "@/bar/Bar";
 import NotificationPopups from "@/notifications/NotificationPopup";
-import GObject, { register } from "ags/gobject";
 import NotificationCenter from "@/notifications/NotificationCenter";
-import GLib from "gi://GLib";
+import { createBinding, createState, For, onCleanup } from "ags";
 import AppLauncher from "@/appLauncher/AppLauncher";
+import GObject, { register } from "ags/gobject";
+import style from "./style.scss";
+import { Gtk } from "ags/gtk4";
+import app from "ags/gtk4/app";
+import GLib from "gi://GLib";
 import OSD from "./osd/OSD";
+import Bar from "@/bar/Bar";
 
 @register({ Implements: [Gtk.Buildable] })
 class WindowTracker extends GObject.Object {
