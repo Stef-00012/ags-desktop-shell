@@ -64,8 +64,6 @@ export default function OSD({ gdkmonitor }: Props) {
 				readFileAsync(backlightMaxPath),
 			]);
 
-			console.log("brightness")
-
 			if (isStartup) return;
 
 			setOsdState({
@@ -85,7 +83,6 @@ export default function OSD({ gdkmonitor }: Props) {
 	}
 
 	function updateSpeakerState(speaker: Wp.Endpoint) {
-		console.log("speaker")
 		if (isStartup) return;
 		
 		let icon = speaker.volumeIcon;
@@ -110,7 +107,6 @@ export default function OSD({ gdkmonitor }: Props) {
 	}
 
 	function updateMicrophoneState(microphone: Wp.Endpoint) {
-		console.log("microphone")
 		if (isStartup) return;
 
 		let icon = microphone.volumeIcon;

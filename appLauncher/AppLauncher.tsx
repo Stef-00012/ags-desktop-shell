@@ -45,7 +45,6 @@ export default function AppLauncher({
 	}
 
 	function handleExternalClick() {
-		console.log("external click");
 		close();
 	}
 
