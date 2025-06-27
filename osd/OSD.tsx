@@ -27,6 +27,11 @@ export default function OSD({ gdkmonitor }: Props) {
 	const [isVisible, setIsVisible] = createState(false);
 
 	let lastTimeout: AstalIO.Time;
+	let isStartup = true;
+
+	timeout(300, () => {
+		isStartup = false;
+	})
 
 	const [osdState, setOsdState] = createState<{
 		type: "speaker" | "microphone" | "brightness";
@@ -34,10 +39,10 @@ export default function OSD({ gdkmonitor }: Props) {
 		mute: boolean;
 		icon: string;
 	}>({
-		type: "speaker",
-		percentage: defaultSpeaker?.volume || 0,
-		mute: defaultSpeaker?.mute || true,
-		icon: defaultSpeaker?.icon || "audio-volume-muted-symbolic",
+		type: "microphone",
+		percentage: defaultMicrophone?.volume || 0,
+		mute: defaultMicrophone?.mute || true,
+		icon: defaultMicrophone?.icon || "audio-volume-muted-symbolic",
 	});
 
 	defaultSpeaker?.connect("notify::volume", updateSpeakerState);
@@ -59,6 +64,10 @@ export default function OSD({ gdkmonitor }: Props) {
 				readFileAsync(backlightMaxPath),
 			]);
 
+			console.log("brightness")
+
+			if (isStartup) return;
+
 			setOsdState({
 				type: "brightness",
 				percentage: parseInt(currentString) / parseInt(maxString),
@@ -76,6 +85,9 @@ export default function OSD({ gdkmonitor }: Props) {
 	}
 
 	function updateSpeakerState(speaker: Wp.Endpoint) {
+		console.log("speaker")
+		if (isStartup) return;
+		
 		let icon = speaker.volumeIcon;
 
 		if (speaker.volume === 0) icon = "audio-volume-muted-symbolic";
@@ -98,6 +110,9 @@ export default function OSD({ gdkmonitor }: Props) {
 	}
 
 	function updateMicrophoneState(microphone: Wp.Endpoint) {
+		console.log("microphone")
+		if (isStartup) return;
+
 		let icon = microphone.volumeIcon;
 
 		if (microphone.volume === 0)
@@ -128,7 +143,6 @@ export default function OSD({ gdkmonitor }: Props) {
 				self.get_surface()?.set_input_region(new giCairo.Region());
 
 				self.connect("map", () => {
-					console.log("mapping surface");
 					self.get_surface()?.set_input_region(new giCairo.Region());
 				});
 			}}
