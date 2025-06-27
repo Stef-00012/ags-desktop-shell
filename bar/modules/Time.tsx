@@ -65,7 +65,7 @@ export default function Time({ class: className }: Props) {
 					setIsPopoverOpen(false);
 				}}
 			>
-				<Gtk.Calendar />
+				<Gtk.Calendar class="calendar" />
 			</popover>
 		</box>
 	);

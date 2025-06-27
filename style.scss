@@ -103,6 +103,50 @@ window.bar {
         background-size: cover;
         background-position: center;
     }
+
+    .time {
+        popover {
+            arrow,
+            contents {
+                background-color: $mantle-color;
+            }
+        }
+
+        .calendar {
+            header {
+                button:hover {
+                    background-color: $crust-color;
+                    background-image: unset;
+                }
+            }
+
+            grid {
+                .day-number {
+                    border-radius: 20px;
+                    outline-color: $crust-color;
+
+                    &.other-month {
+                        color: $surface2-color;
+                    }
+                    
+                    &:selected {
+                        background-color: $crust-color;
+                    }
+                    
+                    &.today {
+                        background-color: $surface0-color;
+                    }
+
+                    &:hover {
+                        background-color: gtkalpha($crust-color, 0.5);
+                        color: $text-color;
+                    }
+
+                }
+
+            }
+        }
+    }
 }
 
 window.notification-popups {
@@ -366,6 +410,40 @@ window.app-launcher {
 
             .app-icon {
                 margin-right: 12px;
+            }
+        }
+    }
+}
+
+window.osd {
+    background-color: transparent;
+
+    .osd-container {
+        background-color: $base-color;
+        border-radius: 30px;
+        padding: 5px 10px;
+
+        .icon {
+            margin-right: 5px;
+        }
+
+        .progress {
+            &.overfilled {
+                progress {
+                    border-color: $red-color;
+                    background-color: $red-color;
+                }
+            }
+
+            progress {
+                border-color: $overlay0-color;
+                background-color: $overlay0-color;
+            }
+
+            progress,
+            trough {
+                min-height: 10px;
+                border-radius: 30px;
             }
         }
     }

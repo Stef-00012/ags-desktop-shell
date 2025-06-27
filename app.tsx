@@ -8,7 +8,7 @@ import GObject, { register } from "ags/gobject";
 import NotificationCenter from "@/notifications/NotificationCenter";
 import GLib from "gi://GLib";
 import AppLauncher from "@/appLauncher/AppLauncher";
-// import OSD from "./osd/OSD";
+import OSD from "./osd/OSD";
 
 @register({ Implements: [Gtk.Buildable] })
 class WindowTracker extends GObject.Object {
@@ -26,6 +26,7 @@ export const [isAppLauncherVisible, setIsAppLauncherVisible] =
 app.start({
 	css: style,
 	gtkTheme: "Adwaita-dark",
+	instanceName: "desktop-shell",
 	main() {
 		const monitors = createBinding(app, "monitors");
 
@@ -52,7 +53,7 @@ app.start({
 							setVisible={setIsAppLauncherVisible}
 						/>
 
-						{/* <OSD gdkmonitor={monitor} /> */}
+						<OSD gdkmonitor={monitor} />
 					</WindowTracker>
 				)}
 			</For>
