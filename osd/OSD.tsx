@@ -39,10 +39,10 @@ export default function OSD({ gdkmonitor }: Props) {
 		mute: boolean;
 		icon: string;
 	}>({
-		type: "microphone",
-		percentage: defaultMicrophone?.volume || 0,
-		mute: defaultMicrophone?.mute || true,
-		icon: defaultMicrophone?.icon || "audio-volume-muted-symbolic",
+		type: "speaker",
+		percentage: defaultSpeaker?.volume || 0,
+		mute: defaultSpeaker?.mute || true,
+		icon: defaultSpeaker?.icon || "audio-volume-muted-symbolic",
 	});
 
 	defaultSpeaker?.connect("notify::volume", updateSpeakerState);
