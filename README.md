@@ -10,6 +10,8 @@ to try it just run `ags run app.ts` using AGS v3
 
 # TO-DO
 
+- [ ] Animations
+
 - [x] Launcher
     - [x] Launch Programs
     - [x] Calculator
