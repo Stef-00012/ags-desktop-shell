@@ -36,3 +36,4 @@ to try it just run `ags run app.ts` using AGS v3
     - [ ] Tray
     - [ ] Power Actions
     - [ ] Workspaces (maybe?)
+- [ ] Session menu
