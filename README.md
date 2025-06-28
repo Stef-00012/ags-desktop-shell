@@ -9,8 +9,30 @@ Currently those plugins are required:
 to try it just run `ags run app.ts` using AGS v3
 
 # TO-DO
-- [x] Show a popup for notifications
-    - [ ] Fix the notif overlay taking too more space then needed when there aren't enough notifs to scroll (and try to find a way to resize it dynamically with a max height of half screen)
-- [ ] Show a notification center to list all previous notifications
-- [ ] Create an app launcher
-- [ ] Create an OSD (On Screen Display) for volume, brightness and microphone
+
+- [x] Launcher
+    - [x] Launch Programs
+    - [x] Calculator
+    - [ ] Clipboard
+- [x] Notification Daemon
+    - [x] Notification Popups
+    - [x] Notification Center
+- [x] OSD
+    - [x] Speaker Volume
+    - [x] Microphone Volume
+    - [x] Brightness
+- [x] Bar
+    - [x] CPU
+    - [x] Disk
+    - [x] RAM
+    - [x] Battery
+    - [x] Clock
+    - [x] Media
+    - [x] Lyrics
+    - [x] Speaker
+    - [x] Microphone
+    - [x] Network
+    - [x] Notifications
+    - [ ] Tray
+    - [ ] Power Actions
+    - [ ] Workspaces (maybe?)

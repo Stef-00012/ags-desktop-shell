@@ -1,8 +1,9 @@
 import NotificationPopups from "@/notifications/NotificationPopup";
 import NotificationCenter from "@/notifications/NotificationCenter";
 import { createBinding, createState, For, onCleanup } from "ags";
-import AppLauncher from "@/appLauncher/AppLauncher";
+import AppLauncher, { type LauncherMode } from "@/launcher/Launcher";
 import GObject, { register } from "ags/gobject";
+import Notifd from "gi://AstalNotifd";
 import style from "./style.scss";
 import { Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
@@ -20,8 +21,10 @@ class WindowTracker extends GObject.Object {
 export const [isNotificationCenterVisible, setIsNotificationCenterVisible] =
 	createState(false);
 
-export const [isAppLauncherVisible, setIsAppLauncherVisible] =
-	createState(false);
+export const [appLauncherMode, setAppLauncherMode] =
+	createState<LauncherMode>("closed");
+
+const notifd = Notifd.get_default();
 
 app.start({
 	css: style,
@@ -49,8 +52,8 @@ app.start({
 
 						<AppLauncher
 							gdkmonitor={monitor}
-							visible={isAppLauncherVisible}
-							setVisible={setIsAppLauncherVisible}
+							mode={appLauncherMode}
+							setMode={setAppLauncherMode}
 						/>
 
 						<OSD gdkmonitor={monitor} />
@@ -65,19 +68,44 @@ app.start({
 		if (!argv) return res("argv parse error");
 
 		switch (argv[0]) {
-			case "toggle-notif": {
-				setIsNotificationCenterVisible((prev) => !prev);
-				setIsAppLauncherVisible(false);
+			case "clear-notif": {
+				notifd.get_notifications().forEach((notif) => notif.dismiss());
 
 				return res("ok");
 			}
 
-			case "toggle-applauncher": {
-				setIsAppLauncherVisible((prev) => !prev);
+			case "toggle-notif": {
+				setIsNotificationCenterVisible((prev) => !prev);
+				setAppLauncherMode("closed");
+
+				return res("ok");
+			}
+
+			case "toggle-launcher-app": {
+				setAppLauncherMode("app");
 				setIsNotificationCenterVisible(false);
 
 				return res("ok");
 			}
+
+			case "toggle-launcher-calculator": {
+				setAppLauncherMode("calculator");
+				setIsNotificationCenterVisible(false);
+
+				return res("ok");
+			}
+
+			/* 
+				DISABLED because exec("cliphist list") seems to error because it returns
+				raw binary image data instead of [[ binary data .. ]] like it would in a TTY
+			*/
+			
+			// case "toggle-launcher-clipboard": {
+			// 	setAppLauncherMode("clipboard");
+			// 	setIsNotificationCenterVisible(false);
+
+			// 	return res("ok");
+			// }
 
 			default: {
 				return res("unknown command");

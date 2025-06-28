@@ -6,6 +6,7 @@ import giCairo from "gi://cairo";
 import {
 	type Accessor,
 	For,
+	createBinding,
 	createComputed,
 	createState,
 	onCleanup,
@@ -26,6 +27,8 @@ export default function NotificationPopups({ gdkmonitor, hidden }: Props) {
 	const [notifications, setNotifications] = createState(
 		[] as Notifd.Notification[],
 	);
+
+	const doNotDisturb = createBinding(notifd, "dont_disturb")
 
 	const notifiedHandler = notifd.connect("notified", (_, id, replaced) => {
 		const notification = notifd.get_notification(id);
@@ -95,9 +98,9 @@ export default function NotificationPopups({ gdkmonitor, hidden }: Props) {
 	});
 
 	const windowVisibility = createComputed(
-		[hidden, notifications],
-		(hidden, notifications) => {
-			return !hidden && notifications.length > 0;
+		[hidden, notifications, doNotDisturb],
+		(hidden, notifications, doNotDisturb) => {
+			return !hidden && !doNotDisturb && notifications.length > 0;
 		},
 	);
 

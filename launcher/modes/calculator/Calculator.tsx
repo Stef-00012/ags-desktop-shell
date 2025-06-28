@@ -1,0 +1,85 @@
+import { createState, For, type Accessor } from "ags";
+import { exec, execAsync } from "ags/process";
+import type { PressedKey } from "../../Launcher";
+import { Gdk, Gtk } from "ags/gtk4";
+
+interface Props {
+	close: () => void;
+	searchValue: Accessor<string | null>;
+	enterPressed: Accessor<boolean>;
+	pressedKey: Accessor<PressedKey | null>;
+	visible: Accessor<boolean>;
+	externalClickPressed: Accessor<boolean>;
+}
+
+export default function CalculatorMode({
+	close,
+	searchValue,
+	enterPressed,
+	pressedKey,
+	visible,
+	externalClickPressed,
+}: Props) {
+	const [result, setResult] = createState<string | null>(null);
+	const [history, setHistory] = createState<string[]>([]);
+
+	externalClickPressed.subscribe(() => {
+		if (!externalClickPressed.get() || !visible.get()) return;
+
+		setHistory([]);
+		close();
+	});
+
+	enterPressed.subscribe(() => {
+		if (!enterPressed.get() || !visible.get()) return;
+
+		const res = result.get();
+		const historyData = history.get();
+
+		if (!res || historyData[0] === res) return;
+
+		setHistory((prev) => [res, ...prev]);
+	});
+
+	pressedKey.subscribe(() => {
+		if (!visible.get()) return;
+
+		const keyData = pressedKey.get();
+
+		if (!keyData) return;
+
+		if (keyData.keyval === Gdk.KEY_Escape) {
+			setHistory([]);
+			close();
+
+			return;
+		}
+	});
+
+	visible.subscribe(() => {
+		if (visible.get()) execAsync("qalc -e '0 - 0'"); // to update the exchange rates
+	});
+
+	searchValue.subscribe(() => {
+		if (!visible.get()) return;
+
+		const value = searchValue.get();
+		if (!value) return;
+
+		const res = exec(`qalc ${value}`);
+
+		setResult(res.trim());
+	});
+
+	return (
+		<box orientation={Gtk.Orientation.VERTICAL} visible={visible} class="calculator-container">
+			<label label={result((res) => res || "")} halign={Gtk.Align.START} class="calculator-result" />
+
+            <Gtk.Separator visible class="calculator-separator" />
+
+			<For each={history}>
+				{(historyEntry) => <label halign={Gtk.Align.START} label={historyEntry} />}
+			</For>
+		</box>
+	);
+}

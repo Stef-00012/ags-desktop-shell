@@ -371,10 +371,10 @@ window.notification-center {
     }
 }
 
-window.app-launcher {
+window.launcher {
     background-color: gtkalpha(#000000, 0.2);
 
-    .applauncher-container {
+    .launcher-container {
         background-color: gtkalpha($crust-color, 0.95);
         border-radius: 15px;
         padding: 1rem;
@@ -394,23 +394,36 @@ window.app-launcher {
             }
         }
 
-        .app-container {
-            padding: 6px;
-            margin-top: 3px;
-            margin-bottom: 3px;
-            background-color: $mantle-color;
-            border-radius: 8px;
+        .apps-container {
+            .app-container {
+                padding: 6px;
+                margin-top: 3px;
+                margin-bottom: 3px;
+                background-color: $mantle-color;
+                border-radius: 8px;
+    
+                &:first-child {
+                    margin-top: 6px;
+                }
+    
+                &:last-child {
+                    margin-bottom: 0;
+                }
+    
+                .app-icon {
+                    margin-right: 12px;
+                }
+            }
+        }
 
-            &:first-child {
+        .calculator-container {
+            .calculator-result {
+                font-size: 20px;
+                font-weight: bold;
+            }
+
+            .calculator-separator {
                 margin-top: 6px;
-            }
-
-            &:last-child {
-                margin-bottom: 0;
-            }
-
-            .app-icon {
-                margin-right: 12px;
             }
         }
     }
