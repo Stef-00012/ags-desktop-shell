@@ -1,3 +1,4 @@
+import { MICROPHONE_VOLUME_STEP } from "@/constants/config";
 import type { MicrophoneStat } from "@/types/systemStats";
 import { microphoneStat } from "@/util/systemStats";
 import { getMicrohponeIcon } from "@/util/icons";
@@ -9,8 +10,6 @@ import Wp from "gi://AstalWp";
 interface Props {
 	class?: string | Accessor<string>;
 }
-
-const VOLUME_STEP = 0.05; // 5%
 
 export default function Microphone({ class: className }: Props) {
 	function transformLabel(stat: MicrophoneStat) {
@@ -33,11 +32,11 @@ export default function Microphone({ class: className }: Props) {
 
 		if (deltaY < 0) {
 			microphone?.set_volume(
-				Math.min(microphone.volume + VOLUME_STEP, 1.5),
+				Math.min(microphone.volume + MICROPHONE_VOLUME_STEP, 1.5),
 			);
 		} else if (deltaY > 0) {
 			microphone?.set_volume(
-				Math.max(microphone.volume - VOLUME_STEP, 0),
+				Math.max(microphone.volume - MICROPHONE_VOLUME_STEP, 0),
 			);
 		}
 	}

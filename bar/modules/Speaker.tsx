@@ -1,3 +1,4 @@
+import { SPEAKER_VOLUME_STEP } from "@/constants/config";
 import type { SpeakerStat } from "@/types/systemStats";
 import { speakerStat } from "@/util/systemStats";
 import { audioIcons } from "@/constants/icons";
@@ -9,8 +10,6 @@ import Wp from "gi://AstalWp";
 interface Props {
 	class?: string | Accessor<string>;
 }
-
-const VOLUME_STEP = 0.05; // 5%
 
 export default function Speaker({ class: className }: Props) {
 	function transformLabel(stat: SpeakerStat) {
@@ -32,9 +31,9 @@ export default function Speaker({ class: className }: Props) {
 		const speaker = wp?.audio.defaultSpeaker;
 
 		if (deltaY < 0)
-			speaker?.set_volume(Math.min(speaker.volume + VOLUME_STEP, 1.5));
+			speaker?.set_volume(Math.min(speaker.volume + SPEAKER_VOLUME_STEP, 1.5));
 		else if (deltaY > 0)
-			speaker?.set_volume(Math.max(speaker.volume - VOLUME_STEP, 0));
+			speaker?.set_volume(Math.max(speaker.volume - SPEAKER_VOLUME_STEP, 0));
 	}
 
 	return (

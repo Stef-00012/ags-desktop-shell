@@ -1,4 +1,5 @@
 import { fetch, Headers, URL, URLSearchParams } from "@/util/fetch";
+import { MUSIXMATCH_TOKEN_PATH } from "@/constants/config";
 import { colorText, escapeMarkup } from "@/util/text";
 import { readFile, writeFile } from "ags/file";
 import { createState, onCleanup } from "ags";
@@ -20,8 +21,6 @@ import type {
 	SongData,
 	Sources,
 } from "@/types/lyrics";
-
-const MUSIXMATCH_TOKEN_PATH = "/tmp/musixmatch_token.json";
 
 const sleep = (ms: number) =>
 	new Promise((resolve) => timeout(ms, () => resolve(null)));

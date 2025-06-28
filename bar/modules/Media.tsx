@@ -1,4 +1,5 @@
 import { formatLyricsTooltip, parseLyricsData, useSong } from "@/util/lyrics";
+import { MEDIA_VOLUME_STEP, MEDIA_MAX_LENGTH } from "@/constants/config";
 import { getLyricsIcon, getMediaIcon } from "@/util/icons";
 import { escapeMarkup, marquee } from "@/util/text";
 import type { SongData } from "@/types/lyrics";
@@ -18,9 +19,6 @@ interface Props {
 	mediaClass?: string | Accessor<string>;
 	lyricsClass?: string | Accessor<string>;
 }
-
-const VOLUME_STEP = 0.05; // 5%
-const MEDIA_MAX_LENGTH = 25;
 
 export default function Media({
 	class: className,
@@ -114,9 +112,9 @@ export default function Media({
 		deltaY: number,
 	) {
 		if (deltaY < 0) {
-			spotify.set_volume(Math.min(spotify.volume + VOLUME_STEP, 1));
+			spotify.set_volume(Math.min(spotify.volume + MEDIA_VOLUME_STEP, 1));
 		} else if (deltaY > 0) {
-			spotify?.set_volume(Math.max(spotify.volume - VOLUME_STEP, 0));
+			spotify?.set_volume(Math.max(spotify.volume - MEDIA_VOLUME_STEP, 0));
 		}
 	}
 

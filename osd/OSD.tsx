@@ -6,13 +6,11 @@ import { createState } from "ags";
 import giCairo from "gi://cairo";
 import Wp from "gi://AstalWp";
 import GLib from "gi://GLib";
+import { BACKLIGHT_BASE_DIR, OSD_TIMEOUT_TIME } from "@/constants/config";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
 }
-
-const BACKLIGHT_BASE_DIR = "/sys/class/backlight";
-const TIMEOUT_TIME = 3000; // 3 seconds
 
 export default function OSD({ gdkmonitor }: Props) {
 	const wp = Wp.get_default();
@@ -76,7 +74,7 @@ export default function OSD({ gdkmonitor }: Props) {
 			setIsVisible(true);
 
 			if (lastTimeout) lastTimeout.cancel();
-			lastTimeout = timeout(TIMEOUT_TIME, () => {
+			lastTimeout = timeout(OSD_TIMEOUT_TIME, () => {
 				setIsVisible(false);
 			});
 		});
@@ -101,7 +99,7 @@ export default function OSD({ gdkmonitor }: Props) {
 		setIsVisible(true);
 
 		if (lastTimeout) lastTimeout.cancel();
-		lastTimeout = timeout(TIMEOUT_TIME, () => {
+		lastTimeout = timeout(OSD_TIMEOUT_TIME, () => {
 			setIsVisible(false);
 		});
 	}
@@ -124,7 +122,7 @@ export default function OSD({ gdkmonitor }: Props) {
 		setIsVisible(true);
 
 		if (lastTimeout) lastTimeout.cancel();
-		lastTimeout = timeout(TIMEOUT_TIME, () => {
+		lastTimeout = timeout(OSD_TIMEOUT_TIME, () => {
 			setIsVisible(false);
 		});
 	}

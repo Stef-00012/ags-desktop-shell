@@ -3,6 +3,7 @@
 	https://github.com/Mabi19/desktop-shell/blob/d70189b2355a4173a8ea6d5699f340fe73497945/utils/system-stats.ts
 */
 
+import { SYSTEM_STATS_UPDATE_INTERVAL } from "@/constants/config";
 import { readFileAsync } from "ags/file";
 import Network from "gi://AstalNetwork";
 import Battery from "gi://AstalBattery";
@@ -20,8 +21,6 @@ import type {
 	DiskStat,
 	CPUInfo,
 } from "@/types/systemStats";
-
-const UPDATE_INTERVAL = 1000;
 
 const battery = Battery.get_default();
 
@@ -395,7 +394,7 @@ async function recalculateDiskUsage() {
 	});
 }
 
-interval(UPDATE_INTERVAL, () => {
+interval(SYSTEM_STATS_UPDATE_INTERVAL, () => {
 	recalculateCpuUsage();
 	recalculateDiskUsage();
 	recalculateMemoryUsage();

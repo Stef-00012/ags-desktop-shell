@@ -1,3 +1,4 @@
+import { DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT } from "@/constants/config";
 import { escapeMarkup, parseMarkdown } from "@/util/text";
 import type Notifd from "gi://AstalNotifd";
 import { fileExists } from "@/util/file";
@@ -10,8 +11,6 @@ import { createState } from "ags";
 import Pango from "gi://Pango";
 import { Gdk } from "ags/gtk4";
 import Adw from "gi://Adw";
-
-const DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT = 5000; // 5 seconds
 
 export default function Notification({
 	notification,
