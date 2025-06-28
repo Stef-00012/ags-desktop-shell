@@ -66,7 +66,11 @@ export default function CalculatorMode({
 		const value = searchValue.get();
 		if (!value) return;
 
-		const res = exec(`qalc ${value}`);
+		let res = "Invalid Input"
+
+		try {
+			res = exec(`qalc ${value}`);
+		} catch(_e) {}
 
 		setResult(res.trim());
 	});
