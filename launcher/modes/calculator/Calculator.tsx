@@ -1,4 +1,4 @@
-import { createState, For, type Accessor } from "ags";
+import { createState, For, type Setter, type Accessor } from "ags";
 import { exec, execAsync } from "ags/process";
 import type { PressedKey } from "../../Launcher";
 import { Gdk, Gtk } from "ags/gtk4";
@@ -6,6 +6,7 @@ import { Gdk, Gtk } from "ags/gtk4";
 interface Props {
 	close: () => void;
 	searchValue: Accessor<string | null>;
+	setSearchValue: Setter<string | null>;
 	enterPressed: Accessor<boolean>;
 	pressedKey: Accessor<PressedKey | null>;
 	visible: Accessor<boolean>;
@@ -15,6 +16,7 @@ interface Props {
 export default function CalculatorMode({
 	close,
 	searchValue,
+	setSearchValue,
 	enterPressed,
 	pressedKey,
 	visible,
@@ -36,9 +38,10 @@ export default function CalculatorMode({
 		const res = result.get();
 		const historyData = history.get();
 
-		if (!res || historyData[0] === res) return;
+		if (!res || historyData[0] === res) return setSearchValue(null);
 
 		setHistory((prev) => [res, ...prev]);
+		setSearchValue(null);
 	});
 
 	pressedKey.subscribe(() => {

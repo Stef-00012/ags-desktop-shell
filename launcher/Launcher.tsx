@@ -134,6 +134,7 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 								<CalculatorMode
 									close={close}
 									searchValue={searchValue}
+									setSearchValue={setSearchValue}
 									enterPressed={enterPressed}
 									pressedKey={pressedKey}
 									visible={mode(
