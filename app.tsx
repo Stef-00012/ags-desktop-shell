@@ -30,6 +30,8 @@ app.start({
 	css: style,
 	gtkTheme: "Adwaita-dark",
 	instanceName: "desktop-shell",
+	icons: `${SRC}/icons`,
+
 	main() {
 		const monitors = createBinding(app, "monitors");
 
@@ -62,7 +64,9 @@ app.start({
 			</For>
 		);
 	},
+
 	requestHandler(request, res) {
+		console.log(request)
 		const [, argv] = GLib.shell_parse_argv(request);
 
 		if (!argv) return res("argv parse error");

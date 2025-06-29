@@ -6,112 +6,16 @@
 import { SYSTEM_STATS_UPDATE_INTERVAL } from "@/constants/config";
 import { readFileAsync } from "ags/file";
 import Network from "gi://AstalNetwork";
-import Battery from "gi://AstalBattery";
 import { interval } from "ags/time";
 import { exec } from "ags/process";
 import { createState } from "ags";
-import Wp from "gi://AstalWp";
 import type {
-	MicrophoneStat,
-	SpeakerStat,
-	BatteryStat,
 	NetworkStat,
 	MemoryStat,
 	CoreInfo,
 	DiskStat,
 	CPUInfo,
 } from "@/types/systemStats";
-
-const battery = Battery.get_default();
-
-export const [batteryStat, setBatteryStat] = createState<BatteryStat>({
-	isPresent: battery.isPresent,
-	capacity: battery.capacity,
-	isCharging: battery.charging,
-	percentage: battery.percentage * 100,
-	timeToFull: battery.timeToFull,
-	timeToEmpty: battery.timeToEmpty,
-	energyRate: battery.energyRate,
-	temperature: battery.temperature,
-	warningLevel: battery.warningLevel,
-	voltage: battery.voltage,
-});
-
-function updateBatteryStat(bat: Battery.Device) {
-	setBatteryStat({
-		isPresent: bat.isPresent,
-		isCharging: bat.charging,
-		percentage: bat.percentage * 100,
-		timeToFull: bat.timeToFull,
-		timeToEmpty: bat.timeToEmpty,
-		capacity: bat.capacity,
-		energyRate: bat.energyRate,
-		temperature: bat.temperature,
-		warningLevel: bat.warningLevel,
-		voltage: bat.voltage,
-	});
-}
-
-battery.connect("notify::charging", updateBatteryStat);
-battery.connect("notify::percentage", updateBatteryStat);
-battery.connect("notify::energy-rate", updateBatteryStat);
-battery.connect("notify::time-to-empty", updateBatteryStat);
-battery.connect("notify::time-to-full", updateBatteryStat);
-
-const wp = Wp.get_default();
-
-export const [speakerStat, setSpeakerStat] = createState<SpeakerStat>({
-	name: wp?.audio.defaultSpeaker.name || "Unknown",
-	muted: wp?.audio.defaultSpeaker.mute || false,
-	volume: Math.round((wp?.audio.defaultSpeaker.volume || 0) * 100),
-	api: wp?.audio.defaultSpeaker.get_pw_property("device.api") || "Unknown",
-	isBluetooth:
-		wp?.audio.defaultSpeaker.get_pw_property("device.api") === "bluez5",
-});
-
-export const [microphoneStat, setMicrophoneStat] = createState<MicrophoneStat>({
-	name: wp?.defaultMicrophone.description || "Unknown",
-	muted: wp?.defaultMicrophone.mute || false,
-	volume: Math.round((wp?.defaultMicrophone.volume || 0) * 100),
-	api: wp?.defaultMicrophone.get_pw_property("device.api") || "Unknown",
-	isBluetooth:
-		wp?.defaultMicrophone.get_pw_property("device.api") === "bluez5",
-});
-
-function updateSpeakerStat(speaker: Wp.Endpoint) {
-	const api = speaker.get_pw_property("device.api");
-
-	setSpeakerStat({
-		name: speaker.description,
-		muted: speaker.mute,
-		volume: Math.round(speaker.volume * 100),
-		api,
-		isBluetooth: api === "bluez5",
-	});
-}
-
-function updateMicrophoneStat(microphone: Wp.Endpoint) {
-	const api = microphone.get_pw_property("device.api");
-
-	setMicrophoneStat({
-		name: microphone.description,
-		muted: microphone.mute,
-		volume: Math.round(microphone.volume * 100),
-		api,
-		isBluetooth: api === "bluez5",
-	});
-}
-
-const defaultSpeaker = wp?.audio.defaultSpeaker;
-const defaultMicrophone = wp?.audio.defaultMicrophone;
-
-defaultSpeaker?.connect("notify::mute", updateSpeakerStat);
-defaultSpeaker?.connect("notify::volume", updateSpeakerStat);
-defaultSpeaker?.connect("notify::device-id", updateSpeakerStat);
-
-defaultMicrophone?.connect("notify::mute", updateMicrophoneStat);
-defaultMicrophone?.connect("notify::volume", updateMicrophoneStat);
-defaultMicrophone?.connect("notify::device-id", updateMicrophoneStat);
 
 export const [cpuUsage, setCpuUsage] = createState<CPUInfo>({
 	total: {
@@ -143,6 +47,7 @@ export const [networkUsage, setNetworkUsage] = createState<NetworkStat>({
 	interface: "Unknown",
 	isWifi: false,
 	isWired: false,
+	icon: "network-offline-symbolic"
 });
 
 export const [diskUsage, setDiskUsage] = createState<DiskStat>({
@@ -293,14 +198,27 @@ function getMainNetworkInterface(): string | undefined {
 const network = Network.get_default();
 
 network.connect("notify::primary", (source) => {
-	setNetworkUsage((prev) => ({
-		...prev,
-		isWifi: source.primary === Network.Primary.WIFI,
-		isWired: source.primary === Network.Primary.WIRED,
-		ssid: source.wifi?.ssid,
-		frequency: source.wifi?.frequency,
-		strength: source.wifi?.strength,
-	}));
+	setNetworkUsage((prev) => {
+		let icon = prev.icon;
+
+		if (source.primary === Network.Primary.WIFI) {
+			icon = network.wifi.iconName;
+		} else if (source.primary === Network.Primary.WIRED) {
+			icon = network.wired.iconName;
+		} else {
+			icon = "network-offline-symbolic";
+		}
+
+		return {
+			...prev,
+			isWifi: source.primary === Network.Primary.WIFI,
+			isWired: source.primary === Network.Primary.WIRED,
+			ssid: source.wifi?.ssid,
+			frequency: source.wifi?.frequency,
+			strength: source.wifi?.strength,
+			icon
+		}
+	});
 });
 
 async function recalculateNetworkUsage() {
@@ -319,6 +237,16 @@ async function recalculateNetworkUsage() {
 			const rx = parseInt(fields[0], 10);
 			const tx = parseInt(fields[8], 10);
 
+			let icon = "network-offline-symbolic";
+
+			if (network.primary === Network.Primary.WIFI) {
+				icon = network.wifi.iconName;
+			} else if (network.primary === Network.Primary.WIRED) {
+				icon = network.wired.iconName;
+			} else {
+				icon = "network-offline-symbolic";
+			}
+
 			const networkInfo: NetworkStat = {
 				rx,
 				tx,
@@ -328,6 +256,7 @@ async function recalculateNetworkUsage() {
 				ssid: network.wifi?.ssid,
 				frequency: network.wifi?.frequency,
 				strength: network.wifi?.strength,
+				icon
 			};
 
 			if (lastNetworkInfo && mainInterface === lastInterface) {
@@ -340,6 +269,7 @@ async function recalculateNetworkUsage() {
 					ssid: network.wifi?.ssid,
 					frequency: network.wifi?.frequency,
 					strength: network.wifi?.strength,
+					icon
 				};
 
 				setNetworkUsage(newNetStats);

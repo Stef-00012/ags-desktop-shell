@@ -1,6 +1,5 @@
 import type { DiskStat } from "@/types/systemStats";
 import { diskUsage } from "@/util/systemStats";
-import { getDiskIcon } from "@/util/icons";
 import type { Accessor } from "ags";
 
 interface Props {
@@ -9,7 +8,7 @@ interface Props {
 
 export default function Disk({ class: className }: Props) {
 	function transformLabel(usage: DiskStat) {
-		return `${getDiskIcon()} ${usage.availableSize}`;
+		return `${usage.availableSize}`;
 	}
 
 	function transformTooltip(usage: DiskStat) {
@@ -18,6 +17,8 @@ export default function Disk({ class: className }: Props) {
 
 	return (
 		<box class={className}>
+			<image iconName="mi-storage-symbolic" class="disk-icon" />
+
 			<label
 				label={diskUsage(transformLabel)}
 				tooltipMarkup={diskUsage(transformTooltip)}

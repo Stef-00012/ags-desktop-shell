@@ -1,6 +1,5 @@
 import { formatLyricsTooltip, parseLyricsData, useSong } from "@/util/lyrics";
 import { MEDIA_VOLUME_STEP, MEDIA_MAX_LENGTH } from "@/constants/config";
-import { getLyricsIcon, getMediaIcon } from "@/util/icons";
 import { escapeMarkup, marquee } from "@/util/text";
 import type { SongData } from "@/types/lyrics";
 import { fileExists } from "@/util/file";
@@ -55,9 +54,9 @@ export default function Media({
 		number,
 		number,
 	]) {
-		if (!track || !artist) return `${getMediaIcon(false)} No Media Playing`;
+		if (!track || !artist) return "No Media Playing";
 
-		return `${getMediaIcon(true)} ${marquee(`${artist} - ${track}`, MEDIA_MAX_LENGTH)}`;
+		return `${marquee(`${artist} - ${track}`, MEDIA_MAX_LENGTH)}`;
 	}
 
 	function transformMediaTooltip([track, artist, album, volume]: [
@@ -67,7 +66,7 @@ export default function Media({
 		number,
 		number,
 	]) {
-		if (!song) return "";
+		if (!track || !artist || !album) return "";
 
 		return [
 			`Artist: ${escapeMarkup(artist)}`,
@@ -77,8 +76,20 @@ export default function Media({
 		].join("\n");
 	}
 
+	function transformMediaHasTooltip([track, artist, album]: [
+		string,
+		string,
+		string,
+		number,
+		number,
+	]) {
+		if (!track || !artist || !album) return false;
+
+		return true;
+	}
+
 	function transformLyricsLabel([song, position]: [SongData | null, number]) {
-		const noMediaMsg = `${getLyricsIcon(false)} No Lyrics Available`;
+		const noMediaMsg = "No Lyrics Available";
 
 		if (!song || !song.lyrics || !song.source) return noMediaMsg;
 
@@ -90,7 +101,7 @@ export default function Media({
 
 		if (!parsedLyrics) return noMediaMsg;
 
-		return `${getLyricsIcon(true)} ${parsedLyrics}`;
+		return `${parsedLyrics}`;
 	}
 
 	function transformLyricsTooltip([song, position]: [
@@ -106,6 +117,31 @@ export default function Media({
 		return formatLyricsTooltip(song, lyricsData);
 	}
 
+	function transformLyricsHasTooltip([song, position]: [
+		SongData | null,
+		number,
+	]) {
+		if (!song || !song.lyrics || !song.source) return false;
+
+		const lyricsData = parseLyricsData(song.lyrics, position, song.source);
+
+		if (!lyricsData) return false;
+
+		return true;
+	}
+
+	function transformMediaIcon([track, artist]: [
+		string,
+		string,
+		string,
+		number,
+		number,
+	]) {
+		if (!track || !artist) return "mi-music-off-symbolic";
+
+		return "mi-music-note-symbolic";
+	}
+
 	function handleScroll(
 		_event: Gtk.EventControllerScroll,
 		_deltaX: number,
@@ -114,7 +150,9 @@ export default function Media({
 		if (deltaY < 0) {
 			spotify.set_volume(Math.min(spotify.volume + MEDIA_VOLUME_STEP, 1));
 		} else if (deltaY > 0) {
-			spotify?.set_volume(Math.max(spotify.volume - MEDIA_VOLUME_STEP, 0));
+			spotify?.set_volume(
+				Math.max(spotify.volume - MEDIA_VOLUME_STEP, 0),
+			);
 		}
 	}
 
@@ -132,11 +170,10 @@ export default function Media({
 				overflow={Gtk.Overflow.HIDDEN}
 			/>
 
-			<label
-				cursor={Gdk.Cursor.new_from_name("pointer", null)}
+			<box
 				class={mediaClass}
-				label={mainMetadata(transformMediaLabel)}
-				hasTooltip
+				cursor={Gdk.Cursor.new_from_name("pointer", null)}
+				hasTooltip={mainMetadata(transformMediaHasTooltip)}
 				onQueryTooltip={(_label, _x, _y, _keyboardMode, tooltip) => {
 					if (mediaDispose) mediaDispose();
 
@@ -155,21 +192,27 @@ export default function Media({
 					return true;
 				}}
 			>
-				<Gtk.EventControllerScroll
-					flags={Gtk.EventControllerScrollFlags.VERTICAL}
-					onScroll={handleScroll}
+				<image
+					iconName={mainMetadata(transformMediaIcon)}
+					class="media-icon"
 				/>
 
-				<Gtk.GestureClick
-					button={Gdk.BUTTON_PRIMARY}
-					onPressed={handleLeftClick}
-				/>
-			</label>
+				<label label={mainMetadata(transformMediaLabel)}>
+					<Gtk.EventControllerScroll
+						flags={Gtk.EventControllerScrollFlags.VERTICAL}
+						onScroll={handleScroll}
+					/>
 
-			<label
+					<Gtk.GestureClick
+						button={Gdk.BUTTON_PRIMARY}
+						onPressed={handleLeftClick}
+					/>
+				</label>
+			</box>
+
+			<box
 				class={lyricsClass}
-				label={lyricsState(transformLyricsLabel)}
-				hasTooltip
+				hasTooltip={lyricsState(transformLyricsHasTooltip)}
 				onQueryTooltip={(_label, _x, _y, _keyboardMode, tooltip) => {
 					if (lyricsDispose) lyricsDispose();
 
@@ -187,7 +230,11 @@ export default function Media({
 
 					return true;
 				}}
-			/>
+			>
+				<image iconName="mi-lyrics-symbolic" class="lyrics-icon" />
+
+				<label label={lyricsState(transformLyricsLabel)} />
+			</box>
 		</box>
 	);
 }

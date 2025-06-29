@@ -1,9 +1,5 @@
 import { MICROPHONE_VOLUME_STEP } from "@/constants/config";
-import type { MicrophoneStat } from "@/types/systemStats";
-import { microphoneStat } from "@/util/systemStats";
-import { getMicrohponeIcon } from "@/util/icons";
-import { audioIcons } from "@/constants/icons";
-import type { Accessor } from "ags";
+import { createBinding, createComputed, createState, type Accessor } from "ags";
 import { Gtk } from "ags/gtk4";
 import Wp from "gi://AstalWp";
 
@@ -12,14 +8,41 @@ interface Props {
 }
 
 export default function Microphone({ class: className }: Props) {
-	function transformLabel(stat: MicrophoneStat) {
-		return `${
-			stat.isBluetooth ? `${audioIcons.bluetooth} ` : ""
-		}${getMicrohponeIcon(stat.muted)} ${stat.volume}%`;
+	const wp = Wp.get_default();
+	const microphone = wp?.audio.defaultMicrophone;
+
+	if (!wp || !microphone)
+		return (
+			<box class={className}>
+				<label label="Inaccessible Microphone" />
+			</box>
+		);
+
+	const volume = createBinding(microphone, "volume");
+	const iconName = createBinding(microphone, "volume_icon");
+	const device = createBinding(microphone, "description");
+
+	const [isBluetooth, setIsBluetooth] = createState(
+		microphone.get_pw_property("device.api") === "bluez5",
+	);
+
+	const icon = createComputed([iconName, volume], transformIcon);
+
+	device.subscribe(() => {
+		setIsBluetooth(microphone.get_pw_property("device.api") === "bluez5");
+	});
+
+	function transformLabel(volume: number) {
+		return `${Math.round(volume * 100)}%`;
 	}
 
-	function transformTooltip(stat: MicrophoneStat) {
-		return `Volume: ${stat.volume}%\nDevice: ${stat.name}`;
+	function transformTooltip(device: string) {
+		return `Device: ${device}`;
+	}
+
+	function transformIcon(iconName: string, volume: number) {
+		if (volume === 0) return "microphone-sensitivity-muted-symbolic";
+		return iconName;
 	}
 
 	function handleScroll(
@@ -31,27 +54,28 @@ export default function Microphone({ class: className }: Props) {
 		const microphone = wp?.audio.defaultMicrophone;
 
 		if (deltaY < 0) {
-			microphone?.set_volume(
-				Math.min(microphone.volume + MICROPHONE_VOLUME_STEP, 1.5),
-			);
+			microphone?.set_volume(microphone.volume + MICROPHONE_VOLUME_STEP);
 		} else if (deltaY > 0) {
-			microphone?.set_volume(
-				Math.max(microphone.volume - MICROPHONE_VOLUME_STEP, 0),
-			);
+			microphone?.set_volume(microphone.volume - MICROPHONE_VOLUME_STEP);
 		}
 	}
 
 	return (
-		<box class={className}>
+		<box class={className} tooltipMarkup={device(transformTooltip)}>
 			<Gtk.EventControllerScroll
 				flags={Gtk.EventControllerScrollFlags.VERTICAL}
 				onScroll={handleScroll}
 			/>
 
-			<label
-				label={microphoneStat(transformLabel)}
-				tooltipMarkup={microphoneStat(transformTooltip)}
+			<image
+				iconName="mi-bluetooth-connected-symbolic"
+				visible={isBluetooth}
+				class="microphone-bluetooth-icon"
 			/>
+
+			<image iconName={icon} class="microphone-icon" />
+
+			<label label={volume(transformLabel)} />
 		</box>
 	);
 }

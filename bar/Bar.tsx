@@ -5,9 +5,11 @@ import Battery from "./modules/Battery";
 import Speaker from "./modules/Speaker";
 import Network from "./modules/Network";
 import Memory from "./modules/Memory";
+import Power from "./modules/Power";
 import Media from "./modules/Media";
 import Disk from "./modules/Disk";
 import Time from "./modules/Time";
+import Tray from "./modules/Tray";
 import Cpu from "./modules/Cpu";
 import app from "ags/gtk4/app";
 
@@ -61,9 +63,17 @@ export default function Bar({ gdkmonitor }: Props) {
 						<Microphone />
 					</box>
 
+					<box class="network">
+						<Network />
+					</box>
+
 					<box class="misc">
-						<Network class="network-module" />
 						<Notifications class="notification-module" />
+						<Tray />
+					</box>
+
+					<box class="power">
+						<Power />
 					</box>
 				</box>
 			</centerbox>

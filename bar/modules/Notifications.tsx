@@ -1,6 +1,5 @@
-import { createBinding, createComputed, type Accessor } from "ags";
+import { createBinding, With, type Accessor } from "ags";
 import { setIsNotificationCenterVisible } from "@/app";
-import { getNotificationIcon } from "@/util/icons";
 import Notifd from "gi://AstalNotifd";
 import { Gdk, Gtk } from "ags/gtk4";
 
@@ -14,13 +13,14 @@ export default function Notifications({ class: className }: Props) {
 	const notifs = createBinding(notifd, "notifications");
 	const dontDisturb = createBinding(notifd, "dontDisturb");
 
-	const notifLabel = createComputed([notifs, dontDisturb]);
+	function transformLabel(notifications: Notifd.Notification[]) {
+		return `${notifications.length}`;
+	}
 
-	function transformLabel([notifications, dontDisturb]: [
-		Notifd.Notification[],
-		boolean,
-	]) {
-		return `${getNotificationIcon(notifications.length > 0, dontDisturb)} ${notifications.length}`;
+	function transformIcon(dontDisturb: boolean) {
+		return dontDisturb
+			? "mi-notifications-off-symbolic"
+			: "mi-notifications-symbolic";
 	}
 
 	function handleLeftClick() {
@@ -59,7 +59,29 @@ export default function Notifications({ class: className }: Props) {
 				onPressed={handleMiddleClick}
 			/>
 
-			<label label={notifLabel(transformLabel)} useMarkup />
+			<box
+				class={notifs((notifications) =>
+					notifications.length > 0
+						? "notification-icon unread"
+						: "notification-icon",
+				)}
+			>
+				<image iconName={dontDisturb(transformIcon)} class="icon" />
+
+				<With value={notifs}>
+					{(notifications) =>
+						notifications.length > 0 && (
+							<image
+								iconName="mi-circle-symbolic"
+								class="unread"
+								pixelSize={8}
+							/>
+						)
+					}
+				</With>
+			</box>
+
+			<label label={notifs(transformLabel)} />
 		</box>
 	);
 }

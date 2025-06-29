@@ -1,6 +1,5 @@
 import type { CPUInfo } from "@/types/systemStats";
 import { cpuUsage } from "@/util/systemStats";
-import { getCPUIcon } from "@/util/icons";
 import type { Accessor } from "ags";
 
 interface Props {
@@ -9,7 +8,7 @@ interface Props {
 
 export default function Cpu({ class: className }: Props) {
 	function transformLabel(usage: CPUInfo) {
-		return `${getCPUIcon()} ${usage.total.percentage.toFixed(2)}%`;
+		return `${usage.total.percentage.toFixed(2)}%`;
 	}
 
 	function transformTooltip(usage: CPUInfo) {
@@ -27,6 +26,8 @@ export default function Cpu({ class: className }: Props) {
 
 	return (
 		<box class={className}>
+			<image iconName="mi-memory-symbolic" class="cpu-icon" />
+
 			<label
 				label={cpuUsage(transformLabel)}
 				tooltipMarkup={cpuUsage(transformTooltip)}

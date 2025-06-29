@@ -1,5 +1,4 @@
-import { createComputed, createState, type Accessor } from "ags";
-import { getClockIcon } from "@/util/icons";
+import { createState, With, type Accessor } from "ags";
 import { createPoll } from "ags/time";
 import { Gdk, Gtk } from "ags/gtk4";
 
@@ -17,15 +16,16 @@ export default function Time({ class: className }: Props) {
 
 	const timeData = createPoll("", 1000, command);
 
-	const label = createComputed([showAlt, timeData], transformLabel);
+	function transformLabel(timeData: string) {
+		const [, , , , hours, minutes, ampm] = timeData.split(" | ");
 
-	function transformLabel(showAlt: boolean, timeData: string) {
-		const [day, month, monthDay, year, hours, minutes, ampm] =
-			timeData.split(" | ");
+		return `${hours}:${minutes} ${ampm}`;
+	}
 
-		return showAlt
-			? `${getClockIcon("clock")} ${hours}:${minutes} ${ampm} ${getClockIcon("calendar")} ${year}, ${monthDay} ${month}, ${day}`
-			: `${getClockIcon("clock")} ${hours}:${minutes} ${ampm}`;
+	function transformAltLabel(timeData: string) {
+		const [day, month, monthDay, year] = timeData.split(" | ");
+
+		return `${year}, ${monthDay} ${month}, ${day}`;
 	}
 
 	function leftClickHandler() {
@@ -58,7 +58,24 @@ export default function Time({ class: className }: Props) {
 				onPressed={rightClickHandler}
 			/>
 
-			<label label={label} />
+			<image iconName="mi-schedule-symbolic" class="time-icon clock" />
+
+			<label label={timeData(transformLabel)} />
+
+			<With value={showAlt}>
+				{(showAlt) =>
+					showAlt && (
+						<box>
+							<image
+								iconName="mi-calendar-month-symbolic"
+								class="time-icon calendar"
+							/>
+
+							<label label={timeData(transformAltLabel)} />
+						</box>
+					)
+				}
+			</With>
 
 			<popover
 				$={(self) => {

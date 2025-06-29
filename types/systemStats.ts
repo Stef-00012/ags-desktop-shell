@@ -1,5 +1,3 @@
-import type Battery from "gi://AstalBattery";
-
 export type CoreInfo = {
 	idle: number;
 	total: number;
@@ -14,6 +12,7 @@ export type CPUInfo = {
 export type NetworkStat = {
 	rx: number;
 	tx: number;
+	icon: string;
 	interface: string;
 	isWifi: boolean;
 	isWired: boolean;
@@ -56,27 +55,6 @@ export type DiskStat = {
 	availableSize: string;
 	usagePercent: string;
 	path: string;
-};
-
-export type BatteryStat = {
-	isPresent: boolean;
-	isCharging: boolean;
-	percentage: number;
-	timeToFull: number;
-	timeToEmpty: number;
-	capacity: number;
-	energyRate: number;
-	temperature: number;
-	warningLevel: Battery.WarningLevel;
-	voltage: number;
-};
-
-export type MicrophoneStat = {
-	name: string;
-	muted: boolean;
-	volume: number;
-	api: string;
-	isBluetooth: boolean;
 };
 
 export type SpeakerStat = {

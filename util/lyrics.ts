@@ -721,6 +721,8 @@ export function useSong(player: Mpris.Player) {
 		});
 
 		getLyrics(player).then((lyrics) => {
+			if (lyrics?.trackId !== player.trackid) return;
+
 			setSong({
 				artist: player.artist,
 				track: player.title,

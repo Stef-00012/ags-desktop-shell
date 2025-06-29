@@ -40,119 +40,39 @@ $crust-color: #181926;
     color: $text-color;
 }
 
-window.bar {
-    background: $base-color;
+tooltip {
+    background: $mantle-color;
+    border-radius: 15px;
+}
+
+tooltip label {
     color: $text-color;
-    font-weight: bold;
+}
 
-    >centerbox {
-        border-radius: 10px;
-    }
+button {
+    border-radius: 8px;
+    background-image: unset;
+    background-color: $mantle-color;
+}
 
-    tooltip {
-        background: $mantle-color;
-        border-radius: 15px;
-    }
+button:hover {
+    background-color: gtkalpha($mantle-color, 0.6);
+}
 
-    tooltip label {
-        color: $text-color;
+popover {
+
+    arrow,
+    contents {
+        background-color: $mantle-color;
     }
 
     button {
-        border-radius: 8px;
-        margin: 2px;
+        background-color: $base-color;
     }
 
-    .resources,
-    .battery,
-    .media-module,
-    .audio,
-    .misc,
-    .microphone,
-    .speaker {
-        margin: 6px;
-        border-radius: 8px;
-        padding: 8px;
-        background-color: $mantle-color;
-        margin-right: 2px;
-
-        .cpu-module,
-        .disk-module,
-        .speaker-module,
-        .network-module {
-            margin-right: 12px;
-        }
+    button:hover {
+        background-color: gtkalpha($base-color, 0.6);
     }
-
-    .misc {
-        margin-right: 6px;
-    }
-
-    .time,
-    .lyrics-module {
-        margin: 6px;
-        border-radius: 8px;
-        padding: 8px;
-        background-color: $mantle-color;
-    }
-
-    .image-cover-art {
-        border-radius: 8px;
-        min-width: 35px;
-        min-height: 35px;
-        background-size: cover;
-        background-position: center;
-    }
-
-    .time {
-        popover {
-
-            arrow,
-            contents {
-                background-color: $mantle-color;
-            }
-        }
-
-        .calendar {
-            header {
-                button:hover {
-                    background-color: $crust-color;
-                    background-image: unset;
-                }
-            }
-
-            grid {
-                .day-number {
-                    border-radius: 20px;
-                    outline-color: $crust-color;
-
-                    &.other-month {
-                        color: $surface2-color;
-                    }
-
-                    &:selected {
-                        background-color: $crust-color;
-                    }
-
-                    &.today {
-                        background-color: $surface0-color;
-                    }
-
-                    &:hover {
-                        background-color: gtkalpha($crust-color, 0.5);
-                        color: $text-color;
-                    }
-
-                }
-
-            }
-        }
-    }
-}
-
-window.notification-popups {
-    all: unset;
-
 }
 
 .notification {
@@ -238,12 +158,6 @@ window.notification-popups {
 
         button {
             margin: 0 0.3rem;
-            background-image: unset;
-            background-color: $mantle-color;
-
-            &:hover {
-                background-color: gtkalpha($mantle-color, 0.6);
-            }
 
             &:first-child {
                 margin-left: 0;
@@ -273,6 +187,176 @@ window.notification-popups {
     }
 }
 
+window.bar {
+    background: $base-color;
+    color: $text-color;
+    font-weight: bold;
+
+    >centerbox {
+        border-radius: 10px;
+    }
+
+    // groups
+    .resources,
+    .battery,
+    .media-module,
+    .audio,
+    .misc,
+    .microphone,
+    .speaker,
+    .network,
+    .power,
+    .time,
+    .lyrics-module {
+        margin: 6px;
+        border-radius: 8px;
+        padding: 8px;
+        background-color: $mantle-color;
+        margin-right: 2px;
+
+        // modules in groups with other modules
+        .cpu-module,
+        .disk-module {
+            margin-right: 12px;
+        }
+    }
+
+    // last group (rightmost)
+    .power {
+        margin-right: 6px;
+    }
+
+    // last modules in groups with other modules
+    .time,
+    .lyrics-module,
+    .notification-module {
+        margin-right: 0;
+    }
+
+    .image-cover-art {
+        border-radius: 8px;
+        min-width: 35px;
+        min-height: 35px;
+        background-size: cover;
+        background-position: center;
+    }
+
+    .time {
+        .calendar {
+            margin-left: 3px;
+            margin-right: 3px;
+
+            header {
+                button {
+                    background-color: unset;
+                }
+
+                button:hover {
+                    background-color: gtkalpha($crust-color, 0.6);
+                    background-image: unset;
+                }
+            }
+
+            grid {
+                .day-number {
+                    border-radius: 20px;
+                    outline-color: $crust-color;
+
+                    &.other-month {
+                        color: $surface2-color;
+                    }
+
+                    &:selected {
+                        background-color: $crust-color;
+                    }
+
+                    &.today {
+                        background-color: $surface0-color;
+                    }
+
+                    &:hover {
+                        background-color: gtkalpha($crust-color, 0.5);
+                        color: $text-color;
+                    }
+
+                }
+
+            }
+        }
+    }
+
+    .tray-popover {
+        .tray-item {
+            .tray-popover-menu {
+                modelbutton {
+                    background-color: $base-color;
+                    margin-top: 3px;
+                    margin-bottom: 3px;
+                }
+
+                modelbutton:first-child {
+                    margin-top: 0;
+                }
+
+                modelbutton:last-child {
+                    margin-bottom: 0;
+                }
+
+                modelbutton.title {
+                    font-weight: bold;
+                    margin-bottom: 6px;
+                }
+
+                modelbutton:hover {
+                    background-color: gtkalpha($base-color, 0.6);
+                }
+
+                separator {
+                    margin-top: 6px;
+                    margin-bottom: 6px;
+                    background-color: gtkalpha($overlay0-color, 0.5);
+                }
+            }
+        }
+    }
+
+    .battery-icon,
+    .cpu-icon,
+    .disk-icon,
+    .media-icon,
+    .lyrics-icon,
+    .microphone-icon,
+    .microphone-bluetooth-icon,
+    .network-icon,
+    .speaker-icon,
+    .speaker-bluetooth-icon,
+    .time.clock {
+        margin-right: 6px;
+    }
+
+    .notification-icon {
+        margin-right: 12px;
+
+        .icon {
+            margin-right: -8px;
+        }
+
+        .unread {
+            color: $red-color;
+            margin-bottom: 6px;
+        }
+
+        &.unread {
+            margin-right: 6px;
+        }
+    }
+}
+
+window.notification-popups {
+    all: unset;
+
+}
+
 window.notification-center {
     background-color: gtkalpha(#000000, 0.2);
 
@@ -286,8 +370,11 @@ window.notification-center {
         .header {
             .title-container {
                 .dismiss-all {
-                    background-image: unset;
                     background-color: $base-color;
+                }
+
+                .dismiss-all:hover {
+                    background-color: gtkalpha($base-color, 0.6);
                 }
 
                 .title {
@@ -401,15 +488,15 @@ window.launcher {
                 margin-bottom: 3px;
                 background-color: $mantle-color;
                 border-radius: 8px;
-    
+
                 &:first-child {
                     margin-top: 6px;
                 }
-    
+
                 &:last-child {
                     margin-bottom: 0;
                 }
-    
+
                 .app-icon {
                     margin-right: 12px;
                 }

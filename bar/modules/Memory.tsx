@@ -1,6 +1,5 @@
 import type { MemoryStat } from "@/types/systemStats";
 import { memoryUsage } from "@/util/systemStats";
-import { getMemoryIcon } from "@/util/icons";
 import type { Accessor } from "ags";
 
 interface Props {
@@ -9,7 +8,7 @@ interface Props {
 
 export default function Memory({ class: className }: Props) {
 	function formatLabel(usage: MemoryStat) {
-		return `${getMemoryIcon()} ${usage.memory.usage.toFixed(1)}%`;
+		return `${usage.memory.usage.toFixed(1)}%`;
 	}
 
 	function formatTooltip(usage: MemoryStat) {
@@ -21,6 +20,8 @@ export default function Memory({ class: className }: Props) {
 
 	return (
 		<box class={className}>
+			<image iconName="mi-memory-alt-symbolic" class="ram-icon" />
+
 			<label
 				label={memoryUsage(formatLabel)}
 				tooltipMarkup={memoryUsage(formatTooltip)}

@@ -1,6 +1,5 @@
 import { formatNetworkThroughput, networkUsage } from "@/util/systemStats";
 import type { NetworkStat } from "@/types/systemStats";
-import { getNetworkIcon } from "@/util/icons";
 import type { Accessor } from "ags";
 
 interface Props {
@@ -10,24 +9,14 @@ interface Props {
 export default function Network({ class: className }: Props) {
 	function transformLabel(stat: NetworkStat) {
 		if (stat.isWifi) {
-			return `${getNetworkIcon({
-				isWifi: stat.isWifi,
-				isWired: stat.isWired,
-				strength: stat.strength,
-			})} ${stat.strength}%`;
+			return `${stat.strength}%`;
 		}
 
 		if (stat.isWired) {
-			return `${getNetworkIcon({
-				isWifi: stat.isWifi,
-				isWired: stat.isWired,
-			})} Wired`;
+			return "Wired";
 		}
 
-		return getNetworkIcon({
-			isWifi: stat.isWifi,
-			isWired: stat.isWired,
-		});
+		return "";
 	}
 
 	function transformTooltip(stat: NetworkStat) {
@@ -52,12 +41,18 @@ export default function Network({ class: className }: Props) {
 		return "";
 	}
 
+	function transformIcon(stat: NetworkStat) {
+		return stat.icon;
+	}
+
 	return (
-		<box class={className}>
-			<label
-				label={networkUsage(transformLabel)}
-				tooltipMarkup={networkUsage(transformTooltip)}
+		<box class={className} tooltipMarkup={networkUsage(transformTooltip)}>
+			<image
+				iconName={networkUsage(transformIcon)}
+				class="network-icon"
 			/>
+
+			<label label={networkUsage(transformLabel)} />
 		</box>
 	);
 }

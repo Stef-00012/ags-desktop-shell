@@ -36,6 +36,10 @@ to try it just run `ags run app.ts` using AGS v3
     - [x] Network
     - [x] Notifications
     - [ ] Tray
-    - [ ] Power Actions
+    - [x] Power Actions
     - [ ] Workspaces (maybe?)
 - [ ] Session menu
+
+# Credits
+
+Icons inside the `icons` folder are from [Material Symbols](https://fonts.google.com/icons?icon.size=24&icon.color=%23e3e3e3&icon.set=Material+Symbols&icon.style=Rounded)
