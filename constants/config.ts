@@ -1,3 +1,7 @@
+import GLib from "gi://GLib";
+
+export const HOME = GLib.getenv("HOME");
+
 export const MUSIXMATCH_TOKEN_PATH = "/tmp/musixmatch_token.json";
 
 export const MEDIA_VOLUME_STEP = 0.05; // 5%
@@ -13,3 +17,5 @@ export const BACKLIGHT_BASE_DIR = "/sys/class/backlight";
 export const OSD_TIMEOUT_TIME = 3000; // 3 seconds
 
 export const SYSTEM_STATS_UPDATE_INTERVAL = 1000;
+
+export const SAVE_FOLDER = `${HOME}/Music/spotifyData`;

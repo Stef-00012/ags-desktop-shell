@@ -59,8 +59,28 @@ button:hover {
     background-color: gtkalpha($mantle-color, 0.6);
 }
 
-popover {
+check {
+    background-color: $surface0-color;
+    background-image: unset;
+    border-radius: 6px;
+    margin-right: 6px;
+    border-color: $mantle-color;
+}
 
+check:hover {
+    background-color: gtkalpha($surface0-color, 0.6);
+}
+
+check:checked {
+    background-color: $surface2-color;
+    color: $text-color;
+}
+
+check:checked:hover {
+    background-color: gtkalpha($surface2-color, 0.6);
+}
+
+popover {
     arrow,
     contents {
         background-color: $mantle-color;
@@ -196,39 +216,28 @@ window.bar {
         border-radius: 10px;
     }
 
-    // groups
-    .resources,
-    .battery,
-    .media-module,
-    .audio,
-    .misc,
-    .microphone,
-    .speaker,
-    .network,
-    .power,
-    .time,
-    .lyrics-module {
+    .module-group {
         margin: 6px;
         border-radius: 8px;
         padding: 8px;
         background-color: $mantle-color;
         margin-right: 2px;
 
-        // modules in groups with other modules
+        &.last {
+            margin-right: 0;
+        }
+
+        &.end {
+            margin-right: 6px;
+        }
+
         .cpu-module,
         .disk-module {
             margin-right: 12px;
         }
     }
 
-    // last group (rightmost)
-    .power {
-        margin-right: 6px;
-    }
-
     // last modules in groups with other modules
-    .time,
-    .lyrics-module,
     .notification-module {
         margin-right: 0;
     }
@@ -330,7 +339,8 @@ window.bar {
     .network-icon,
     .speaker-icon,
     .speaker-bluetooth-icon,
-    .time.clock {
+    .ram-icon,
+    .time-icon.clock {
         margin-right: 6px;
     }
 

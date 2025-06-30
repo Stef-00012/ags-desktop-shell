@@ -35,7 +35,7 @@ to try it just run `ags run app.ts` using AGS v3
     - [x] Microphone
     - [x] Network
     - [x] Notifications
-    - [ ] Tray
+    - [x] Tray
     - [x] Power Actions
     - [ ] Workspaces (maybe?)
 - [ ] Session menu

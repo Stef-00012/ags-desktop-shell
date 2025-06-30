@@ -32,47 +32,48 @@ export default function Bar({ gdkmonitor }: Props) {
 		>
 			<centerbox cssName="centerbox">
 				<box $type="start" hexpand>
-					<box class="resources">
+					<box class="module-group">
 						<Cpu class="cpu-module" />
 						<Disk class="disk-module" />
 						<Memory />
 					</box>
 
-					<box class="battery">
+					<box class="module-group">
 						<Battery class="battery-module" />
 					</box>
 
-					<box class="time">
-						<Time />
+					<box class="module-group last">
+						<Time class="time" />
 					</box>
 				</box>
 
 				<box $type="center">
 					<Media
-						mediaClass="media-module"
-						lyricsClass="lyrics-module"
+						coverClass="image-cover-art"
+						mediaClass="module-group"
+						lyricsClass="module-group last"
 					/>
 				</box>
 
 				<box $type="end">
-					<box class="speaker">
+					<box class="module-group">
 						<Speaker />
 					</box>
 
-					<box class="microphone">
+					<box class="module-group">
 						<Microphone />
 					</box>
 
-					<box class="network">
+					<box class="module-group">
 						<Network />
 					</box>
 
-					<box class="misc">
+					<box class="module-group">
 						<Notifications class="notification-module" />
 						<Tray />
 					</box>
 
-					<box class="power">
+					<box class="module-group end">
 						<Power />
 					</box>
 				</box>

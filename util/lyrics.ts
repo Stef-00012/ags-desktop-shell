@@ -6,10 +6,7 @@ import { createState, onCleanup } from "ags";
 import type Mpris from "gi://AstalMpris";
 import Soup from "gi://Soup?version=3.0";
 import { timeout } from "ags/time";
-import {
-	tooltipCurrentSong,
-	lyricsSourceColor,
-} from "@/constants/colors";
+import { tooltipCurrentSong, lyricsSourceColor } from "@/constants/colors";
 import type {
 	MusixmatchSearchResult,
 	UsertokenResponse,
@@ -582,6 +579,36 @@ function parseLyrics(
 	}
 
 	return formattedLyrics;
+}
+
+export function convertToLrc(song: SongData): string | null {
+	if (!song.lyrics || song.lyrics.length === 0) return null;
+
+	const lrcLyrics = song.lyrics
+		.map((lyric) => {
+			const minutes = Math.floor(lyric.time / 60)
+				.toString()
+				.padStart(2, "0");
+			const seconds = Math.floor(lyric.time % 60)
+				.toString()
+				.padStart(2, "0");
+			const milliseconds = Math.floor((lyric.time % 1) * 1000)
+				.toString()
+				.padStart(3, "0");
+
+			return `[${minutes}:${seconds}.${milliseconds}] ${lyric.text}`;
+		})
+		.join("\n");
+
+	return [
+		`# Track: ${song.track}`,
+		`# Artist: ${song.artist}`,
+		`# Album: ${song.album}`,
+		`# Source: ${song.source}`,
+		`# Track ID: ${song.trackId}`,
+		``,
+		lrcLyrics,
+	].join("\n");
 }
 
 /*

@@ -56,13 +56,20 @@ export default function Tray({ class: className }: Props) {
 					<For each={trayItems}>
 						{(trayItem) => {
 							let popovermenu: Gtk.PopoverMenu | null = null;
-							const [isPopoverMenuOpen, setIsPopoverMenuOpen] = createState(false);
+							const [isPopoverMenuOpen, setIsPopoverMenuOpen] =
+								createState(false);
 
 							if (!trayItem.gicon && !trayItem.title)
 								return <box visible={false} />;
 
 							return (
-								<box class="tray-item">
+								<box
+									class="tray-item"
+									cursor={Gdk.Cursor.new_from_name(
+										"pointer",
+										null,
+									)}
+								>
 									<image
 										class="icon"
 										gicon={trayItem.gicon}
@@ -91,10 +98,10 @@ export default function Tray({ class: className }: Props) {
 										onReleased={() => {
 											if (popovermenu) {
 												if (isPopoverMenuOpen.get()) {
-													setIsPopoverMenuOpen(false)
+													setIsPopoverMenuOpen(false);
 													popovermenu.popdown();
 												} else {
-													setIsPopoverMenuOpen(true)
+													setIsPopoverMenuOpen(true);
 													popovermenu.popup();
 												}
 											}
@@ -114,9 +121,9 @@ export default function Tray({ class: className }: Props) {
 									<Gtk.PopoverMenu
 										class="tray-popover-menu"
 										menuModel={trayItem.menuModel}
-                                        onClosed={() => {
-                                            setIsPopoverMenuOpen(false)
-                                        }}
+										onClosed={() => {
+											setIsPopoverMenuOpen(false);
+										}}
 										$={(self) => {
 											popovermenu = self;
 

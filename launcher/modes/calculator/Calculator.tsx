@@ -29,6 +29,7 @@ export default function CalculatorMode({
 		if (!externalClickPressed.get() || !visible.get()) return;
 
 		setHistory([]);
+		setResult(null);
 		close();
 	});
 
@@ -42,6 +43,7 @@ export default function CalculatorMode({
 
 		setHistory((prev) => [res, ...prev]);
 		setSearchValue(null);
+		setResult(null);
 	});
 
 	pressedKey.subscribe(() => {
@@ -53,6 +55,7 @@ export default function CalculatorMode({
 
 		if (keyData.keyval === Gdk.KEY_Escape) {
 			setHistory([]);
+			setResult(null);
 			close();
 
 			return;
@@ -69,23 +72,33 @@ export default function CalculatorMode({
 		const value = searchValue.get();
 		if (!value) return;
 
-		let res = "Invalid Input"
+		let res = "Invalid Input";
 
 		try {
 			res = exec(`qalc ${value}`);
-		} catch(_e) {}
+		} catch (_e) {}
 
 		setResult(res.trim());
 	});
 
 	return (
-		<box orientation={Gtk.Orientation.VERTICAL} visible={visible} class="calculator-container">
-			<label label={result((res) => res || "")} halign={Gtk.Align.START} class="calculator-result" />
+		<box
+			orientation={Gtk.Orientation.VERTICAL}
+			visible={visible}
+			class="calculator-container"
+		>
+			<label
+				label={result((res) => res || "")}
+				halign={Gtk.Align.START}
+				class="calculator-result"
+			/>
 
-            <Gtk.Separator visible class="calculator-separator" />
+			<Gtk.Separator visible class="calculator-separator" />
 
 			<For each={history}>
-				{(historyEntry) => <label halign={Gtk.Align.START} label={historyEntry} />}
+				{(historyEntry) => (
+					<label halign={Gtk.Align.START} label={historyEntry} />
+				)}
 			</For>
 		</box>
 	);

@@ -1,5 +1,14 @@
-import { formatLyricsTooltip, parseLyricsData, useSong } from "@/util/lyrics";
-import { MEDIA_VOLUME_STEP, MEDIA_MAX_LENGTH } from "@/constants/config";
+import {
+	convertToLrc,
+	formatLyricsTooltip,
+	parseLyricsData,
+	useSong,
+} from "@/util/lyrics";
+import {
+	MEDIA_VOLUME_STEP,
+	MEDIA_MAX_LENGTH,
+	SAVE_FOLDER,
+} from "@/constants/config";
 import { escapeMarkup, marquee } from "@/util/text";
 import type { SongData } from "@/types/lyrics";
 import { fileExists } from "@/util/file";
@@ -12,17 +21,21 @@ import {
 	jsx,
 	type Accessor,
 } from "ags";
+import Gio from "gi://Gio?version=2.0";
+import { execAsync } from "ags/process";
 
 interface Props {
 	class?: string | Accessor<string>;
 	mediaClass?: string | Accessor<string>;
 	lyricsClass?: string | Accessor<string>;
+	coverClass?: string | Accessor<string>;
 }
 
 export default function Media({
 	class: className,
 	mediaClass,
 	lyricsClass,
+	coverClass,
 }: Props) {
 	let mediaDispose: (() => void) | null = null;
 	let lyricsDispose: (() => void) | null = null;
@@ -142,7 +155,36 @@ export default function Media({
 		return "mi-music-note-symbolic";
 	}
 
-	function handleScroll(
+	function handleIconLeftClick() {
+		const cover = coverArt.get();
+
+		if (!cover || !fileExists(cover)) return;
+
+		execAsync(`xdg-open "${cover}"`);
+	}
+
+	function handleIconMiddleClick() {
+		const cover = coverArt.get();
+
+		if (!cover || !fileExists(cover)) return;
+
+		if (!fileExists(SAVE_FOLDER, true))
+			Gio.File.new_for_path(SAVE_FOLDER).make_directory_with_parents(
+				null,
+			);
+
+		const destFile = Gio.File.new_for_path(
+			`${SAVE_FOLDER}/${spotify.trackid.split("/").pop()}.png`,
+		);
+		Gio.File.new_for_path(cover).copy(
+			destFile,
+			Gio.FileCopyFlags.OVERWRITE,
+			null,
+			null,
+		);
+	}
+
+	function handleMediaScroll(
 		_event: Gtk.EventControllerScroll,
 		_deltaX: number,
 		deltaY: number,
@@ -156,19 +198,76 @@ export default function Media({
 		}
 	}
 
-	function handleLeftClick() {
+	function handleMediaLeftClick() {
 		spotify.play_pause();
+	}
+
+	function handleMediaMiddleClick() {
+		spotify.raise();
+	}
+
+	function handleLyricsLeftClick() {
+		const songData = song.get();
+
+		if (!songData) return;
+
+		const lyrics = convertToLrc(songData);
+
+		if (!lyrics) return;
+
+		const path = `/tmp/lyrics.lrc`;
+
+		Gio.File.new_for_path(path)
+			.create(Gio.FileCreateFlags.REPLACE_DESTINATION, null)
+			.write(lyrics, null);
+
+		execAsync(`xdg-open "${path}"`);
+	}
+
+	function handleLyricsMiddleClick() {
+		const songData = song.get();
+
+		if (!songData) return;
+
+		const lyrics = convertToLrc(songData);
+
+		if (!lyrics) return;
+
+		const path = `${SAVE_FOLDER}/${songData.trackId.split("/").pop()}.lrc`;
+
+		if (!fileExists(SAVE_FOLDER, true))
+			Gio.File.new_for_path(SAVE_FOLDER).make_directory_with_parents(
+				null,
+			);
+
+		Gio.File.new_for_path(path)
+			.create(Gio.FileCreateFlags.REPLACE_DESTINATION, null)
+			.write(lyrics, null);
+
+		execAsync(`xdg-open "${path}"`);
 	}
 
 	return (
 		<box class={className}>
-			<image
-				valign={Gtk.Align.CENTER}
-				class="image-cover-art"
-				visible={coverArt((path) => !!path && fileExists(path))}
-				file={coverArt}
-				overflow={Gtk.Overflow.HIDDEN}
-			/>
+			<box cursor={Gdk.Cursor.new_from_name("pointer", null)}>
+				<image
+					class={coverClass}
+					valign={Gtk.Align.CENTER}
+					visible={coverArt((path) => !!path && fileExists(path))}
+					file={coverArt}
+					overflow={Gtk.Overflow.HIDDEN}
+				/>
+
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_PRIMARY}
+					onPressed={handleIconLeftClick}
+				/>
+
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_MIDDLE}
+					onPressed={handleIconMiddleClick}
+				/>
+			</box>
 
 			<box
 				class={mediaClass}
@@ -197,21 +296,27 @@ export default function Media({
 					class="media-icon"
 				/>
 
-				<label label={mainMetadata(transformMediaLabel)}>
-					<Gtk.EventControllerScroll
-						flags={Gtk.EventControllerScrollFlags.VERTICAL}
-						onScroll={handleScroll}
-					/>
+				<label label={mainMetadata(transformMediaLabel)} />
 
-					<Gtk.GestureClick
-						button={Gdk.BUTTON_PRIMARY}
-						onPressed={handleLeftClick}
-					/>
-				</label>
+				<Gtk.EventControllerScroll
+					flags={Gtk.EventControllerScrollFlags.VERTICAL}
+					onScroll={handleMediaScroll}
+				/>
+
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_PRIMARY}
+					onPressed={handleMediaLeftClick}
+				/>
+
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_MIDDLE}
+					onPressed={handleMediaMiddleClick}
+				/>
 			</box>
 
 			<box
 				class={lyricsClass}
+				cursor={Gdk.Cursor.new_from_name("pointer", null)}
 				hasTooltip={lyricsState(transformLyricsHasTooltip)}
 				onQueryTooltip={(_label, _x, _y, _keyboardMode, tooltip) => {
 					if (lyricsDispose) lyricsDispose();
@@ -234,6 +339,16 @@ export default function Media({
 				<image iconName="mi-lyrics-symbolic" class="lyrics-icon" />
 
 				<label label={lyricsState(transformLyricsLabel)} />
+
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_PRIMARY}
+					onPressed={handleLyricsLeftClick}
+				/>
+
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_MIDDLE}
+					onPressed={handleLyricsMiddleClick}
+				/>
 			</box>
 		</box>
 	);
