@@ -8,11 +8,52 @@ Currently those plugins are required:
 
 to try it just run `ags run app.ts` using AGS v3
 
+### Features
+
+- Bar
+    - CPU - See the general load and each core's load (on hover)
+    - Disk - See the available and used disk space (on hover)
+    - RAM - See the available and used RAM & Swap (on hover)
+    - Battery - See the percentage, power drain and time to empty/full of the battery (on hover)
+    - Time - See current hour, year & month (on click) and calendar (on right click)
+    - Media Icon - The cover url of the playing media on Spotify
+    - Media Metadata - The Spotify song name & arist, and album & volume (on hover)
+    - Media Lyrics - The spotify song line-synced lyrics when available (sourced from [Musixmatch](https://musixmatch.com) and [lrclib.net](https://lrclib.net))
+    - Speaker - Volume and device name (on hover)
+    - Micrphone - Volume and device name (on hover)
+    - Network - Wifi or ethernet info
+    - Notifications - Notification count and center (on click)
+    - Tray - Tray apps
+    - Power - Power actions (see session menu)
+
+- Notification Daemon
+    - Notification popup
+    - Notification center
+
+- OSD:
+    - Speaker volume %
+    - Microphone volume %
+    - Screen brightness %
+
+- Launcher
+    - Apps
+    - Calculator
+
+- Session Menu
+    - Lock Screen
+    - Sleep
+    - Logout
+    - Task Manager
+    - Hibernate
+    - Shutdown
+    - Reboot
+    - Reboot to Firmware (UEFI/BIOS)
+
 ### Suggested Hyprland Config
 
 `windowrule`s:
 - `float, class:^(gjs)$` (float normal desktop shell windows)
-- `noblur, class:^(gjs)$` (remove the blur to normal desktop shell windows)
+- `noblur, class:^(gjs)$, title:^(?!AGS Session Menu$).*` (remove the blur to normal desktop shell windows (except for session manager))
 - `noanim, class:^(gjs)$` (disable the animations normal desktop shell windows)
 - `pin, class:^(gjs)$, title:^(AGS Notification Center)$` (pin the notification center so it always stays in the active workspace)
 - `pin, class:^(gjs)$, title:^(AGS Session Menu)$` (pin th session menu so it always stays in the active workspace)
