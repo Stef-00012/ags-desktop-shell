@@ -9,7 +9,6 @@ interface Props {
 	enterPressed: Accessor<boolean>;
 	pressedKey: Accessor<PressedKey | null>;
 	visible: Accessor<boolean>;
-	externalClickPressed: Accessor<boolean>;
 }
 
 export default function ClipboardMode({
@@ -18,7 +17,6 @@ export default function ClipboardMode({
 	enterPressed,
 	pressedKey,
 	visible,
-	externalClickPressed,
 }: Props) {
 	const [clipboard, setClipboard] = createState<string[]>([]);
 	const [filteredClipboard, setFilteredClipboard] = createState<string[]>([]);
@@ -33,12 +31,6 @@ export default function ClipboardMode({
 
 		setClipboard(data);
 		setFilteredClipboard(data);
-	});
-
-	externalClickPressed.subscribe(() => {
-		if (!externalClickPressed.get() || !visible.get()) return;
-
-		close();
 	});
 
 	pressedKey.subscribe(() => {

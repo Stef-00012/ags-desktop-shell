@@ -98,6 +98,7 @@ export default function Notification({
 	return (
 		<Adw.Clamp maximumSize={530}>
 			<box
+				cursor={defaultAction ? Gdk.Cursor.new_from_name("pointer", null) : undefined}
 				widthRequest={530}
 				class={`notification ${urgency(notification.urgency)} ${isNotificationCenter ? "center" : ""}`}
 				orientation={Gtk.Orientation.VERTICAL}
@@ -201,7 +202,6 @@ export default function Notification({
 								label={parseMarkdown(
 									escapeMarkup(notification.body),
 								)}
-								wrapMode={Pango.WrapMode.CHAR}
 							/>
 						)}
 					</box>

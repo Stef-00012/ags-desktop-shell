@@ -10,7 +10,7 @@ interface Props {
 	enterPressed: Accessor<boolean>;
 	pressedKey: Accessor<PressedKey | null>;
 	visible: Accessor<boolean>;
-	externalClickPressed: Accessor<boolean>;
+	closed: Accessor<boolean>;
 }
 
 export default function CalculatorMode({
@@ -20,13 +20,13 @@ export default function CalculatorMode({
 	enterPressed,
 	pressedKey,
 	visible,
-	externalClickPressed,
+	closed,
 }: Props) {
 	const [result, setResult] = createState<string | null>(null);
 	const [history, setHistory] = createState<string[]>([]);
 
-	externalClickPressed.subscribe(() => {
-		if (!externalClickPressed.get() || !visible.get()) return;
+	closed.subscribe(() => {
+		if (!closed.get() || !visible.get()) return;
 
 		setHistory([]);
 		setResult(null);

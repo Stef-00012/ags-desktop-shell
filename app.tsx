@@ -10,6 +10,7 @@ import app from "ags/gtk4/app";
 import GLib from "gi://GLib";
 import OSD from "./osd/OSD";
 import Bar from "@/bar/Bar";
+import SessionMenu from "./sessionMenu/SessionMenu";
 
 @register({ Implements: [Gtk.Buildable] })
 class WindowTracker extends GObject.Object {
@@ -19,6 +20,9 @@ class WindowTracker extends GObject.Object {
 }
 
 export const [isNotificationCenterVisible, setIsNotificationCenterVisible] =
+	createState(false);
+
+export const [isSessionMenuVisible, setIsSessionMenuVisible] =
 	createState(false);
 
 export const [appLauncherMode, setAppLauncherMode] =
@@ -59,6 +63,12 @@ app.start({
 						/>
 
 						<OSD gdkmonitor={monitor} />
+
+						<SessionMenu
+							gdkmonitor={monitor}
+							visible={isSessionMenuVisible}
+							setVisible={setIsSessionMenuVisible}
+						/>
 					</WindowTracker>
 				)}
 			</For>
@@ -66,7 +76,6 @@ app.start({
 	},
 
 	requestHandler(request, res) {
-		console.log(request)
 		const [, argv] = GLib.shell_parse_argv(request);
 
 		if (!argv) return res("argv parse error");
@@ -79,13 +88,25 @@ app.start({
 			}
 
 			case "toggle-notif": {
+				if (isSessionMenuVisible.get()) return res("session menu is currently open");
+
 				setIsNotificationCenterVisible((prev) => !prev);
 				setAppLauncherMode("closed");
 
 				return res("ok");
 			}
 
+			case "toggle-session-menu": {
+				setIsSessionMenuVisible((prev) => !prev);
+				setIsNotificationCenterVisible(false);
+				setAppLauncherMode("closed")
+
+				return res("ok");
+			}
+
 			case "toggle-launcher-app": {
+				if (isSessionMenuVisible.get()) return res("session menu is currently open");
+
 				setAppLauncherMode("app");
 				setIsNotificationCenterVisible(false);
 
@@ -93,6 +114,8 @@ app.start({
 			}
 
 			case "toggle-launcher-calculator": {
+				if (isSessionMenuVisible.get()) return res("session menu is currently open");
+
 				setAppLauncherMode("calculator");
 				setIsNotificationCenterVisible(false);
 

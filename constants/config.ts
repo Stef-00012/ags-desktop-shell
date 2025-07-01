@@ -19,3 +19,7 @@ export const OSD_TIMEOUT_TIME = 3000; // 3 seconds
 export const SYSTEM_STATS_UPDATE_INTERVAL = 1000;
 
 export const SAVE_FOLDER = `${HOME}/Music/spotifyData`;
+
+export const SESSION_MENU_BUTTON_WIDTH = 120
+export const SESSION_MENU_BUTTON_HEIGHT = 120
+export const SESSION_MENU_BUTTON_GAP = 50;

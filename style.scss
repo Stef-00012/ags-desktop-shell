@@ -298,7 +298,7 @@ window.bar {
         .tray-item {
             .tray-popover-menu {
                 modelbutton {
-                    background-color: $base-color;
+                    background-color: unset;
                     margin-top: 3px;
                     margin-bottom: 3px;
                 }
@@ -317,7 +317,7 @@ window.bar {
                 }
 
                 modelbutton:hover {
-                    background-color: gtkalpha($base-color, 0.6);
+                    background-color: gtkalpha($base-color, 0.8);
                 }
 
                 separator {
@@ -469,13 +469,10 @@ window.notification-center {
 }
 
 window.launcher {
-    background-color: gtkalpha(#000000, 0.2);
-
     .launcher-container {
         background-color: gtkalpha($crust-color, 0.95);
         border-radius: 15px;
         padding: 1rem;
-        margin: 1rem;
         box-shadow: 2px 3px 8px 0 gtkalpha(black, 0.4);
 
         .search-entry {
@@ -558,6 +555,24 @@ window.osd {
                 min-height: 10px;
                 border-radius: 30px;
             }
+        }
+    }
+}
+
+window.session-menu {
+    background-color: gtkalpha(black, 0.6);
+
+    button {
+        border-radius: 20px;
+    }
+
+    label {
+        margin-top: 10px;
+    }
+
+    tooltip {
+        label {
+            margin-top: 0;
         }
     }
 }

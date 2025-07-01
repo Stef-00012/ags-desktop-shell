@@ -29,7 +29,7 @@ export default function OSD({ gdkmonitor }: Props) {
 
 	timeout(300, () => {
 		isStartup = false;
-	})
+	});
 
 	const [osdState, setOsdState] = createState<{
 		type: "speaker" | "microphone" | "brightness";
@@ -82,7 +82,7 @@ export default function OSD({ gdkmonitor }: Props) {
 
 	function updateSpeakerState(speaker: Wp.Endpoint) {
 		if (isStartup) return;
-		
+
 		let icon = speaker.volumeIcon;
 
 		if (speaker.volume === 0) icon = "audio-volume-muted-symbolic";
@@ -132,6 +132,7 @@ export default function OSD({ gdkmonitor }: Props) {
 			gdkmonitor={gdkmonitor}
 			visible={isVisible}
 			class="osd"
+			title="AGS OSD"
 			css={`margin-top: ${marginTop}px;`}
 			$={(self) => {
 				self.get_surface()?.set_input_region(new giCairo.Region());

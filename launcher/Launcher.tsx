@@ -1,8 +1,9 @@
 import { createState, type Accessor, type Setter } from "ags";
-import { Astal, Gdk, Gtk } from "ags/gtk4";
-import Adw from "gi://Adw";
+import { type Gdk, Gtk } from "ags/gtk4";
 import AppMode from "./modes/app/App";
 import CalculatorMode from "./modes/calculator/Calculator";
+import { barHeight } from "@/bar/Bar";
+import Adw from "gi://Adw?version=1";
 // import ClipboardMode from "./modes/clipboard/Clipboard";
 
 export type LauncherMode = "closed" | "calculator" | "app" | "clipboard";
@@ -20,6 +21,7 @@ interface Props {
 export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 	const [searchValue, setSearchValue] = createState<string | null>(null);
 	const [pressedKey, setPressedKey] = createState<PressedKey | null>(null);
+	const [closed, setClosed] = createState(false);
 
 	let entry: Gtk.Entry | null = null;
 
@@ -28,23 +30,19 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 	});
 
 	const [enterPressed, setEnterPressed] = createState(false);
-	const [externalClickPressed, setExternalClickPressed] = createState(false);
 
 	const maxWidth = gdkmonitor.geometry.width * 0.5;
 	const maxHeight = gdkmonitor.geometry.height * 0.5;
+
+	searchValue.subscribe(() => {
+		entry?.set_text(searchValue.get() || "")
+	})
 
 	function close() {
 		setMode("closed");
 		setSearchValue(null);
 
-		if (entry) entry.set_text("")
-	}
-
-	function handleExternalClick() {
-		console.log("external click");
-
-		setExternalClickPressed(true);
-		setExternalClickPressed(false);
+		if (entry) entry.set_text("");
 	}
 
 	function handleKeyPress(
@@ -73,35 +71,30 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 	}
 
 	return (
-		<window
+		<Gtk.Window
 			class="launcher"
+			title="AGS Launcher"
 			visible={mode((currentMode) => currentMode !== "closed")}
-			gdkmonitor={gdkmonitor} // maybe remove this so it only appears on the focused monitor
-			fullscreened
-			keymode={Astal.Keymode.EXCLUSIVE}
-			anchor={
-				Astal.WindowAnchor.BOTTOM |
-				Astal.WindowAnchor.RIGHT |
-				Astal.WindowAnchor.LEFT |
-				Astal.WindowAnchor.TOP
-			}
+			display={gdkmonitor.display}
+			onCloseRequest={() => {
+				close();
+
+				setClosed(true);
+				setClosed(false);
+			}}
 		>
 			<Gtk.EventControllerKey onKeyPressed={handleKeyPress} />
 
-			<Gtk.GestureClick
-				button={Gdk.BUTTON_PRIMARY}
-				onPressed={handleExternalClick}
-				propagationPhase={Gtk.PropagationPhase.TARGET}
-			/>
-
-			<Adw.Clamp maximumSize={maxWidth}>
-				<Adw.Clamp
-					maximumSize={maxHeight}
-					orientation={Gtk.Orientation.VERTICAL}
-				>
+			<Adw.Clamp orientation={Gtk.Orientation.VERTICAL} maximumSize={maxHeight}>
+				<Adw.Clamp maximumSize={maxWidth}>
 					<box
+						widthRequest={maxWidth}
+						heightRequest={maxHeight}
+						
+						hexpand
 						class="launcher-container"
 						orientation={Gtk.Orientation.VERTICAL}
+						marginTop={barHeight}
 					>
 						<entry
 							class="search-entry"
@@ -128,7 +121,7 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 									visible={mode(
 										(currentMode) => currentMode === "app",
 									)}
-									externalClickPressed={externalClickPressed}
+									closed={closed}
 								/>
 
 								<CalculatorMode
@@ -138,10 +131,9 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 									enterPressed={enterPressed}
 									pressedKey={pressedKey}
 									visible={mode(
-										(currentMode) =>
-											currentMode === "calculator",
+										(currentMode) => currentMode === "calculator",
 									)}
-									externalClickPressed={externalClickPressed}
+									closed={closed}
 								/>
 
 								{/* <ClipboardMode
@@ -153,13 +145,12 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 										(currentMode) =>
 											currentMode === "clipboard",
 									)}
-									externalClickPressed={externalClickPressed}
 								/> */}
 							</box>
 						</scrolledwindow>
 					</box>
 				</Adw.Clamp>
 			</Adw.Clamp>
-		</window>
+		</Gtk.Window>
 	);
 }

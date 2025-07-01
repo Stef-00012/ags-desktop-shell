@@ -10,7 +10,7 @@ interface Props {
 	enterPressed: Accessor<boolean>;
 	pressedKey: Accessor<PressedKey | null>;
 	visible: Accessor<boolean>;
-	externalClickPressed: Accessor<boolean>;
+	closed: Accessor<boolean>;
 }
 
 export default function AppMode({
@@ -19,7 +19,7 @@ export default function AppMode({
 	enterPressed,
 	pressedKey,
 	visible,
-	externalClickPressed,
+	closed,
 }: Props) {
 	const apps = new Apps.Apps({
 		nameMultiplier: 2,
@@ -27,8 +27,8 @@ export default function AppMode({
 		executableMultiplier: 2,
 	});
 
-	externalClickPressed.subscribe(() => {
-		if (!externalClickPressed.get() || !visible.get()) return;
+	closed.subscribe(() => {
+		if (!closed.get() || !visible.get()) return;
 
 		close();
 	});
@@ -45,9 +45,9 @@ export default function AppMode({
 
 	pressedKey.subscribe(() => {
 		if (!visible.get()) return;
-		
+
 		const keyData = pressedKey.get();
-		
+
 		if (!keyData) return;
 
 		if (keyData.keyval === Gdk.KEY_Escape) return close();
@@ -88,7 +88,11 @@ export default function AppMode({
 	});
 
 	return (
-		<box orientation={Gtk.Orientation.VERTICAL} visible={visible} class="apps-container">
+		<box
+			orientation={Gtk.Orientation.VERTICAL}
+			visible={visible}
+			class="apps-container"
+		>
 			<For each={appList}>
 				{(app) => (
 					<App
