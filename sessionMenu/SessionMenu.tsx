@@ -87,7 +87,7 @@ export default function SessionMenu({
 									valign={Gtk.Align.CENTER}
 								>
 									<image
-										pixelSize={64}
+										pixelSize={60}
 										iconName="mi-lock-symbolic"
 									/>
 
@@ -112,7 +112,7 @@ export default function SessionMenu({
 									valign={Gtk.Align.CENTER}
 								>
 									<image
-										pixelSize={64}
+										pixelSize={60}
 										iconName="mi-dark-mode-symbolic"
 									/>
 
@@ -136,7 +136,7 @@ export default function SessionMenu({
 									valign={Gtk.Align.CENTER}
 								>
 									<image
-										pixelSize={64}
+										pixelSize={60}
 										iconName="mi-logout-symbolic"
 									/>
 
@@ -160,7 +160,7 @@ export default function SessionMenu({
 									valign={Gtk.Align.CENTER}
 								>
 									<image
-										pixelSize={64}
+										pixelSize={60}
 										iconName="mi-browse-activity-symbolic"
 									/>
 
@@ -186,7 +186,7 @@ export default function SessionMenu({
 									valign={Gtk.Align.CENTER}
 								>
 									<image
-										pixelSize={64}
+										pixelSize={60}
 										iconName="mi-downloading-symbolic"
 									/>
 
@@ -210,7 +210,7 @@ export default function SessionMenu({
 									valign={Gtk.Align.CENTER}
 								>
 									<image
-										pixelSize={64}
+										pixelSize={60}
 										iconName="mi-power-settings-new-symbolic"
 									/>
 
@@ -234,7 +234,7 @@ export default function SessionMenu({
 									valign={Gtk.Align.CENTER}
 								>
 									<image
-										pixelSize={64}
+										pixelSize={60}
 										iconName="mi-restart-alt-symbolic"
 									/>
 
@@ -260,7 +260,7 @@ export default function SessionMenu({
 									valign={Gtk.Align.CENTER}
 								>
 									<image
-										pixelSize={64}
+										pixelSize={60}
 										iconName="mi-settings-applications-symbolic"
 									/>
 

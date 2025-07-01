@@ -14,7 +14,8 @@ to try it just run `ags run app.ts` using AGS v3
 - `float, class:^(gjs)$` (float normal desktop shell windows)
 - `noblur, class:^(gjs)$` (remove the blur to normal desktop shell windows)
 - `noanim, class:^(gjs)$` (disable the animations normal desktop shell windows)
-- `pin, class:^(gjs)$, title:^(AGS Notification Center)$` (pin the notification cneter so it always stays in the active workspace)
+- `pin, class:^(gjs)$, title:^(AGS Notification Center)$` (pin the notification center so it always stays in the active workspace)
+- `pin, class:^(gjs)$, title:^(AGS Session Menu)$` (pin th session menu so it always stays in the active workspace)
 
 `layerrule`s:
 - `noanim, gtk4-layer-shell` (disable the animations layered desktop shell windows)
@@ -49,7 +50,7 @@ to try it just run `ags run app.ts` using AGS v3
     - [x] Tray
     - [x] Power Actions
     - [ ] Workspaces (maybe?)
-- [ ] Session menu
+- [x] Session menu
 
 # Credits
 
