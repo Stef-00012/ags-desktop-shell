@@ -7,6 +7,7 @@ import { timeout } from "ags/time";
 import giCairo from "gi://cairo";
 import Wp from "gi://AstalWp";
 import GLib from "gi://GLib";
+import { sleep } from "@/util/timer";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -137,7 +138,7 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 	return (
 		<window
 			gdkmonitor={gdkmonitor}
-			visible={visibleState}
+			// visible={visibleState}
 			class="osd"
 			title="AGS OSD"
 			css={`margin-top: ${marginTop}px;`}
@@ -147,35 +148,59 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 				self.connect("map", () => {
 					self.get_surface()?.set_input_region(new giCairo.Region());
 				});
+
+				const revealer = self.child as Gtk.Revealer;
+				const transitionDuration = revealer.get_transition_duration();
+
+				visibleState.subscribe(async () => {
+					const visible = visibleState.get();
+
+					if (!visible) {
+						revealer.set_reveal_child(visible)
+
+						await sleep(transitionDuration)
+					}
+
+					self.set_visible(visible);
+
+					if (visible) {
+						revealer.set_reveal_child(visible);
+					}
+				})
 			}}
 		>
-			<box
-				heightRequest={maxHeight}
-				widthRequest={maxWidth}
-				class="osd-container"
+			<revealer
+				transitionDuration={300}
+				transitionType={Gtk.RevealerTransitionType.CROSSFADE}
 			>
-				<image
-					iconName={osdState((state) => state.icon)}
-					class="icon"
-				/>
+				<box
+					heightRequest={maxHeight}
+					widthRequest={maxWidth}
+					class="osd-container"
+				>
+					<image
+						iconName={osdState((state) => state.icon)}
+						class="icon"
+					/>
 
-				<Gtk.ProgressBar
-					hexpand
-					valign={Gtk.Align.CENTER}
-					class={osdState((state) =>
-						Math.round(state.percentage * 100) > 100
-							? "progress overfilled"
-							: "progress",
-					)}
-					fraction={osdState((state) => state.percentage)}
-				/>
+					<Gtk.ProgressBar
+						hexpand
+						valign={Gtk.Align.CENTER}
+						class={osdState((state) =>
+							Math.round(state.percentage * 100) > 100
+								? "progress overfilled"
+								: "progress",
+						)}
+						fraction={osdState((state) => state.percentage)}
+					/>
 
-				<label
-					label={osdState(
-						(state) => `${Math.round(state.percentage * 100)}%`,
-					)}
-				/>
-			</box>
+					<label
+						label={osdState(
+							(state) => `${Math.round(state.percentage * 100)}%`,
+						)}
+					/>
+				</box>
+			</revealer>
 		</window>
 	);
 }

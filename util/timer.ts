@@ -4,7 +4,7 @@
 */
 
 import type AstalIO from "gi://AstalIO";
-import { interval } from "ags/time";
+import { interval, timeout } from "ags/time";
 import GLib from "gi://GLib";
 
 export class Timer {
@@ -74,4 +74,10 @@ export class Timer {
 		this.interval?.cancel();
 		this.interval = null;
 	}
+}
+
+export async function sleep(time: number): Promise<void> {
+	return new Promise((resolve) => {
+		timeout(time, resolve);
+	});
 }

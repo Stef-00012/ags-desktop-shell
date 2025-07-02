@@ -23,3 +23,5 @@ export const SAVE_FOLDER = `${HOME}/Music/spotifyData`;
 export const SESSION_MENU_BUTTON_WIDTH = 120;
 export const SESSION_MENU_BUTTON_HEIGHT = 120;
 export const SESSION_MENU_BUTTON_GAP = 50;
+
+export const NOTIFICATION_ANIMATION_DURATION = 500; // 0.5 seconds

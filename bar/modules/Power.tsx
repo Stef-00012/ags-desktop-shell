@@ -20,9 +20,11 @@ export default function Power({ class: className }: Props) {
 			if (isPopoverOpen.get()) {
 				setIsPopoverOpen(false);
 				popover.popdown();
+				popover.set_css_classes(popover.cssClasses.filter(className => className !== "open"))
 			} else {
 				setIsPopoverOpen(true);
 				popover.popup();
+				popover.set_css_classes([...popover.cssClasses, "open"])
 			}
 		}
 	}
@@ -49,8 +51,9 @@ export default function Power({ class: className }: Props) {
 				$={(self) => {
 					popover = self as Gtk.Popover;
 				}}
-				onClosed={() => {
+				onClosed={(self) => {
 					setIsPopoverOpen(false);
+					self.set_css_classes(self.cssClasses.filter(className => className !== "open"))
 				}}
 			>
 				<box spacing={6} orientation={Gtk.Orientation.VERTICAL}>

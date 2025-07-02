@@ -19,6 +19,7 @@ export default function Speaker({ class: className }: Props) {
 		);
 
 	const volume = createBinding(speaker, "volume");
+	const isMuted = createBinding(speaker, "mute")
 	const iconName = createBinding(speaker, "volume_icon");
 	const device = createBinding(speaker, "description");
 
@@ -26,7 +27,7 @@ export default function Speaker({ class: className }: Props) {
 		speaker.get_pw_property("device.api") === "bluez5",
 	);
 
-	const icon = createComputed([iconName, volume], transformIcon);
+	const icon = createComputed([iconName, volume, isMuted], transformIcon);
 
 	device.subscribe(() => {
 		setIsBluetooth(speaker.get_pw_property("device.api") === "bluez5");
@@ -40,9 +41,9 @@ export default function Speaker({ class: className }: Props) {
 		return `Device: ${device}`;
 	}
 
-	function transformIcon(iconName: string, volume: number) {
+	function transformIcon(iconName: string, volume: number, isMuted: boolean) {
 		if (volume === 0) return "audio-volume-muted-symbolic";
-		else if (Math.round(volume * 100) === 100)
+		else if (Math.round(volume * 100) === 100 && !isMuted)
 			return "audio-volume-high-symbolic";
 		return iconName;
 	}

@@ -4,6 +4,7 @@ import { isIcon } from "@/util/icons";
 import Notifd from "gi://AstalNotifd";
 import { barHeight } from "@/bar/Bar";
 import { Gtk, Gdk } from "ags/gtk4";
+import { sleep } from "@/util/timer";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -13,7 +14,7 @@ interface Props {
 
 export default function NotificationCenter({
 	gdkmonitor,
-	visible,
+	visible: isVisible,
 	setVisible,
 }: Props) {
 	const notifd = Notifd.get_default();
@@ -93,7 +94,7 @@ export default function NotificationCenter({
 	return (
 		<Gtk.Window
 			class="notification-center"
-			visible={visible}
+			// visible={isVisible}
 			widthRequest={gdkmonitor.geometry.width}
 			heightRequest={gdkmonitor.geometry.height}
 			valign={Gtk.Align.END}
@@ -102,136 +103,164 @@ export default function NotificationCenter({
 			onCloseRequest={() => {
 				setVisible(false);
 			}}
+			$={(self) => {
+				const revealer = self.child as Gtk.Revealer;
+				const transitionDuration = revealer.get_transition_duration();
+				
+				isVisible.subscribe(async () => {
+					const classes = self.cssClasses
+					const visible = isVisible.get();
+
+					if (!visible) {
+						revealer.set_reveal_child(visible)
+						self.set_css_classes(classes.filter(className => className !== "open"))
+
+						await sleep(transitionDuration)
+					}
+
+					self.set_visible(visible);
+
+					if (visible) {
+						revealer.set_reveal_child(visible);
+						self.set_css_classes([...classes, "open"]);
+					}
+				})
+			}}
 		>
 			<Gtk.EventControllerKey onKeyPressed={handleEscKey} />
 
-			<Gtk.GestureClick
-				button={Gdk.BUTTON_PRIMARY}
-				onPressed={handleExternalClick}
-				propagationPhase={Gtk.PropagationPhase.TARGET}
-			/>
-
-			<box
-				marginTop={barHeight}
-				orientation={Gtk.Orientation.VERTICAL}
-				widthRequest={540}
-				class="notification-container"
-				halign={Gtk.Align.END}
+			<revealer
+				transitionDuration={500}
+				transitionType={Gtk.RevealerTransitionType.SLIDE_LEFT}
 			>
-				<box class="header" orientation={Gtk.Orientation.VERTICAL}>
-					<box
-						class="title-container"
-						orientation={Gtk.Orientation.HORIZONTAL}
-					>
-						<label label="Notifications" class="title" />
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_PRIMARY}
+					onPressed={handleExternalClick}
+					propagationPhase={Gtk.PropagationPhase.TARGET}
+				/>
 
-						<box hexpand />
-
-						<button
-							label="Clear All"
-							class="dismiss-all"
-							onClicked={() => {
-								for (const category of notificationCategories.get()) {
-									for (const notif of category.notifications) {
-										notif.dismiss();
-									}
-								}
-							}}
-						/>
-					</box>
-
-					<box
-						class="dnd-container"
-						orientation={Gtk.Orientation.HORIZONTAL}
-					>
-						<label label="Do not Disturb" class="dnd-title" />
-
-						<box hexpand />
-
-						<switch
-							class="dnd-toggle"
-							onStateSet={handleDndSwitch}
-							state={doNotDisturb}
-							active={doNotDisturb}
-						/>
-					</box>
-				</box>
-
-				<Gtk.Separator class="header-separator" visible />
-
-				<scrolledwindow
-					propagateNaturalHeight
-					propagateNaturalWidth
-					hscrollbarPolicy={Gtk.PolicyType.NEVER}
+				<box
+					marginTop={barHeight}
+					orientation={Gtk.Orientation.VERTICAL}
+					widthRequest={540}
+					class="notification-container"
+					halign={Gtk.Align.END}
 				>
-					<box orientation={Gtk.Orientation.VERTICAL}>
-						<For each={notificationCategories}>
-							{(notificationCategory, index) => (
-								<box
-									class="category"
-									orientation={Gtk.Orientation.VERTICAL}
-								>
+					<box class="header" orientation={Gtk.Orientation.VERTICAL}>
+						<box
+							class="title-container"
+							orientation={Gtk.Orientation.HORIZONTAL}
+						>
+							<label label="Notifications" class="title" />
+
+							<box hexpand />
+
+							<button
+								label="Clear All"
+								class="dismiss-all"
+								onClicked={() => {
+									for (const category of notificationCategories.get()) {
+										for (const notif of category.notifications) {
+											notif.dismiss();
+										}
+									}
+								}}
+							/>
+						</box>
+
+						<box
+							class="dnd-container"
+							orientation={Gtk.Orientation.HORIZONTAL}
+						>
+							<label label="Do not Disturb" class="dnd-title" />
+
+							<box hexpand />
+
+							<switch
+								class="dnd-toggle"
+								onStateSet={handleDndSwitch}
+								state={doNotDisturb}
+								active={doNotDisturb}
+							/>
+						</box>
+					</box>
+
+					<Gtk.Separator class="header-separator" visible />
+
+					<scrolledwindow
+						propagateNaturalHeight
+						propagateNaturalWidth
+						hscrollbarPolicy={Gtk.PolicyType.NEVER}
+					>
+						<box orientation={Gtk.Orientation.VERTICAL}>
+							<For each={notificationCategories}>
+								{(notificationCategory, index) => (
 									<box
-										class="category-header"
-										orientation={Gtk.Orientation.HORIZONTAL}
+										class="category"
+										orientation={Gtk.Orientation.VERTICAL}
 									>
-										{notificationCategory.icon && (
-											<image
-												class="category-icon"
-												visible={Boolean(
-													notificationCategory.icon,
-												)}
-												iconName={
-													notificationCategory.icon
-												}
-												pixelSize={32}
+										<box
+											class="category-header"
+											orientation={Gtk.Orientation.HORIZONTAL}
+										>
+											{notificationCategory.icon && (
+												<image
+													class="category-icon"
+													visible={Boolean(
+														notificationCategory.icon,
+													)}
+													iconName={
+														notificationCategory.icon
+													}
+													pixelSize={32}
+												/>
+											)}
+
+											<label
+												class="category-title"
+												label={notificationCategory.title}
 											/>
+
+											<box hexpand />
+
+											<button
+												class="dismiss-category"
+												label="X"
+												onClicked={() => {
+													for (const notif of notificationCategory.notifications) {
+														notif.dismiss();
+													}
+												}}
+											/>
+										</box>
+
+										{notificationCategory.notifications.map(
+											(notif) => (
+												<Notification
+													notification={notif}
+													onHide={(notif) =>
+														notif.dismiss()
+													}
+													isNotificationCenter
+												/>
+											),
 										)}
 
-										<label
-											class="category-title"
-											label={notificationCategory.title}
-										/>
-
-										<box hexpand />
-
-										<button
-											class="dismiss-category"
-											label="X"
-											onClicked={() => {
-												for (const notif of notificationCategory.notifications) {
-													notif.dismiss();
-												}
-											}}
-										/>
-									</box>
-
-									{notificationCategory.notifications.map(
-										(notif) => (
-											<Notification
-												notification={notif}
-												onHide={(notif) =>
-													notif.dismiss()
-												}
-												isNotificationCenter
+										{index.get() !==
+											notificationCategories.get().length -
+												1 && (
+											<Gtk.Separator
+												class="category-separator"
+												visible
 											/>
-										),
-									)}
-
-									{index.get() !==
-										notificationCategories.get().length -
-											1 && (
-										<Gtk.Separator
-											class="category-separator"
-											visible
-										/>
-									)}
-								</box>
-							)}
-						</For>
-					</box>
-				</scrolledwindow>
-			</box>
+										)}
+									</box>
+								)}
+							</For>
+						</box>
+					</scrolledwindow>
+				</box>
+			</revealer>
 		</Gtk.Window>
 	);
 }

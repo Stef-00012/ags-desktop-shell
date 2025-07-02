@@ -19,9 +19,12 @@ export default function Tray({ class: className }: Props) {
 			if (isPopoverOpen.get()) {
 				setIsPopoverOpen(false);
 				popover.popdown();
+				popover.set_css_classes(popover.cssClasses.filter(className => className !== "open"))
 			} else {
+				popover.set_state_flags(Gtk.StateFlags.FOCUS_WITHIN | Gtk.StateFlags.DIR_LTR, true);
 				setIsPopoverOpen(true);
 				popover.popup();
+				popover.set_css_classes([...popover.cssClasses, "open"])
 			}
 		}
 	}
@@ -48,8 +51,9 @@ export default function Tray({ class: className }: Props) {
 				$={(self) => {
 					popover = self as Gtk.Popover;
 				}}
-				onClosed={() => {
+				onClosed={(self) => {
 					setIsPopoverOpen(false);
+					self.set_css_classes(self.cssClasses.filter(className => className !== "open"))
 				}}
 			>
 				<box spacing={12}>
@@ -100,9 +104,11 @@ export default function Tray({ class: className }: Props) {
 												if (isPopoverMenuOpen.get()) {
 													setIsPopoverMenuOpen(false);
 													popovermenu.popdown();
+													popovermenu.set_css_classes(popovermenu.cssClasses.filter(className => className !== "open"))
 												} else {
 													setIsPopoverMenuOpen(true);
 													popovermenu.popup();
+													popovermenu.set_css_classes([...popovermenu.cssClasses, "open"])
 												}
 											}
 										}}
@@ -121,8 +127,9 @@ export default function Tray({ class: className }: Props) {
 									<Gtk.PopoverMenu
 										class="tray-popover-menu"
 										menuModel={trayItem.menuModel}
-										onClosed={() => {
+										onClosed={(self) => {
 											setIsPopoverMenuOpen(false);
+											self.set_css_classes(self.cssClasses.filter(className => className !== "open"))
 										}}
 										$={(self) => {
 											popovermenu = self;

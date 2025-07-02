@@ -1,12 +1,12 @@
-import { DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT } from "@/constants/config";
+import { DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT, NOTIFICATION_ANIMATION_DURATION } from "@/constants/config";
 import { escapeMarkup, parseMarkdown } from "@/util/text";
 import type Notifd from "gi://AstalNotifd";
 import { fileExists } from "@/util/file";
 import { time } from "@/util/formatTime";
 import { urgency } from "@/util/notif";
-import Gtk from "gi://Gtk?version=4.0";
+import Gtk from "gi://Gtk";
 import { isIcon } from "@/util/icons";
-import { Timer } from "@/util/timer";
+import { sleep, Timer } from "@/util/timer";
 import { createState } from "ags";
 import Pango from "gi://Pango";
 import { Gdk } from "ags/gtk4";
@@ -37,11 +37,16 @@ export default function Notification({
 
 	const [progressBarFraction, setProgressBarFraction] =
 		createState<number>(1);
+	const [isHidden, setIsHidden] = createState(false);
 
-	timer.subscribe(() => {
+	timer.subscribe(async () => {
 		setProgressBarFraction(1 - timer.timeLeft / timer.timeout);
 
 		if (timer.timeLeft <= 0) {
+			setIsHidden(true);
+
+			await sleep(NOTIFICATION_ANIMATION_DURATION - NOTIFICATION_ANIMATION_DURATION * 0.6)
+
 			onHide(notification);
 		}
 	});
@@ -96,150 +101,171 @@ export default function Notification({
 	}
 
 	return (
-		<Adw.Clamp maximumSize={530}>
-			<box
-				cursor={
-					defaultAction
-						? Gdk.Cursor.new_from_name("pointer", null)
-						: undefined
+		<revealer
+			transitionDuration={NOTIFICATION_ANIMATION_DURATION}
+			transitionType={isNotificationCenter ? Gtk.RevealerTransitionType.NONE : Gtk.RevealerTransitionType.SLIDE_LEFT}
+			$={async (self) => {
+				if (isNotificationCenter) self.set_reveal_child(true);
+				else {
+					await sleep(100);
+					self.set_reveal_child(!isHidden.get());
 				}
-				widthRequest={530}
-				class={`notification ${urgency(notification.urgency)} ${isNotificationCenter ? "center" : ""}`}
-				orientation={Gtk.Orientation.VERTICAL}
-			>
-				{!isNotificationCenter && (
-					<Gtk.EventControllerMotion
-						onEnter={handleHoverEnter}
-						onLeave={handleHoverLeave}
-					/>
-				)}
 
-				{getLeftClickComponent(true)}
+				const unsubscribe = isHidden.subscribe(() => {
+					const hidden = isHidden.get()
 
-				<Gtk.GestureClick
-					button={Gdk.BUTTON_SECONDARY}
-					onPressed={handleRightClick}
-				/>
-
-				<Gtk.GestureClick
-					button={Gdk.BUTTON_MIDDLE}
-					onPressed={handleMiddleClick}
-				/>
-
-				<box class="header">
-					{getLeftClickComponent()}
-
-					{(notification.appIcon ||
-						isIcon(notification.desktopEntry)) && (
-						<image
-							class="app-icon"
-							visible={Boolean(
-								notification.appIcon ||
-									notification.desktopEntry,
-							)}
-							iconName={
-								notification.appIcon ||
-								notification.desktopEntry
-							}
+					if (hidden) {
+						self.set_reveal_child(false);
+						unsubscribe();
+					}
+				})
+			}}
+		>
+			<Adw.Clamp maximumSize={530}>
+				<box
+					cursor={
+						defaultAction
+							? Gdk.Cursor.new_from_name("pointer", null)
+							: undefined
+					}
+					widthRequest={530}
+					class={`notification ${urgency(notification.urgency)} ${isNotificationCenter ? "center" : ""}`}
+					orientation={Gtk.Orientation.VERTICAL}
+				>
+					{!isNotificationCenter && (
+						<Gtk.EventControllerMotion
+							onEnter={handleHoverEnter}
+							onLeave={handleHoverLeave}
 						/>
 					)}
 
-					<label
-						class="app-name"
-						halign={Gtk.Align.START}
-						ellipsize={Pango.EllipsizeMode.END}
-						label={notification.appName || "Unknown"}
+					{getLeftClickComponent(true)}
+
+					<Gtk.GestureClick
+						button={Gdk.BUTTON_SECONDARY}
+						onPressed={handleRightClick}
 					/>
 
-					<label
-						class="time"
-						hexpand
-						halign={Gtk.Align.END}
-						label={time(notification.time)}
+					<Gtk.GestureClick
+						button={Gdk.BUTTON_MIDDLE}
+						onPressed={handleMiddleClick}
 					/>
-				</box>
 
-				<Gtk.Separator visible />
+					<box class="header">
+						{getLeftClickComponent()}
 
-				<box class="content">
-					{getLeftClickComponent()}
-
-					{notification.image && fileExists(notification.image) && (
-						<image
-							valign={Gtk.Align.START}
-							class="image"
-							file={notification.image}
-						/>
-					)}
-
-					{notification.image && isIcon(notification.image) && (
-						<box valign={Gtk.Align.START} class="icon-image">
+						{(notification.appIcon ||
+							isIcon(notification.desktopEntry)) && (
 							<image
-								iconName={notification.image}
-								halign={Gtk.Align.CENTER}
-								valign={Gtk.Align.CENTER}
+								class="app-icon"
+								visible={Boolean(
+									notification.appIcon ||
+										notification.desktopEntry,
+								)}
+								iconName={
+									notification.appIcon ||
+									notification.desktopEntry
+								}
 							/>
+						)}
+
+						<label
+							class="app-name"
+							halign={Gtk.Align.START}
+							ellipsize={Pango.EllipsizeMode.END}
+							label={notification.appName || "Unknown"}
+						/>
+
+						<label
+							class="time"
+							hexpand
+							halign={Gtk.Align.END}
+							label={time(notification.time)}
+						/>
+					</box>
+
+					<Gtk.Separator visible />
+
+					<box class="content">
+						{getLeftClickComponent()}
+
+						{notification.image && fileExists(notification.image) && (
+							<image
+								valign={Gtk.Align.START}
+								class="image"
+								file={notification.image}
+							/>
+						)}
+
+						{notification.image && isIcon(notification.image) && (
+							<box valign={Gtk.Align.START} class="icon-image">
+								<image
+									iconName={notification.image}
+									halign={Gtk.Align.CENTER}
+									valign={Gtk.Align.CENTER}
+								/>
+							</box>
+						)}
+
+						<box orientation={Gtk.Orientation.VERTICAL}>
+							<label
+								class="summary"
+								halign={Gtk.Align.START}
+								xalign={0}
+								label={parseMarkdown(
+									escapeMarkup(notification.summary),
+								)}
+								useMarkup
+								ellipsize={Pango.EllipsizeMode.END}
+								wrapMode={Pango.WrapMode.CHAR}
+							/>
+
+							{notification.body && (
+								<label
+									class="body"
+									wrap
+									useMarkup
+									halign={Gtk.Align.START}
+									xalign={0}
+									justify={Gtk.Justification.FILL}
+									label={parseMarkdown(
+										escapeMarkup(notification.body),
+									)}
+								/>
+							)}
+						</box>
+					</box>
+
+					{notificationActions.length > 0 && (
+						<box class="actions">
+							{notificationActions.map(({ label, id }) => (
+								<button
+									name="actionButton"
+									hexpand
+									onClicked={() => notification.invoke(id)}
+								>
+									<label
+										label={label}
+										halign={Gtk.Align.CENTER}
+										hexpand
+									/>
+								</button>
+							))}
 						</box>
 					)}
 
-					<box orientation={Gtk.Orientation.VERTICAL}>
-						<label
-							class="summary"
-							halign={Gtk.Align.START}
-							xalign={0}
-							label={parseMarkdown(
-								escapeMarkup(notification.summary),
-							)}
-							useMarkup
-							ellipsize={Pango.EllipsizeMode.END}
-							wrapMode={Pango.WrapMode.CHAR}
+					<box>
+						<Gtk.ProgressBar
+							visible={!isNotificationCenter}
+							class="progress-bar"
+							hexpand
+							fraction={progressBarFraction}
+							widthRequest={491} // width - (border-radius * 3)
+							halign={Gtk.Align.CENTER}
 						/>
-
-						{notification.body && (
-							<label
-								class="body"
-								wrap
-								useMarkup
-								halign={Gtk.Align.START}
-								xalign={0}
-								justify={Gtk.Justification.FILL}
-								label={parseMarkdown(
-									escapeMarkup(notification.body),
-								)}
-							/>
-						)}
 					</box>
 				</box>
-
-				{notificationActions.length > 0 && (
-					<box class="actions">
-						{notificationActions.map(({ label, id }) => (
-							<button
-								name="actionButton"
-								hexpand
-								onClicked={() => notification.invoke(id)}
-							>
-								<label
-									label={label}
-									halign={Gtk.Align.CENTER}
-									hexpand
-								/>
-							</button>
-						))}
-					</box>
-				)}
-
-				<box>
-					<Gtk.ProgressBar
-						visible={!isNotificationCenter}
-						class="progress-bar"
-						hexpand
-						fraction={progressBarFraction}
-						widthRequest={491} // width - (border-radius * 3)
-						halign={Gtk.Align.CENTER}
-					/>
-				</box>
-			</box>
-		</Adw.Clamp>
+			</Adw.Clamp>
+		</revealer>
 	);
 }

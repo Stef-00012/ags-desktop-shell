@@ -80,8 +80,12 @@ check:checked {
 check:checked:hover {
     background-color: gtkalpha($surface2-color, 0.6);
 }
-
 popover {
+    opacity: 0;
+
+    transition-property: opacity;
+    transition-duration: 0.3s;
+    transition-timing-function: ease-in-out;
 
     arrow,
     contents {
@@ -94,6 +98,10 @@ popover {
 
     button:hover {
         background-color: gtkalpha($base-color, 0.6);
+    }
+
+    &.open {
+        opacity: 1;
     }
 }
 
@@ -345,6 +353,11 @@ window.bar {
         margin-right: 6px;
     }
 
+    .time-icon.calendar {
+        margin-right: 6px;
+        margin-left: 6px;
+    }
+
     .notification-icon {
         margin-right: 12px;
 
@@ -368,7 +381,12 @@ window.notification-popups {
 }
 
 window.notification-center {
-    background-color: gtkalpha(#000000, 0.2);
+    background-color: gtkalpha(#000000, 0);
+    transition: background-color 0.5s ease-in-out;
+
+    &.open {
+        background-color: gtkalpha(#000000, 0.2);
+    }
 
     .notification-container {
         background-color: gtkalpha($crust-color, 0.95);

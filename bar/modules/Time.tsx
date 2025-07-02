@@ -37,9 +37,11 @@ export default function Time({ class: className }: Props) {
 			if (isPopoverOpen.get()) {
 				setIsPopoverOpen(false);
 				popover.popdown();
+				popover.set_css_classes(popover.cssClasses.filter(className => className !== "open"))
 			} else {
 				setIsPopoverOpen(true);
 				popover.popup();
+				popover.set_css_classes([...popover.cssClasses, "open"])
 			}
 		}
 	}
@@ -81,8 +83,9 @@ export default function Time({ class: className }: Props) {
 				$={(self) => {
 					popover = self;
 				}}
-				onClosed={() => {
+				onClosed={(self) => {
 					setIsPopoverOpen(false);
+					self.set_css_classes(self.cssClasses.filter(className => className !== "open"))
 				}}
 			>
 				<Gtk.Calendar class="calendar" />

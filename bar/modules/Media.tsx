@@ -2,7 +2,7 @@ import { escapeMarkup, marquee } from "@/util/text";
 import type { SongData } from "@/types/lyrics";
 import { fileExists } from "@/util/file";
 import { execAsync } from "ags/process";
-import Gio from "gi://Gio?version=2.0";
+import Gio from "gi://Gio";
 import { Gdk, Gtk } from "ags/gtk4";
 import Mpris from "gi://AstalMpris";
 import {
