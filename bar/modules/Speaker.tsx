@@ -19,7 +19,7 @@ export default function Speaker({ class: className }: Props) {
 		);
 
 	const volume = createBinding(speaker, "volume");
-	const isMuted = createBinding(speaker, "mute")
+	const isMuted = createBinding(speaker, "mute");
 	const iconName = createBinding(speaker, "volume_icon");
 	const device = createBinding(speaker, "description");
 

@@ -3,8 +3,8 @@ import Notification from "./components/Notification";
 import { isIcon } from "@/util/icons";
 import Notifd from "gi://AstalNotifd";
 import { barHeight } from "@/bar/Bar";
-import { Gtk, Gdk } from "ags/gtk4";
 import { sleep } from "@/util/timer";
+import { Gtk, Gdk } from "ags/gtk4";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -106,16 +106,18 @@ export default function NotificationCenter({
 			$={(self) => {
 				const revealer = self.child as Gtk.Revealer;
 				const transitionDuration = revealer.get_transition_duration();
-				
+
 				isVisible.subscribe(async () => {
-					const classes = self.cssClasses
+					const classes = self.cssClasses;
 					const visible = isVisible.get();
 
 					if (!visible) {
-						revealer.set_reveal_child(visible)
-						self.set_css_classes(classes.filter(className => className !== "open"))
+						revealer.set_reveal_child(visible);
+						self.set_css_classes(
+							classes.filter((className) => className !== "open"),
+						);
 
-						await sleep(transitionDuration)
+						await sleep(transitionDuration);
 					}
 
 					self.set_visible(visible);
@@ -124,7 +126,7 @@ export default function NotificationCenter({
 						revealer.set_reveal_child(visible);
 						self.set_css_classes([...classes, "open"]);
 					}
-				})
+				});
 			}}
 		>
 			<Gtk.EventControllerKey onKeyPressed={handleEscKey} />
@@ -201,7 +203,9 @@ export default function NotificationCenter({
 									>
 										<box
 											class="category-header"
-											orientation={Gtk.Orientation.HORIZONTAL}
+											orientation={
+												Gtk.Orientation.HORIZONTAL
+											}
 										>
 											{notificationCategory.icon && (
 												<image
@@ -218,7 +222,9 @@ export default function NotificationCenter({
 
 											<label
 												class="category-title"
-												label={notificationCategory.title}
+												label={
+													notificationCategory.title
+												}
 											/>
 
 											<box hexpand />
@@ -247,7 +253,8 @@ export default function NotificationCenter({
 										)}
 
 										{index.get() !==
-											notificationCategories.get().length -
+											notificationCategories.get()
+												.length -
 												1 && (
 											<Gtk.Separator
 												class="category-separator"

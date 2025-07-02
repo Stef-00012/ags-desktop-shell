@@ -4,8 +4,8 @@ import CalculatorMode from "./modes/calculator/Calculator";
 import { type Gdk, Gtk } from "ags/gtk4";
 import AppMode from "./modes/app/App";
 import { barHeight } from "@/bar/Bar";
-import Adw from "gi://Adw";
 import { sleep } from "@/util/timer";
+import Adw from "gi://Adw";
 
 export type LauncherMode = "closed" | "calculator" | "app" | "clipboard";
 export interface PressedKey {
@@ -88,16 +88,18 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 			$={(self) => {
 				const revealer = self.child as Gtk.Revealer;
 				const transitionDuration = revealer.get_transition_duration();
-				
+
 				mode.subscribe(async () => {
-					const classes = self.cssClasses
+					const classes = self.cssClasses;
 					const visible = mode.get() !== "closed";
 
 					if (!visible) {
-						revealer.set_reveal_child(visible)
-						self.set_css_classes(classes.filter(className => className !== "open"))
+						revealer.set_reveal_child(visible);
+						self.set_css_classes(
+							classes.filter((className) => className !== "open"),
+						);
 
-						await sleep(transitionDuration)
+						await sleep(transitionDuration);
 					}
 
 					self.set_visible(visible);
@@ -106,7 +108,7 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 						revealer.set_reveal_child(visible);
 						self.set_css_classes([...classes, "open"]);
 					}
-				})
+				});
 			}}
 		>
 			<Gtk.EventControllerKey onKeyPressed={handleKeyPress} />
@@ -151,7 +153,8 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 										enterPressed={enterPressed}
 										pressedKey={pressedKey}
 										visible={mode(
-											(currentMode) => currentMode === "app",
+											(currentMode) =>
+												currentMode === "app",
 										)}
 										closed={closed}
 									/>

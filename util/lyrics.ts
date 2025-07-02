@@ -1,3 +1,4 @@
+import { tooltipCurrentSong, lyricsSourceColor } from "@/constants/colors";
 import { fetch, Headers, URL, URLSearchParams } from "@/util/fetch";
 import { MUSIXMATCH_TOKEN_PATH } from "@/constants/config";
 import { colorText, escapeMarkup } from "@/util/text";
@@ -6,7 +7,6 @@ import { createState, onCleanup } from "ags";
 import type Mpris from "gi://AstalMpris";
 import Soup from "gi://Soup";
 import { timeout } from "ags/time";
-import { tooltipCurrentSong, lyricsSourceColor } from "@/constants/colors";
 import type {
 	MusixmatchSearchResult,
 	UsertokenResponse,

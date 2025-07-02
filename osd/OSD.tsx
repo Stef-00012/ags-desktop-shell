@@ -1,13 +1,13 @@
 import { BACKLIGHT_BASE_DIR, OSD_TIMEOUT_TIME } from "@/constants/config";
-import { monitorFile, readFileAsync } from "ags/file";
 import { type Accessor, createComputed, createState } from "ags";
+import { monitorFile, readFileAsync } from "ags/file";
 import { type Gdk, Gtk } from "ags/gtk4";
 import type AstalIO from "gi://AstalIO";
+import { sleep } from "@/util/timer";
 import { timeout } from "ags/time";
 import giCairo from "gi://cairo";
 import Wp from "gi://AstalWp";
 import GLib from "gi://GLib";
-import { sleep } from "@/util/timer";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -25,7 +25,10 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 	const defaultMicrophone = wp?.audio.defaultMicrophone;
 
 	const [isVisible, setIsVisible] = createState(false);
-	const visibleState = createComputed([isVisible, hidden], transformVisibleState)
+	const visibleState = createComputed(
+		[isVisible, hidden],
+		transformVisibleState,
+	);
 
 	let lastTimeout: AstalIO.Time;
 	let isStartup = true;
@@ -85,7 +88,6 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 
 	function transformVisibleState(isVisible: boolean, hidden: boolean) {
 		return isVisible && !hidden;
-
 	}
 
 	function updateSpeakerState(speaker: Wp.Endpoint) {
@@ -156,9 +158,9 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 					const visible = visibleState.get();
 
 					if (!visible) {
-						revealer.set_reveal_child(visible)
+						revealer.set_reveal_child(visible);
 
-						await sleep(transitionDuration)
+						await sleep(transitionDuration);
 					}
 
 					self.set_visible(visible);
@@ -166,7 +168,7 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 					if (visible) {
 						revealer.set_reveal_child(visible);
 					}
-				})
+				});
 			}}
 		>
 			<revealer

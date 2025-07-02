@@ -1,16 +1,19 @@
-import { DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT, NOTIFICATION_ANIMATION_DURATION } from "@/constants/config";
 import { escapeMarkup, parseMarkdown } from "@/util/text";
+import { sleep, Timer } from "@/util/timer";
 import type Notifd from "gi://AstalNotifd";
 import { fileExists } from "@/util/file";
 import { time } from "@/util/formatTime";
 import { urgency } from "@/util/notif";
-import Gtk from "gi://Gtk";
 import { isIcon } from "@/util/icons";
-import { sleep, Timer } from "@/util/timer";
 import { createState } from "ags";
 import Pango from "gi://Pango";
 import { Gdk } from "ags/gtk4";
+import Gtk from "gi://Gtk";
 import Adw from "gi://Adw";
+import {
+	DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT,
+	NOTIFICATION_ANIMATION_DURATION,
+} from "@/constants/config";
 
 export default function Notification({
 	notification,
@@ -45,7 +48,10 @@ export default function Notification({
 		if (timer.timeLeft <= 0) {
 			setIsHidden(true);
 
-			await sleep(NOTIFICATION_ANIMATION_DURATION - NOTIFICATION_ANIMATION_DURATION * 0.6)
+			await sleep(
+				NOTIFICATION_ANIMATION_DURATION -
+					NOTIFICATION_ANIMATION_DURATION * 0.6,
+			);
 
 			onHide(notification);
 		}
@@ -103,7 +109,11 @@ export default function Notification({
 	return (
 		<revealer
 			transitionDuration={NOTIFICATION_ANIMATION_DURATION}
-			transitionType={isNotificationCenter ? Gtk.RevealerTransitionType.NONE : Gtk.RevealerTransitionType.SLIDE_LEFT}
+			transitionType={
+				isNotificationCenter
+					? Gtk.RevealerTransitionType.NONE
+					: Gtk.RevealerTransitionType.SLIDE_LEFT
+			}
 			$={async (self) => {
 				if (isNotificationCenter) self.set_reveal_child(true);
 				else {
@@ -112,13 +122,13 @@ export default function Notification({
 				}
 
 				const unsubscribe = isHidden.subscribe(() => {
-					const hidden = isHidden.get()
+					const hidden = isHidden.get();
 
 					if (hidden) {
 						self.set_reveal_child(false);
 						unsubscribe();
 					}
-				})
+				});
 			}}
 		>
 			<Adw.Clamp maximumSize={530}>
@@ -189,13 +199,14 @@ export default function Notification({
 					<box class="content">
 						{getLeftClickComponent()}
 
-						{notification.image && fileExists(notification.image) && (
-							<image
-								valign={Gtk.Align.START}
-								class="image"
-								file={notification.image}
-							/>
-						)}
+						{notification.image &&
+							fileExists(notification.image) && (
+								<image
+									valign={Gtk.Align.START}
+									class="image"
+									file={notification.image}
+								/>
+							)}
 
 						{notification.image && isIcon(notification.image) && (
 							<box valign={Gtk.Align.START} class="icon-image">

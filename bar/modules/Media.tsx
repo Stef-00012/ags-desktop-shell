@@ -2,9 +2,9 @@ import { escapeMarkup, marquee } from "@/util/text";
 import type { SongData } from "@/types/lyrics";
 import { fileExists } from "@/util/file";
 import { execAsync } from "ags/process";
-import Gio from "gi://Gio";
 import { Gdk, Gtk } from "ags/gtk4";
 import Mpris from "gi://AstalMpris";
+import Gio from "gi://Gio";
 import {
 	MEDIA_VOLUME_STEP,
 	MEDIA_MAX_LENGTH,

@@ -3,8 +3,8 @@
 	https://github.com/Mabi19/desktop-shell/blob/d70189b2355a4173a8ea6d5699f340fe73497945/utils/timer.ts
 */
 
-import type AstalIO from "gi://AstalIO";
 import { interval, timeout } from "ags/time";
+import type AstalIO from "gi://AstalIO";
 import GLib from "gi://GLib";
 
 export class Timer {
