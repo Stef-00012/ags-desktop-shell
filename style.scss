@@ -579,7 +579,12 @@ window.osd {
 }
 
 window.session-menu {
-    background-color: gtkalpha(black, 0.6);
+    background-color: gtkalpha(#000000, 0);
+    transition: background-color 0.3s ease-in-out;
+
+    &.open {
+        background-color: gtkalpha(#000000, 0.6);
+    }
 
     button {
         border-radius: 20px;
