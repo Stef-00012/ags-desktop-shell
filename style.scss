@@ -254,8 +254,7 @@ window.bar {
 
     .time {
         .calendar {
-            margin-left: 3px;
-            margin-right: 3px;
+            border-width: 0;
 
             header {
                 button {
@@ -366,7 +365,6 @@ window.bar {
 
 window.notification-popups {
     all: unset;
-
 }
 
 window.notification-center {
