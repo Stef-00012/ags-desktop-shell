@@ -1,7 +1,7 @@
-import { exec } from "ags/process";
+import { createState, For, type Accessor } from "ags";
 import type { PressedKey } from "../../Launcher";
 import { Gdk, Gtk } from "ags/gtk4";
-import { createState, For, type Accessor } from "ags";
+import { exec } from "ags/process";
 
 interface Props {
 	close: () => void;
@@ -82,9 +82,9 @@ export default function ClipboardMode({
 				current = query[i];
 
 			while (current) {
-                lastSearched = e.indexOf(current, lastSearched + 1)
-				
-                if (lastSearched === -1) {
+				lastSearched = e.indexOf(current, lastSearched + 1);
+
+				if (lastSearched === -1) {
 					return false;
 				}
 
@@ -110,10 +110,16 @@ export default function ClipboardMode({
 			<For each={filteredClipboard}>
 				{(clipboardEntry) => (
 					<box>
-                        <Gtk.GestureClick button={Gdk.BUTTON_PRIMARY} onPressed={() => copyText(clipboardEntry)} />
+						<Gtk.GestureClick
+							button={Gdk.BUTTON_PRIMARY}
+							onPressed={() => copyText(clipboardEntry)}
+						/>
 
-                        <label halign={Gtk.Align.START} label={clipboardEntry} />
-                    </box>
+						<label
+							halign={Gtk.Align.START}
+							label={clipboardEntry}
+						/>
+					</box>
 				)}
 			</For>
 		</box>

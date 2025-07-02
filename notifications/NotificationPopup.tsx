@@ -4,8 +4,8 @@ import Notifd from "gi://AstalNotifd";
 import { timeout } from "ags/time";
 import giCairo from "gi://cairo";
 import {
-	type Accessor,
 	For,
+	type Accessor,
 	createBinding,
 	createComputed,
 	createState,
@@ -28,7 +28,7 @@ export default function NotificationPopups({ gdkmonitor, hidden }: Props) {
 		[] as Notifd.Notification[],
 	);
 
-	const doNotDisturb = createBinding(notifd, "dont_disturb")
+	const doNotDisturb = createBinding(notifd, "dont_disturb");
 
 	const notifiedHandler = notifd.connect("notified", (_, id, replaced) => {
 		const notification = notifd.get_notification(id);

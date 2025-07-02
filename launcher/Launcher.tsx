@@ -1,10 +1,10 @@
 import { createState, type Accessor, type Setter } from "ags";
+import CalculatorMode from "./modes/calculator/Calculator";
+// import ClipboardMode from "./modes/clipboard/Clipboard";
 import { type Gdk, Gtk } from "ags/gtk4";
 import AppMode from "./modes/app/App";
-import CalculatorMode from "./modes/calculator/Calculator";
 import { barHeight } from "@/bar/Bar";
-import Adw from "gi://Adw?version=1";
-// import ClipboardMode from "./modes/clipboard/Clipboard";
+import Adw from "gi://Adw";
 
 export type LauncherMode = "closed" | "calculator" | "app" | "clipboard";
 export interface PressedKey {
@@ -34,12 +34,14 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 	const maxWidth = gdkmonitor.geometry.width * 0.5;
 	const maxHeight = gdkmonitor.geometry.height * 0.5;
 
-	searchValue.subscribe(() => {
-		entry?.set_text(searchValue.get() || "")
-	})
-
 	function close() {
 		setMode("closed");
+		setSearchValue(null);
+
+		if (entry) entry.set_text("");
+	}
+
+	function emptySearch() {
 		setSearchValue(null);
 
 		if (entry) entry.set_text("");
@@ -85,12 +87,14 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 		>
 			<Gtk.EventControllerKey onKeyPressed={handleKeyPress} />
 
-			<Adw.Clamp orientation={Gtk.Orientation.VERTICAL} maximumSize={maxHeight}>
+			<Adw.Clamp
+				orientation={Gtk.Orientation.VERTICAL}
+				maximumSize={maxHeight}
+			>
 				<Adw.Clamp maximumSize={maxWidth}>
 					<box
 						widthRequest={maxWidth}
 						heightRequest={maxHeight}
-						
 						hexpand
 						class="launcher-container"
 						orientation={Gtk.Orientation.VERTICAL}
@@ -127,11 +131,12 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 								<CalculatorMode
 									close={close}
 									searchValue={searchValue}
-									setSearchValue={setSearchValue}
+									emptySearch={emptySearch}
 									enterPressed={enterPressed}
 									pressedKey={pressedKey}
 									visible={mode(
-										(currentMode) => currentMode === "calculator",
+										(currentMode) =>
+											currentMode === "calculator",
 									)}
 									closed={closed}
 								/>

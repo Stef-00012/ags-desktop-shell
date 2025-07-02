@@ -1,6 +1,6 @@
-import { Gdk, Gtk } from "ags/gtk4";
 import { type Accessor, createBinding, createState, For } from "ags";
 import AstalTray from "gi://AstalTray";
+import { Gdk, Gtk } from "ags/gtk4";
 
 interface Props {
 	class?: string | Accessor<string>;

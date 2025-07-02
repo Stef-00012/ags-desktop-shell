@@ -1,14 +1,14 @@
-import { Gdk, Gtk } from "ags/gtk4";
 import type { Accessor, Setter } from "ags";
 import { execAsync } from "ags/process";
-import Adw from "gi://Adw";
 import { barHeight } from "@/bar/Bar";
+import { Gdk, Gtk } from "ags/gtk4";
+import Pango from "gi://Pango";
+import Adw from "gi://Adw";
 import {
 	SESSION_MENU_BUTTON_GAP,
 	SESSION_MENU_BUTTON_HEIGHT,
 	SESSION_MENU_BUTTON_WIDTH,
 } from "@/constants/config";
-import Pango from "gi://Pango?version=1.0";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;

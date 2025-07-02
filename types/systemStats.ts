@@ -56,11 +56,3 @@ export type DiskStat = {
 	usagePercent: string;
 	path: string;
 };
-
-export type SpeakerStat = {
-	name: string;
-	muted: boolean;
-	volume: number;
-	api: string;
-	isBluetooth: boolean;
-};

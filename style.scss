@@ -53,6 +53,7 @@ button {
     border-radius: 8px;
     background-image: unset;
     background-color: $mantle-color;
+    outline-color: $surface1-color;
 }
 
 button:hover {
@@ -81,6 +82,7 @@ check:checked:hover {
 }
 
 popover {
+
     arrow,
     contents {
         background-color: $mantle-color;

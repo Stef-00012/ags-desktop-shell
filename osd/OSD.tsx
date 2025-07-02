@@ -1,3 +1,4 @@
+import { BACKLIGHT_BASE_DIR, OSD_TIMEOUT_TIME } from "@/constants/config";
 import { monitorFile, readFileAsync } from "ags/file";
 import { type Gdk, Gtk } from "ags/gtk4";
 import type AstalIO from "gi://AstalIO";
@@ -6,7 +7,6 @@ import { createState } from "ags";
 import giCairo from "gi://cairo";
 import Wp from "gi://AstalWp";
 import GLib from "gi://GLib";
-import { BACKLIGHT_BASE_DIR, OSD_TIMEOUT_TIME } from "@/constants/config";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;

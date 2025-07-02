@@ -1,7 +1,8 @@
-import NotificationPopups from "@/notifications/NotificationPopup";
-import NotificationCenter from "@/notifications/NotificationCenter";
-import { createBinding, createState, For, onCleanup } from "ags";
 import AppLauncher, { type LauncherMode } from "@/launcher/Launcher";
+import NotificationCenter from "@/notifications/NotificationCenter";
+import NotificationPopups from "@/notifications/NotificationPopup";
+import { createBinding, createState, For, onCleanup } from "ags";
+import SessionMenu from "@/sessionMenu/SessionMenu";
 import GObject, { register } from "ags/gobject";
 import Notifd from "gi://AstalNotifd";
 import style from "./style.scss";
@@ -10,7 +11,6 @@ import app from "ags/gtk4/app";
 import GLib from "gi://GLib";
 import OSD from "./osd/OSD";
 import Bar from "@/bar/Bar";
-import SessionMenu from "./sessionMenu/SessionMenu";
 
 @register({ Implements: [Gtk.Buildable] })
 class WindowTracker extends GObject.Object {
@@ -30,10 +30,38 @@ export const [appLauncherMode, setAppLauncherMode] =
 
 const notifd = Notifd.get_default();
 
+isNotificationCenterVisible.subscribe(() => {
+	if (isNotificationCenterVisible.get()) {
+		if (isSessionMenuVisible.get())
+			return setIsNotificationCenterVisible(false);
+
+		setAppLauncherMode("closed");
+	}
+});
+
+isSessionMenuVisible.subscribe(() => {
+	if (isSessionMenuVisible.get()) {
+		setIsNotificationCenterVisible(false);
+		setAppLauncherMode("closed");
+	}
+});
+
+appLauncherMode.subscribe(() => {
+	if (appLauncherMode.get() !== "closed") {
+		if (isSessionMenuVisible.get()) return setAppLauncherMode("closed");
+
+		setIsNotificationCenterVisible(false);
+	}
+});
+
+const instanceName = SRC.includes("desktop-shell")
+	? "desktop-shell-dev"
+	: "desktop-shell";
+
 app.start({
 	css: style,
 	gtkTheme: "Adwaita-dark",
-	instanceName: "desktop-shell",
+	instanceName,
 	icons: `${SRC}/icons`,
 
 	main() {
@@ -88,7 +116,8 @@ app.start({
 			}
 
 			case "toggle-notif": {
-				if (isSessionMenuVisible.get()) return res("session menu is currently open");
+				if (isSessionMenuVisible.get())
+					return res("session menu is currently open");
 
 				setIsNotificationCenterVisible((prev) => !prev);
 				setAppLauncherMode("closed");
@@ -99,13 +128,14 @@ app.start({
 			case "toggle-session-menu": {
 				setIsSessionMenuVisible((prev) => !prev);
 				setIsNotificationCenterVisible(false);
-				setAppLauncherMode("closed")
+				setAppLauncherMode("closed");
 
 				return res("ok");
 			}
 
 			case "toggle-launcher-app": {
-				if (isSessionMenuVisible.get()) return res("session menu is currently open");
+				if (isSessionMenuVisible.get())
+					return res("session menu is currently open");
 
 				setAppLauncherMode("app");
 				setIsNotificationCenterVisible(false);
@@ -114,7 +144,8 @@ app.start({
 			}
 
 			case "toggle-launcher-calculator": {
-				if (isSessionMenuVisible.get()) return res("session menu is currently open");
+				if (isSessionMenuVisible.get())
+					return res("session menu is currently open");
 
 				setAppLauncherMode("calculator");
 				setIsNotificationCenterVisible(false);
@@ -126,7 +157,7 @@ app.start({
 				DISABLED because exec("cliphist list") seems to error because it returns
 				raw binary image data instead of [[ binary data .. ]] like it would in a TTY
 			*/
-			
+
 			// case "toggle-launcher-clipboard": {
 			// 	setAppLauncherMode("clipboard");
 			// 	setIsNotificationCenterVisible(false);

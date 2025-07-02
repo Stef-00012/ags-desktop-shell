@@ -47,7 +47,7 @@ export const [networkUsage, setNetworkUsage] = createState<NetworkStat>({
 	interface: "Unknown",
 	isWifi: false,
 	isWired: false,
-	icon: "network-offline-symbolic"
+	icon: "network-offline-symbolic",
 });
 
 export const [diskUsage, setDiskUsage] = createState<DiskStat>({
@@ -216,8 +216,8 @@ network.connect("notify::primary", (source) => {
 			ssid: source.wifi?.ssid,
 			frequency: source.wifi?.frequency,
 			strength: source.wifi?.strength,
-			icon
-		}
+			icon,
+		};
 	});
 });
 
@@ -256,7 +256,7 @@ async function recalculateNetworkUsage() {
 				ssid: network.wifi?.ssid,
 				frequency: network.wifi?.frequency,
 				strength: network.wifi?.strength,
-				icon
+				icon,
 			};
 
 			if (lastNetworkInfo && mainInterface === lastInterface) {
@@ -269,7 +269,7 @@ async function recalculateNetworkUsage() {
 					ssid: network.wifi?.ssid,
 					frequency: network.wifi?.frequency,
 					strength: network.wifi?.strength,
-					icon
+					icon,
 				};
 
 				setNetworkUsage(newNetStats);

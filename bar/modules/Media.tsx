@@ -1,3 +1,15 @@
+import { escapeMarkup, marquee } from "@/util/text";
+import type { SongData } from "@/types/lyrics";
+import { fileExists } from "@/util/file";
+import { execAsync } from "ags/process";
+import Gio from "gi://Gio?version=2.0";
+import { Gdk, Gtk } from "ags/gtk4";
+import Mpris from "gi://AstalMpris";
+import {
+	MEDIA_VOLUME_STEP,
+	MEDIA_MAX_LENGTH,
+	SAVE_FOLDER,
+} from "@/constants/config";
 import {
 	convertToLrc,
 	formatLyricsTooltip,
@@ -5,24 +17,12 @@ import {
 	useSong,
 } from "@/util/lyrics";
 import {
-	MEDIA_VOLUME_STEP,
-	MEDIA_MAX_LENGTH,
-	SAVE_FOLDER,
-} from "@/constants/config";
-import { escapeMarkup, marquee } from "@/util/text";
-import type { SongData } from "@/types/lyrics";
-import { fileExists } from "@/util/file";
-import { Gdk, Gtk } from "ags/gtk4";
-import Mpris from "gi://AstalMpris";
-import {
 	createBinding,
 	createComputed,
 	createRoot,
 	jsx,
 	type Accessor,
 } from "ags";
-import Gio from "gi://Gio?version=2.0";
-import { execAsync } from "ags/process";
 
 interface Props {
 	class?: string | Accessor<string>;

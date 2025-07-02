@@ -1,8 +1,8 @@
 import { createState, For, type Accessor } from "ags";
-import App from "./components/App";
-import Apps from "gi://AstalApps";
 import type { PressedKey } from "../../Launcher";
 import { Gdk, Gtk } from "ags/gtk4";
+import App from "./components/App";
+import Apps from "gi://AstalApps";
 
 interface Props {
 	close: () => void;
@@ -31,16 +31,21 @@ export default function AppMode({
 		if (!closed.get() || !visible.get()) return;
 
 		close();
+		setAppList(apps.get_list());
 	});
 
 	enterPressed.subscribe(() => {
 		if (!enterPressed.get() || !visible.get()) return;
 
-		const apps = appList.get();
+		const list = appList.get();
 
-		if (apps.length <= 0) return close();
+		if (list.length <= 0) {
+			close();
+			setAppList(apps.get_list());
+			return;
+		}
 
-		apps[0].launch();
+		list[0].launch();
 	});
 
 	pressedKey.subscribe(() => {
@@ -50,7 +55,11 @@ export default function AppMode({
 
 		if (!keyData) return;
 
-		if (keyData.keyval === Gdk.KEY_Escape) return close();
+		if (keyData.keyval === Gdk.KEY_Escape) {
+			close();
+			setAppList(apps.get_list());
+			return;
+		}
 
 		const isAlt = keyData.modifier & Gdk.ModifierType.ALT_MASK;
 
@@ -70,10 +79,15 @@ export default function AppMode({
 		if (isAlt && numberKeys.includes(keyData.keyval)) {
 			const index = numberKeys.indexOf(keyData.keyval);
 
-			if (index === -1 || index >= appList.get().length) return close();
+			if (index === -1 || index >= appList.get().length) {
+				close();
+				setAppList(apps.get_list());
+				return;
+			}
 
 			appList.get()[index].launch();
 			close();
+			setAppList(apps.get_list());
 		}
 	});
 
@@ -100,6 +114,7 @@ export default function AppMode({
 						onOpen={() => {
 							app.launch();
 							close();
+							setAppList(apps.get_list());
 						}}
 					/>
 				)}

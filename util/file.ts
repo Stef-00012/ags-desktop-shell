@@ -6,5 +6,6 @@ export function fileExists(path: string, dir = false) {
 			path,
 			GLib.FileTest.EXISTS | GLib.FileTest.IS_DIR,
 		);
+
 	return GLib.file_test(path, GLib.FileTest.EXISTS);
 }

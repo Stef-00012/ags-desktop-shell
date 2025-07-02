@@ -1,6 +1,7 @@
-import { Gdk, Gtk } from "ags/gtk4";
 import { type Accessor, createState } from "ags";
+import { setIsSessionMenuVisible } from "@/app";
 import { execAsync } from "ags/process";
+import { Gdk, Gtk } from "ags/gtk4";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -11,6 +12,10 @@ export default function Power({ class: className }: Props) {
 	const [isPopoverOpen, setIsPopoverOpen] = createState(false);
 
 	function handleLeftClick() {
+		setIsSessionMenuVisible((prev) => !prev);
+	}
+
+	function handleRightClick() {
 		if (popover) {
 			if (isPopoverOpen.get()) {
 				setIsPopoverOpen(false);
@@ -31,6 +36,11 @@ export default function Power({ class: className }: Props) {
 			<Gtk.GestureClick
 				button={Gdk.BUTTON_PRIMARY}
 				onPressed={handleLeftClick}
+			/>
+
+			<Gtk.GestureClick
+				button={Gdk.BUTTON_SECONDARY}
+				onPressed={handleRightClick}
 			/>
 
 			<image iconName="system-shutdown-symbolic" pixelSize={16} />

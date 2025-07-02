@@ -1,12 +1,12 @@
-import { createState, For, type Setter, type Accessor } from "ags";
-import { exec, execAsync } from "ags/process";
+import { createState, For, type Accessor } from "ags";
 import type { PressedKey } from "../../Launcher";
+import { exec, execAsync } from "ags/process";
 import { Gdk, Gtk } from "ags/gtk4";
 
 interface Props {
 	close: () => void;
 	searchValue: Accessor<string | null>;
-	setSearchValue: Setter<string | null>;
+	emptySearch: () => void;
 	enterPressed: Accessor<boolean>;
 	pressedKey: Accessor<PressedKey | null>;
 	visible: Accessor<boolean>;
@@ -16,7 +16,7 @@ interface Props {
 export default function CalculatorMode({
 	close,
 	searchValue,
-	setSearchValue,
+	emptySearch,
 	enterPressed,
 	pressedKey,
 	visible,
@@ -39,10 +39,10 @@ export default function CalculatorMode({
 		const res = result.get();
 		const historyData = history.get();
 
-		if (!res || historyData[0] === res) return setSearchValue(null);
+		if (!res || historyData[0] === res) return emptySearch();
 
 		setHistory((prev) => [res, ...prev]);
-		setSearchValue(null);
+		emptySearch();
 		setResult(null);
 	});
 

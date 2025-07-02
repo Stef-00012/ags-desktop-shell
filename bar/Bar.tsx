@@ -7,13 +7,13 @@ import Network from "./modules/Network";
 import Memory from "./modules/Memory";
 import Power from "./modules/Power";
 import Media from "./modules/Media";
+import { timeout } from "ags/time";
 import Disk from "./modules/Disk";
+import { createState } from "ags";
 import Time from "./modules/Time";
 import Tray from "./modules/Tray";
 import Cpu from "./modules/Cpu";
 import app from "ags/gtk4/app";
-import { createState } from "ags";
-import { timeout } from "ags/time";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -35,8 +35,8 @@ export default function Bar({ gdkmonitor }: Props) {
 			application={app}
 			$={(self) => {
 				timeout(500, () => {
-					setBarHeight(self.get_allocated_height())
-				})
+					setBarHeight(self.get_allocated_height());
+				});
 			}}
 		>
 			<centerbox cssName="centerbox">

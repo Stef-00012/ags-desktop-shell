@@ -1,5 +1,5 @@
-import { MICROPHONE_VOLUME_STEP } from "@/constants/config";
 import { createBinding, createComputed, createState, type Accessor } from "ags";
+import { MICROPHONE_VOLUME_STEP } from "@/constants/config";
 import { Gtk } from "ags/gtk4";
 import Wp from "gi://AstalWp";
 

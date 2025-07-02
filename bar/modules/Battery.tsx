@@ -1,9 +1,9 @@
 import { createState, createComputed, createBinding } from "ags";
 import { formatSeconds } from "@/util/formatTime";
 import AstalBattery from "gi://AstalBattery";
+import { execAsync } from "ags/process";
 import type { Accessor } from "ags";
 import { Gdk, Gtk } from "ags/gtk4";
-import { execAsync } from "ags/process";
 
 interface Props {
 	class?: string | Accessor<string>;
