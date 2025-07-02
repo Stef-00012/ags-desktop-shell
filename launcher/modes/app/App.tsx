@@ -46,6 +46,7 @@ export default function AppMode({
 		}
 
 		list[0].launch();
+		close()
 	});
 
 	pressedKey.subscribe(() => {
