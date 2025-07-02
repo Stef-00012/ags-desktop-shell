@@ -68,7 +68,7 @@ to try it just run `ags run app.ts` using AGS v3
 - [x] Launcher
     - [x] Launch Programs
     - [x] Calculator
-    - [ ] Clipboard
+    - [ ] Clipboard (not sure)
 - [x] Notification Daemon
     - [x] Notification Popups
     - [x] Notification Center
@@ -90,7 +90,6 @@ to try it just run `ags run app.ts` using AGS v3
     - [x] Notifications
     - [x] Tray
     - [x] Power Actions
-    - [ ] Workspaces (maybe?)
 - [x] Session menu
 
 # Credits
