@@ -1,18 +1,19 @@
 import { BACKLIGHT_BASE_DIR, OSD_TIMEOUT_TIME } from "@/constants/config";
 import { monitorFile, readFileAsync } from "ags/file";
+import { type Accessor, createComputed, createState } from "ags";
 import { type Gdk, Gtk } from "ags/gtk4";
 import type AstalIO from "gi://AstalIO";
 import { timeout } from "ags/time";
-import { createState } from "ags";
 import giCairo from "gi://cairo";
 import Wp from "gi://AstalWp";
 import GLib from "gi://GLib";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
+	hidden: Accessor<boolean>;
 }
 
-export default function OSD({ gdkmonitor }: Props) {
+export default function OSD({ gdkmonitor, hidden }: Props) {
 	const wp = Wp.get_default();
 
 	const maxWidth = gdkmonitor.geometry.width * 0.125;
@@ -23,6 +24,7 @@ export default function OSD({ gdkmonitor }: Props) {
 	const defaultMicrophone = wp?.audio.defaultMicrophone;
 
 	const [isVisible, setIsVisible] = createState(false);
+	const visibleState = createComputed([isVisible, hidden], transformVisibleState)
 
 	let lastTimeout: AstalIO.Time;
 	let isStartup = true;
@@ -80,6 +82,11 @@ export default function OSD({ gdkmonitor }: Props) {
 		});
 	}
 
+	function transformVisibleState(isVisible: boolean, hidden: boolean) {
+		return isVisible && !hidden;
+
+	}
+
 	function updateSpeakerState(speaker: Wp.Endpoint) {
 		if (isStartup) return;
 
@@ -130,7 +137,7 @@ export default function OSD({ gdkmonitor }: Props) {
 	return (
 		<window
 			gdkmonitor={gdkmonitor}
-			visible={isVisible}
+			visible={visibleState}
 			class="osd"
 			title="AGS OSD"
 			css={`margin-top: ${marginTop}px;`}

@@ -1,7 +1,7 @@
 import AppLauncher, { type LauncherMode } from "@/launcher/Launcher";
 import NotificationCenter from "@/notifications/NotificationCenter";
 import NotificationPopups from "@/notifications/NotificationPopup";
-import { createBinding, createState, For, onCleanup } from "ags";
+import { createBinding, createComputed, createState, For, onCleanup } from "ags";
 import SessionMenu from "@/sessionMenu/SessionMenu";
 import GObject, { register } from "ags/gobject";
 import Notifd from "gi://AstalNotifd";
@@ -27,6 +27,8 @@ export const [isSessionMenuVisible, setIsSessionMenuVisible] =
 
 export const [appLauncherMode, setAppLauncherMode] =
 	createState<LauncherMode>("closed");
+
+const isNotificationPopupHidden = createComputed([isNotificationCenterVisible, isSessionMenuVisible], transformIsNotificationPopupHidden)
 
 const notifd = Notifd.get_default();
 
@@ -54,6 +56,10 @@ appLauncherMode.subscribe(() => {
 	}
 });
 
+function transformIsNotificationPopupHidden(isNotificationCenterVisible: boolean, isSessionMenuVisible: boolean) {
+	return isNotificationCenterVisible || isSessionMenuVisible;
+}
+
 const instanceName = SRC.includes("desktop-shell")
 	? "desktop-shell-dev"
 	: "desktop-shell";
@@ -75,7 +81,7 @@ app.start({
 
 						<NotificationPopups
 							gdkmonitor={monitor}
-							hidden={isNotificationCenterVisible}
+							hidden={isNotificationPopupHidden}
 						/>
 
 						<NotificationCenter
@@ -90,7 +96,10 @@ app.start({
 							setMode={setAppLauncherMode}
 						/>
 
-						<OSD gdkmonitor={monitor} />
+						<OSD
+							gdkmonitor={monitor}
+							hidden={isSessionMenuVisible}
+						/>
 
 						<SessionMenu
 							gdkmonitor={monitor}
