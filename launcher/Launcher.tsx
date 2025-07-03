@@ -152,6 +152,7 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 										searchValue={searchValue}
 										enterPressed={enterPressed}
 										pressedKey={pressedKey}
+										entry={entry}
 										visible={mode(
 											(currentMode) =>
 												currentMode === "app",

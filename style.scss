@@ -515,6 +515,16 @@ window.launcher {
                 background-color: $mantle-color;
                 border-radius: 8px;
 
+                border: 0 solid $surface0-color;
+
+                transition-property: border-width;
+                transition-duration: 0.2s;
+                transition-timing-function: ease-in-out;
+
+                &.focus {
+                    border-width: 3px;
+                }
+
                 &:first-child {
                     margin-top: 6px;
                 }

@@ -1,19 +1,21 @@
 import type Apps from "gi://AstalApps";
 import { isIcon } from "@/util/icons";
 import { Gdk, Gtk } from "ags/gtk4";
+import type { Accessor } from "ags";
 
 interface Props {
 	app: Apps.Application;
+	focused: Accessor<boolean>
 	onOpen: () => void;
 }
 
-export default function App({ app, onOpen }: Props) {
+export default function App({ app, focused, onOpen }: Props) {
 	function handleLeftClick() {
 		onOpen();
 	}
 
 	return (
-		<box orientation={Gtk.Orientation.HORIZONTAL} class="app-container">
+		<box orientation={Gtk.Orientation.HORIZONTAL} class={focused((isFocused) => isFocused ? "app-container focus" : "app-container")}>
 			<Gtk.GestureClick
 				button={Gdk.BUTTON_PRIMARY}
 				onPressed={handleLeftClick}
