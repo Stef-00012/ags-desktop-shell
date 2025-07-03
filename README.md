@@ -10,6 +10,8 @@ to try it just run `ags run app.ts` using AGS v3
 
 ### Features
 
+[!Features Preview](https://i.stefdp.com/raw/yxrB0y2qvw74.mp4)
+
 - Bar
     - CPU - See the general load and each core's load (on hover)
     - Disk - See the available and used disk space (on hover)
@@ -66,6 +68,11 @@ to try it just run `ags run app.ts` using AGS v3
 - [`AstalNotifd`](https://aylur.github.io/astal/guide/libraries/notifd#installation)
 - [`AstalTray`](https://aylur.github.io/astal/guide/libraries/tray#installation)
 - [`AstalWp`](https://aylur.github.io/astal/guide/libraries/wireplumber#installation)
+
+### How to run
+
+1. Clone this repository and move its contents to `~/.config/ags`
+2. just run `ags run`
 
 ### Suggested Hyprland Config
 
