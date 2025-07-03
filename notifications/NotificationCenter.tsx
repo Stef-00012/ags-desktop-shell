@@ -141,6 +141,18 @@ export default function NotificationCenter({
 					propagationPhase={Gtk.PropagationPhase.TARGET}
 				/>
 
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_SECONDARY}
+					onPressed={handleExternalClick}
+					propagationPhase={Gtk.PropagationPhase.TARGET}
+				/>
+
+				<Gtk.GestureClick
+					button={Gdk.BUTTON_MIDDLE}
+					onPressed={handleExternalClick}
+					propagationPhase={Gtk.PropagationPhase.TARGET}
+				/>
+
 				<box
 					marginTop={barHeight}
 					orientation={Gtk.Orientation.VERTICAL}

@@ -237,8 +237,8 @@ export default function Notification({
 									wrap
 									useMarkup
 									halign={Gtk.Align.START}
+									wrapMode={Pango.WrapMode.CHAR}
 									xalign={0}
-									justify={Gtk.Justification.FILL}
 									label={parseMarkdown(
 										escapeMarkup(notification.body),
 									)}
