@@ -5,7 +5,7 @@ import type { Accessor } from "ags";
 
 interface Props {
 	app: Apps.Application;
-	focused: Accessor<boolean>
+	focused: Accessor<boolean>;
 	onOpen: () => void;
 }
 
@@ -15,7 +15,13 @@ export default function App({ app, focused, onOpen }: Props) {
 	}
 
 	return (
-		<box orientation={Gtk.Orientation.HORIZONTAL} class={focused((isFocused) => isFocused ? "app-container focus" : "app-container")}>
+		<box
+			orientation={Gtk.Orientation.HORIZONTAL}
+			class={focused((isFocused) =>
+				isFocused ? "app-container focus" : "app-container",
+			)}
+			cursor={Gdk.Cursor.new_from_name("pointer", null)}
+		>
 			<Gtk.GestureClick
 				button={Gdk.BUTTON_PRIMARY}
 				onPressed={handleLeftClick}

@@ -54,6 +54,8 @@ button {
     background-image: unset;
     background-color: $mantle-color;
     outline-color: $surface1-color;
+
+    transition: background-color 0.3s ease-in-out;
 }
 
 button:hover {
@@ -103,6 +105,38 @@ popover {
 
     &.open {
         opacity: 1;
+    }
+}
+
+scrolledwindow {
+    scrollbar {
+        background-color: gtkalpha(#000000, 0.2);
+        border-radius: 20px;
+
+        trough {
+            margin: 1px;
+            background-color: gtkalpha($surface0-color, 0.1);
+
+            slider {
+                background-color: gtkalpha($overlay1-color, 0.6);
+            }
+
+            &:hover {
+                background-color: gtkalpha($surface0-color, 0.2);
+
+                slider {
+                    background-color: gtkalpha($overlay1-color, 0.3);
+
+                    &:hover {
+                        background-color: gtkalpha($overlay1-color, 0.4);
+                    }
+
+                    &:active {
+                        background-color: $surface0-color;
+                    }
+                }
+            }
+        }
     }
 }
 
@@ -514,12 +548,15 @@ window.launcher {
                 margin-bottom: 3px;
                 background-color: $mantle-color;
                 border-radius: 8px;
-
                 border: 0 solid $surface0-color;
 
-                transition-property: border-width;
-                transition-duration: 0.2s;
-                transition-timing-function: ease-in-out;
+                transition: border-width 0.2s ease-in-out;
+                transition: background-color 0.2s ease-in-out;
+
+                &:hover {
+                    border-width: 1px;
+                    background-color: gtkalpha($mantle-color, 0.6);
+                }
 
                 &.focus {
                     border-width: 3px;

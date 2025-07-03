@@ -105,6 +105,7 @@ export default function SessionMenu({
 						>
 							<box spacing={SESSION_MENU_BUTTON_GAP}>
 								<button
+									cursor={Gdk.Cursor.new_from_name("pointer", null)}
 									widthRequest={SESSION_MENU_BUTTON_WIDTH}
 									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
 									onClicked={() => {
@@ -130,6 +131,7 @@ export default function SessionMenu({
 								</button>
 
 								<button
+									cursor={Gdk.Cursor.new_from_name("pointer", null)}
 									widthRequest={SESSION_MENU_BUTTON_WIDTH}
 									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
 									onClicked={() => {
@@ -155,6 +157,7 @@ export default function SessionMenu({
 								</button>
 
 								<button
+									cursor={Gdk.Cursor.new_from_name("pointer", null)}
 									widthRequest={SESSION_MENU_BUTTON_WIDTH}
 									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
 									onClicked={() => {
@@ -179,6 +182,7 @@ export default function SessionMenu({
 								</button>
 
 								<button
+									cursor={Gdk.Cursor.new_from_name("pointer", null)}
 									widthRequest={SESSION_MENU_BUTTON_WIDTH}
 									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
 									onClicked={() => {
@@ -205,6 +209,7 @@ export default function SessionMenu({
 
 							<box spacing={SESSION_MENU_BUTTON_GAP}>
 								<button
+									cursor={Gdk.Cursor.new_from_name("pointer", null)}
 									widthRequest={SESSION_MENU_BUTTON_WIDTH}
 									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
 									onClicked={() => {
@@ -229,6 +234,7 @@ export default function SessionMenu({
 								</button>
 
 								<button
+									cursor={Gdk.Cursor.new_from_name("pointer", null)}
 									widthRequest={SESSION_MENU_BUTTON_WIDTH}
 									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
 									onClicked={() => {
@@ -253,6 +259,7 @@ export default function SessionMenu({
 								</button>
 
 								<button
+									cursor={Gdk.Cursor.new_from_name("pointer", null)}
 									widthRequest={SESSION_MENU_BUTTON_WIDTH}
 									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
 									onClicked={() => {
@@ -277,6 +284,7 @@ export default function SessionMenu({
 								</button>
 
 								<button
+									cursor={Gdk.Cursor.new_from_name("pointer", null)}
 									widthRequest={SESSION_MENU_BUTTON_WIDTH}
 									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
 									onClicked={() => {

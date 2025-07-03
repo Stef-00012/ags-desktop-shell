@@ -160,6 +160,7 @@ export default function NotificationCenter({
 							<button
 								label="Clear All"
 								class="dismiss-all"
+								cursor={Gdk.Cursor.new_from_name("pointer", null)}
 								onClicked={() => {
 									for (const category of notificationCategories.get()) {
 										for (const notif of category.notifications) {
@@ -183,6 +184,7 @@ export default function NotificationCenter({
 								onStateSet={handleDndSwitch}
 								state={doNotDisturb}
 								active={doNotDisturb}
+								cursor={Gdk.Cursor.new_from_name("pointer", null)}
 							/>
 						</box>
 					</box>
@@ -232,6 +234,7 @@ export default function NotificationCenter({
 											<button
 												class="dismiss-category"
 												label="X"
+												cursor={Gdk.Cursor.new_from_name("pointer", null)}
 												onClicked={() => {
 													for (const notif of notificationCategory.notifications) {
 														notif.dismiss();

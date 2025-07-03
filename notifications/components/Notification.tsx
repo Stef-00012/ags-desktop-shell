@@ -253,6 +253,7 @@ export default function Notification({
 								<button
 									name="actionButton"
 									hexpand
+									cursor={Gdk.Cursor.new_from_name("pointer", null)}
 									onClicked={() => notification.invoke(id)}
 								>
 									<label

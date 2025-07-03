@@ -68,6 +68,7 @@ export default function Power({ class: className }: Props) {
 					<box spacing={6}>
 						<button
 							tooltipMarkup="Lock"
+							cursor={Gdk.Cursor.new_from_name("pointer", null)}
 							onClicked={() => {
 								execAsync("loginctl lock-session");
 								popover?.popdown();
@@ -81,6 +82,7 @@ export default function Power({ class: className }: Props) {
 
 						<button
 							tooltipMarkup="Sleep"
+							cursor={Gdk.Cursor.new_from_name("pointer", null)}
 							onClicked={() => {
 								execAsync("systemctl suspend");
 								popover?.popdown();
@@ -94,6 +96,7 @@ export default function Power({ class: className }: Props) {
 
 						<button
 							tooltipMarkup="Logout"
+							cursor={Gdk.Cursor.new_from_name("pointer", null)}
 							onClicked={() => {
 								execAsync("pkill Hyprland");
 								popover?.popdown();
@@ -107,6 +110,7 @@ export default function Power({ class: className }: Props) {
 
 						<button
 							tooltipMarkup="Task Manager"
+							cursor={Gdk.Cursor.new_from_name("pointer", null)}
 							onClicked={() => {
 								execAsync("kitty btop");
 								popover?.popdown();
@@ -122,6 +126,7 @@ export default function Power({ class: className }: Props) {
 					<box spacing={6}>
 						<button
 							tooltipMarkup="Hibernate"
+							cursor={Gdk.Cursor.new_from_name("pointer", null)}
 							onClicked={() => {
 								execAsync("systemctl hibernate");
 								popover?.popdown();
@@ -135,6 +140,7 @@ export default function Power({ class: className }: Props) {
 
 						<button
 							tooltipMarkup="Shutdown"
+							cursor={Gdk.Cursor.new_from_name("pointer", null)}
 							onClicked={() => {
 								execAsync("systemctl poweroff");
 								popover?.popdown();
@@ -148,6 +154,7 @@ export default function Power({ class: className }: Props) {
 
 						<button
 							tooltipMarkup="Reboot"
+							cursor={Gdk.Cursor.new_from_name("pointer", null)}
 							onClicked={() => {
 								execAsync("reboot");
 								popover?.popdown();
@@ -161,6 +168,7 @@ export default function Power({ class: className }: Props) {
 
 						<button
 							tooltipMarkup="Reboot to Firmware Settings"
+							cursor={Gdk.Cursor.new_from_name("pointer", null)}
 							onClicked={() => {
 								execAsync("systemctl reboot --firmware-setup");
 								popover?.popdown();
