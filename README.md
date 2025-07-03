@@ -66,6 +66,8 @@ https://i.stefdp.com/raw/yxrB0y2qvw74.mp4
 1. Clone this repository and move its contents to `~/.config/ags`
 2. just run `ags run`
 
+An example for NixOS can be found [here](https://github.com/Stef-00012/dots/tree/main/homes/stef/programs/widgets/ags).
+
 ### Suggested Hyprland Config
 
 `windowrule`s:
