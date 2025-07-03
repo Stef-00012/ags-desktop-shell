@@ -68,7 +68,7 @@ export default function NotificationPopups({ gdkmonitor, hidden }: Props) {
 	let window: Gtk.Window | null;
 
 	notifications.subscribe(() => {
-		timeout(100, () => {
+		timeout(400, () => {
 			if (!window || !notificationContainer) return;
 
 			const [_success, bounds] =
