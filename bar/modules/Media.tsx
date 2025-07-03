@@ -217,6 +217,10 @@ export default function Media({
 
 		const path = `/tmp/lyrics.lrc`;
 
+		if (fileExists(path)) {
+			Gio.File.new_for_path(path).delete(null)
+		}
+
 		Gio.File.new_for_path(path)
 			.create(Gio.FileCreateFlags.REPLACE_DESTINATION, null)
 			.write(lyrics, null);
@@ -239,6 +243,10 @@ export default function Media({
 			Gio.File.new_for_path(SAVE_FOLDER).make_directory_with_parents(
 				null,
 			);
+
+		if (fileExists(path)) {
+			Gio.File.new_for_path(path).delete(null);
+		}
 
 		Gio.File.new_for_path(path)
 			.create(Gio.FileCreateFlags.REPLACE_DESTINATION, null)
