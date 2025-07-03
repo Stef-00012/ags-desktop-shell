@@ -49,6 +49,22 @@ to try it just run `ags run app.ts` using AGS v3
     - Reboot
     - Reboot to Firmware (UEFI/BIOS)
 
+### Required Libraries
+
+- `libsoup3`
+- `glib-networking`
+- `libadwaita`
+- [`AstalIO`](https://aylur.github.io/libastal/io)
+- [`Astal4`](https://aylur.github.io/libastal/astal4)
+- [`AstalApps`](https://aylur.github.io/astal/guide/libraries/apps)
+- [`AstalBattery`](https://aylur.github.io/astal/guide/libraries/battery)
+- [`AstalBluetooth`](https://aylur.github.io/astal/guide/libraries/bluetooth)
+- [`AstalMpris`](https://aylur.github.io/astal/guide/libraries/mpris)
+- [`AstalNetwork`](https://aylur.github.io/astal/guide/libraries/network)
+- [`AstalNotifd`](https://aylur.github.io/astal/guide/libraries/notifd)
+- [`AstalTray`](https://aylur.github.io/astal/guide/libraries/tray)
+- [`AstalWo`](https://aylur.github.io/astal/guide/libraries/wireplumber)
+
 ### Suggested Hyprland Config
 
 `windowrule`s:
