@@ -2,7 +2,7 @@ This is my linux custom desktop shell.
 
 ### Features
 
-<video src="https://i.stefdp.com/raw/yxrB0y2qvw74.mp4" controls="controls">Your browser does not support playing this video!</video>
+https://i.stefdp.com/raw/yxrB0y2qvw74.mp4
 
 - Bar
     - CPU - See the general load and each core's load (on hover)
