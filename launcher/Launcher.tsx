@@ -77,8 +77,8 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 		<Gtk.Window
 			class="launcher"
 			title="AGS Launcher"
-			// visible={mode((currentMode) => currentMode !== "closed")}
 			display={gdkmonitor.display}
+			resizable={false}
 			onCloseRequest={() => {
 				close();
 

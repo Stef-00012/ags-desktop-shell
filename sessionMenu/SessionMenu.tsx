@@ -39,9 +39,9 @@ export default function SessionMenu({
 		<Gtk.Window
 			widthRequest={gdkmonitor.geometry.width}
 			heightRequest={gdkmonitor.geometry.height}
+			resizable={false}
 			class="session-menu"
 			title="AGS Session Menu"
-			// visible={isVisible}
 			display={gdkmonitor.display}
 			onCloseRequest={() => {
 				setVisible(false);

@@ -94,9 +94,9 @@ export default function NotificationCenter({
 	return (
 		<Gtk.Window
 			class="notification-center"
-			// visible={isVisible}
 			widthRequest={gdkmonitor.geometry.width}
 			heightRequest={gdkmonitor.geometry.height}
+			resizable={false}
 			valign={Gtk.Align.END}
 			title="AGS Notification Center"
 			display={gdkmonitor.display}

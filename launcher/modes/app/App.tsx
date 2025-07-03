@@ -21,7 +21,7 @@ export default function AppMode({
 	pressedKey,
 	visible,
 	closed,
-	entry
+	entry,
 }: Props) {
 	const apps = new Apps.Apps({
 		nameMultiplier: 2,
@@ -29,7 +29,7 @@ export default function AppMode({
 		executableMultiplier: 2,
 	});
 
-	const [focusedApp, setFocusedApp] = createState(0)
+	const [focusedApp, setFocusedApp] = createState(0);
 
 	closed.subscribe(() => {
 		if (!closed.get() || !visible.get()) return;
@@ -41,7 +41,7 @@ export default function AppMode({
 	enterPressed.subscribe(() => {
 		if (!enterPressed.get() || !visible.get()) return;
 
-		handleInputEnter()
+		handleInputEnter();
 	});
 
 	pressedKey.subscribe(() => {
@@ -51,12 +51,19 @@ export default function AppMode({
 
 		if (!keyData) return;
 
-		if ((keyData.keyval === Gdk.KEY_Down || keyData.keyval === Gdk.KEY_Tab) && appList.get().length > focusedApp.get()) {
+		if (
+			(keyData.keyval === Gdk.KEY_Down ||
+				keyData.keyval === Gdk.KEY_Tab) &&
+			appList.get().length > focusedApp.get()
+		) {
 			setFocusedApp((prev) => prev + 1);
 			return;
 		}
 
-		if (keyData.keyval === Gdk.KEY_Up || keyData.keyval === Gdk.KEY_ISO_Left_Tab) {
+		if (
+			keyData.keyval === Gdk.KEY_Up ||
+			keyData.keyval === Gdk.KEY_ISO_Left_Tab
+		) {
 			if (focusedApp.get() > 0) setFocusedApp((prev) => prev - 1);
 			return;
 		}
@@ -108,9 +115,11 @@ export default function AppMode({
 			if (text.length > 0) {
 				const pos = entry.get_position();
 				if (pos > 0) {
-					const newText = entry.text.slice(0, pos - 1) + entry.text.slice(pos);
+					const newText =
+						entry.text.slice(0, pos - 1) + entry.text.slice(pos);
+
 					entry.set_text(newText);
-					entry.grab_focus()
+					entry.grab_focus();
 					entry.set_position(pos - 1);
 				}
 			}
@@ -124,9 +133,11 @@ export default function AppMode({
 			if (text.length > 0) {
 				const pos = entry.get_position();
 				if (pos > 0) {
-					const newText = entry.text.slice(0, pos) + entry.text.slice(pos + 1);
+					const newText =
+						entry.text.slice(0, pos) + entry.text.slice(pos + 1);
+
 					entry.set_text(newText);
-					entry.grab_focus()
+					entry.grab_focus();
 					entry.set_position(pos);
 				}
 			}
@@ -206,16 +217,16 @@ export default function AppMode({
 			Gdk.KEY_Meta_R,
 			Gdk.KEY_Super_L,
 			Gdk.KEY_Super_R,
-			Gdk.KEY_KbdInputAssistCancel
-		]
-
-		console.log(keyData.keyval)
+			Gdk.KEY_KbdInputAssistCancel,
+		];
 
 		if (!keyData.modifier && entry && !entry.hasFocus) {
 			entry.grab_focus();
 
 			if (!invalidKeys.includes(keyData.keyval)) {
-				entry.set_text(entry.text + String.fromCharCode(keyData.keyval));
+				entry.set_text(
+					entry.text + String.fromCharCode(keyData.keyval),
+				);
 				entry.set_position(entry.text.length);
 			}
 
@@ -231,7 +242,7 @@ export default function AppMode({
 		if (!visible.get()) return;
 
 		setAppList(apps.fuzzy_query(searchValue.get()));
-		setFocusedApp(0)
+		setFocusedApp(0);
 	});
 
 	function handleInputEnter() {
@@ -245,7 +256,7 @@ export default function AppMode({
 		}
 
 		list[appIndex].launch();
-		close()
+		close();
 		setAppList(apps.get_list());
 	}
 
@@ -259,7 +270,10 @@ export default function AppMode({
 				{(app, index) => (
 					<App
 						app={app}
-						focused={createComputed([focusedApp, index], (focusedApp, index) => focusedApp === index)}
+						focused={createComputed(
+							[focusedApp, index],
+							(focusedApp, index) => focusedApp === index,
+						)}
 						onOpen={() => {
 							app.launch();
 							close();

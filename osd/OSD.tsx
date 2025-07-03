@@ -140,7 +140,6 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 	return (
 		<window
 			gdkmonitor={gdkmonitor}
-			// visible={visibleState}
 			class="osd"
 			title="AGS OSD"
 			css={`margin-top: ${marginTop}px;`}
