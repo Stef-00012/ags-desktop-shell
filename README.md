@@ -58,14 +58,14 @@ to try it just run `ags run app.ts` using AGS v3
 - `glib-networking`
 - `libadwaita`
 - [`AstalIO`](https://aylur.github.io/astal/guide/installation) & [`Astal4`](https://aylur.github.io/astal/guide/installation)
-- [`AstalApps`](https://aylur.github.io/astal/guide/libraries/apps)
-- [`AstalBattery`](https://aylur.github.io/astal/guide/libraries/battery)
-- [`AstalBluetooth`](https://aylur.github.io/astal/guide/libraries/bluetooth)
-- [`AstalMpris`](https://aylur.github.io/astal/guide/libraries/mpris)
-- [`AstalNetwork`](https://aylur.github.io/astal/guide/libraries/network)
-- [`AstalNotifd`](https://aylur.github.io/astal/guide/libraries/notifd)
-- [`AstalTray`](https://aylur.github.io/astal/guide/libraries/tray)
-- [`AstalWp`](https://aylur.github.io/astal/guide/libraries/wireplumber)
+- [`AstalApps`](https://aylur.github.io/astal/guide/libraries/apps#installation)
+- [`AstalBattery`](https://aylur.github.io/astal/guide/libraries/battery#installation)
+- [`AstalBluetooth`](https://aylur.github.io/astal/guide/libraries/bluetooth#installation)
+- [`AstalMpris`](https://aylur.github.io/astal/guide/libraries/mpris#installation)
+- [`AstalNetwork`](https://aylur.github.io/astal/guide/libraries/network#installation)
+- [`AstalNotifd`](https://aylur.github.io/astal/guide/libraries/notifd#installation)
+- [`AstalTray`](https://aylur.github.io/astal/guide/libraries/tray#installation)
+- [`AstalWp`](https://aylur.github.io/astal/guide/libraries/wireplumber#installation)
 
 ### Suggested Hyprland Config
 
