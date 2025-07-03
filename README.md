@@ -10,7 +10,7 @@ to try it just run `ags run app.ts` using AGS v3
 
 ### Features
 
-![Features Preview](https://i.stefdp.com/raw/yxrB0y2qvw74.mp4)
+<video src="https://i.stefdp.com/raw/yxrB0y2qvw74.mp4" alt="Features Preview" controls preload></video>
 
 - Bar
     - CPU - See the general load and each core's load (on hover)
