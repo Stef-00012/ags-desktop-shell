@@ -51,11 +51,13 @@ to try it just run `ags run app.ts` using AGS v3
 
 ### Required Libraries
 
+> [!IMPORTANT]
+> [`ags`](https://aylur.github.io/ags/guide/install.html) is required to run the desktop shell
+
 - `libsoup3`
 - `glib-networking`
 - `libadwaita`
-- [`AstalIO`](https://aylur.github.io/libastal/io)
-- [`Astal4`](https://aylur.github.io/libastal/astal4)
+- [`AstalIO`](https://aylur.github.io/astal/guide/installation) & [`Astal4`](https://aylur.github.io/astal/guide/installation)
 - [`AstalApps`](https://aylur.github.io/astal/guide/libraries/apps)
 - [`AstalBattery`](https://aylur.github.io/astal/guide/libraries/battery)
 - [`AstalBluetooth`](https://aylur.github.io/astal/guide/libraries/bluetooth)
@@ -63,7 +65,7 @@ to try it just run `ags run app.ts` using AGS v3
 - [`AstalNetwork`](https://aylur.github.io/astal/guide/libraries/network)
 - [`AstalNotifd`](https://aylur.github.io/astal/guide/libraries/notifd)
 - [`AstalTray`](https://aylur.github.io/astal/guide/libraries/tray)
-- [`AstalWo`](https://aylur.github.io/astal/guide/libraries/wireplumber)
+- [`AstalWp`](https://aylur.github.io/astal/guide/libraries/wireplumber)
 
 ### Suggested Hyprland Config
 
