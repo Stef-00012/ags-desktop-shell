@@ -1,8 +1,9 @@
-import { BACKLIGHT_BASE_DIR, OSD_TIMEOUT_TIME } from "@/constants/config";
 import { type Accessor, createComputed, createState } from "ags";
 import { monitorFile, readFileAsync } from "ags/file";
+import { defaultConfig } from "@/constants/config";
 import { type Gdk, Gtk } from "ags/gtk4";
 import type AstalIO from "gi://AstalIO";
+import { config } from "@/util/config";
 import { sleep } from "@/util/timer";
 import { timeout } from "ags/time";
 import giCairo from "gi://cairo";
@@ -55,12 +56,16 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 	defaultMicrophone?.connect("notify::volume", updateMicrophoneState);
 	defaultMicrophone?.connect("notify::mute", updateMicrophoneState);
 
-	const dir = GLib.Dir.open(BACKLIGHT_BASE_DIR, 0);
+	const dir = GLib.Dir.open(
+		config.get().paths?.backlightBaseDir ??
+			defaultConfig.paths.backlightBaseDir,
+		0,
+	);
 	const backlightDirName = dir.read_name();
 
 	if (backlightDirName) {
-		const backlightCurrentPath = `${BACKLIGHT_BASE_DIR}/${backlightDirName}/brightness`;
-		const backlightMaxPath = `${BACKLIGHT_BASE_DIR}/${backlightDirName}/max_brightness`;
+		const backlightCurrentPath = `${config.get().paths?.backlightBaseDir ?? defaultConfig.paths.backlightBaseDir}/${backlightDirName}/brightness`;
+		const backlightMaxPath = `${config.get().paths?.backlightBaseDir ?? defaultConfig.paths.backlightBaseDir}/${backlightDirName}/max_brightness`;
 
 		monitorFile(backlightCurrentPath, async () => {
 			const [currentString, maxString] = await Promise.all([
@@ -80,9 +85,12 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 			setIsVisible(true);
 
 			if (lastTimeout) lastTimeout.cancel();
-			lastTimeout = timeout(OSD_TIMEOUT_TIME, () => {
-				setIsVisible(false);
-			});
+			lastTimeout = timeout(
+				config.get().timeouts?.osd ?? defaultConfig.timeouts.osd,
+				() => {
+					setIsVisible(false);
+				},
+			);
 		});
 	}
 
@@ -109,9 +117,12 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 		setIsVisible(true);
 
 		if (lastTimeout) lastTimeout.cancel();
-		lastTimeout = timeout(OSD_TIMEOUT_TIME, () => {
-			setIsVisible(false);
-		});
+		lastTimeout = timeout(
+			config.get().timeouts?.osd ?? defaultConfig.timeouts.osd,
+			() => {
+				setIsVisible(false);
+			},
+		);
 	}
 
 	function updateMicrophoneState(microphone: Wp.Endpoint) {
@@ -132,9 +143,12 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 		setIsVisible(true);
 
 		if (lastTimeout) lastTimeout.cancel();
-		lastTimeout = timeout(OSD_TIMEOUT_TIME, () => {
-			setIsVisible(false);
-		});
+		lastTimeout = timeout(
+			config.get().timeouts?.osd ?? defaultConfig.timeouts.osd,
+			() => {
+				setIsVisible(false);
+			},
+		);
 	}
 
 	return (
@@ -171,8 +185,18 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 			}}
 		>
 			<revealer
-				transitionDuration={300}
-				transitionType={Gtk.RevealerTransitionType.CROSSFADE}
+				transitionDuration={config(
+					(cfg) =>
+						cfg.animationsDuration?.osd ??
+						defaultConfig.animationsDuration.osd,
+				)}
+				transitionType={config(
+					(cfg) =>
+						Gtk.RevealerTransitionType[
+							cfg.animationsType?.osd ??
+								defaultConfig.animationsType.osd
+						],
+				)}
 			>
 				<box
 					heightRequest={maxHeight}

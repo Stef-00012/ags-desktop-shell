@@ -1,19 +1,17 @@
 import { escapeMarkup, parseMarkdown } from "@/util/text";
+import { defaultConfig } from "@/constants/config";
 import { sleep, Timer } from "@/util/timer";
 import type Notifd from "gi://AstalNotifd";
 import { fileExists } from "@/util/file";
 import { time } from "@/util/formatTime";
 import { urgency } from "@/util/notif";
+import { config } from "@/util/config";
 import { isIcon } from "@/util/icons";
 import { createState } from "ags";
 import Pango from "gi://Pango";
 import { Gdk } from "ags/gtk4";
 import Gtk from "gi://Gtk";
 import Adw from "gi://Adw";
-import {
-	DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT,
-	NOTIFICATION_ANIMATION_DURATION,
-} from "@/constants/config";
 
 export default function Notification({
 	notification,
@@ -33,7 +31,8 @@ export default function Notification({
 
 	const expireTimeout =
 		notification.expireTimeout === -1
-			? DEFAULT_NOTIFICATION_EXPIRE_TIMEOUT
+			? (config.get().timeouts?.defaultNotificationExpire ??
+				defaultConfig.timeouts.defaultNotificationExpire)
 			: notification.expireTimeout;
 
 	const timer = new Timer(expireTimeout);
@@ -49,8 +48,11 @@ export default function Notification({
 			setIsHidden(true);
 
 			await sleep(
-				NOTIFICATION_ANIMATION_DURATION -
-					NOTIFICATION_ANIMATION_DURATION * 0.6,
+				(config.get().animationsDuration?.notification ??
+					defaultConfig.animationsDuration.notification) -
+					(config.get().animationsDuration?.notification ??
+						defaultConfig.animationsDuration.notification) *
+						0.6,
 			);
 
 			onHide(notification);
@@ -108,7 +110,11 @@ export default function Notification({
 
 	return (
 		<revealer
-			transitionDuration={NOTIFICATION_ANIMATION_DURATION}
+			transitionDuration={config(
+				(cfg) =>
+					cfg.animationsDuration?.notification ??
+					defaultConfig.animationsDuration.notification,
+			)}
 			transitionType={
 				isNotificationCenter
 					? Gtk.RevealerTransitionType.NONE
@@ -253,7 +259,10 @@ export default function Notification({
 								<button
 									name="actionButton"
 									hexpand
-									cursor={Gdk.Cursor.new_from_name("pointer", null)}
+									cursor={Gdk.Cursor.new_from_name(
+										"pointer",
+										null,
+									)}
 									onClicked={() => notification.invoke(id)}
 								>
 									<label

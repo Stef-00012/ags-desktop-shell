@@ -3,9 +3,10 @@
 	https://github.com/Mabi19/desktop-shell/blob/d70189b2355a4173a8ea6d5699f340fe73497945/utils/system-stats.ts
 */
 
-import { SYSTEM_STATS_UPDATE_INTERVAL } from "@/constants/config";
+import { defaultConfig } from "@/constants/config";
 import { readFileAsync } from "ags/file";
 import Network from "gi://AstalNetwork";
+import { config } from "@/util/config";
 import { interval } from "ags/time";
 import { exec } from "ags/process";
 import { createState } from "ags";
@@ -324,9 +325,27 @@ async function recalculateDiskUsage() {
 	});
 }
 
-interval(SYSTEM_STATS_UPDATE_INTERVAL, () => {
+function handleInterval() {
 	recalculateCpuUsage();
 	recalculateDiskUsage();
 	recalculateMemoryUsage();
 	recalculateNetworkUsage();
+}
+
+let currentInterval =
+	config.get()?.systemStatsUpdateInterval ||
+	defaultConfig.systemStatsUpdateInterval;
+let systemStatsInterval = interval(currentInterval, handleInterval);
+
+config.subscribe(() => {
+	const newConfig = config.get();
+
+	if (newConfig.systemStatsUpdateInterval !== currentInterval) {
+		systemStatsInterval.cancel();
+
+		currentInterval =
+			newConfig?.systemStatsUpdateInterval ||
+			defaultConfig.systemStatsUpdateInterval;
+		systemStatsInterval = interval(currentInterval, handleInterval);
+	}
 });

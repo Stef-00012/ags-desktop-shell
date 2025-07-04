@@ -1,15 +1,13 @@
 import { escapeMarkup, marquee } from "@/util/text";
+import { defaultConfig } from "@/constants/config";
 import type { SongData } from "@/types/lyrics";
 import { fileExists } from "@/util/file";
 import { execAsync } from "ags/process";
+import { config } from "@/util/config";
+import { writeFile } from "ags/file";
 import { Gdk, Gtk } from "ags/gtk4";
 import Mpris from "gi://AstalMpris";
 import Gio from "gi://Gio";
-import {
-	MEDIA_VOLUME_STEP,
-	MEDIA_MAX_LENGTH,
-	SAVE_FOLDER,
-} from "@/constants/config";
 import {
 	convertToLrc,
 	formatLyricsTooltip,
@@ -69,7 +67,7 @@ export default function Media({
 	]) {
 		if (!track || !artist) return "No Media Playing";
 
-		return `${marquee(`${artist} - ${track}`, MEDIA_MAX_LENGTH)}`;
+		return `${marquee(`${artist} - ${track}`, config.get()?.mediaMaxLength ?? defaultConfig.mediaMaxLength)}`;
 	}
 
 	function transformMediaTooltip([track, artist, album, volume]: [
@@ -168,13 +166,20 @@ export default function Media({
 
 		if (!cover || !fileExists(cover)) return;
 
-		if (!fileExists(SAVE_FOLDER, true))
-			Gio.File.new_for_path(SAVE_FOLDER).make_directory_with_parents(
-				null,
-			);
+		if (
+			!fileExists(
+				config.get().paths?.saveFolder ??
+					defaultConfig.paths.saveFolder,
+				true,
+			)
+		)
+			Gio.File.new_for_path(
+				config.get().paths?.saveFolder ??
+					defaultConfig.paths.saveFolder,
+			).make_directory_with_parents(null);
 
 		const destFile = Gio.File.new_for_path(
-			`${SAVE_FOLDER}/${spotify.trackid.split("/").pop()}.png`,
+			`${config.get().paths?.saveFolder ?? defaultConfig.paths.saveFolder}/${spotify.trackid.split("/").pop()}.png`,
 		);
 		Gio.File.new_for_path(cover).copy(
 			destFile,
@@ -190,16 +195,29 @@ export default function Media({
 		deltaY: number,
 	) {
 		if (deltaY < 0) {
-			spotify.set_volume(Math.min(spotify.volume + MEDIA_VOLUME_STEP, 1));
+			spotify.set_volume(
+				spotify.volume +
+					(config.get().volumeStep?.media ??
+						defaultConfig.volumeStep.media),
+			);
 		} else if (deltaY > 0) {
 			spotify?.set_volume(
-				Math.max(spotify.volume - MEDIA_VOLUME_STEP, 0),
+				spotify.volume -
+					(config.get().volumeStep?.media ??
+						defaultConfig.volumeStep.media),
 			);
 		}
 	}
 
 	function handleMediaLeftClick() {
 		spotify.play_pause();
+	}
+
+	function handleMediaRightClick() {
+		execAsync(`wl-copy ${spotify.trackid.split("/").pop()}`);
+		execAsync(
+			`notify-send "Stef Shell Media" "The track ID of the song has been copied"`,
+		);
 	}
 
 	function handleMediaMiddleClick() {
@@ -218,12 +236,10 @@ export default function Media({
 		const path = `/tmp/lyrics.lrc`;
 
 		if (fileExists(path)) {
-			Gio.File.new_for_path(path).delete(null)
+			Gio.File.new_for_path(path).delete(null);
 		}
 
-		Gio.File.new_for_path(path)
-			.create(Gio.FileCreateFlags.REPLACE_DESTINATION, null)
-			.write(lyrics, null);
+		writeFile(path, lyrics);
 
 		execAsync(`xdg-open "${path}"`);
 	}
@@ -237,20 +253,25 @@ export default function Media({
 
 		if (!lyrics) return;
 
-		const path = `${SAVE_FOLDER}/${songData.trackId.split("/").pop()}.lrc`;
+		const path = `${config.get().paths?.saveFolder ?? defaultConfig.paths.saveFolder}/${songData.trackId.split("/").pop()}.lrc`;
 
-		if (!fileExists(SAVE_FOLDER, true))
-			Gio.File.new_for_path(SAVE_FOLDER).make_directory_with_parents(
-				null,
-			);
+		if (
+			!fileExists(
+				config.get().paths?.saveFolder ??
+					defaultConfig.paths.saveFolder,
+				true,
+			)
+		)
+			Gio.File.new_for_path(
+				config.get().paths?.saveFolder ??
+					defaultConfig.paths.saveFolder,
+			).make_directory_with_parents(null);
 
 		if (fileExists(path)) {
 			Gio.File.new_for_path(path).delete(null);
 		}
 
-		Gio.File.new_for_path(path)
-			.create(Gio.FileCreateFlags.REPLACE_DESTINATION, null)
-			.write(lyrics, null);
+		writeFile(path, lyrics);
 
 		execAsync(`xdg-open "${path}"`);
 	}
@@ -317,6 +338,11 @@ export default function Media({
 				/>
 
 				<Gtk.GestureClick
+					button={Gdk.BUTTON_SECONDARY}
+					onPressed={handleMediaRightClick}
+				/>
+
+				<Gtk.GestureClick
 					button={Gdk.BUTTON_MIDDLE}
 					onPressed={handleMediaMiddleClick}
 				/>
@@ -324,7 +350,11 @@ export default function Media({
 
 			<box
 				class={lyricsClass}
-				cursor={Gdk.Cursor.new_from_name("pointer", null)}
+				cursor={lyricsState(([songData]) =>
+					songData?.lyrics
+						? Gdk.Cursor.new_from_name("pointer", null)
+						: Gdk.Cursor.new_from_name("default", null),
+				)}
 				hasTooltip={lyricsState(transformLyricsHasTooltip)}
 				onQueryTooltip={(_label, _x, _y, _keyboardMode, tooltip) => {
 					if (lyricsDispose) lyricsDispose();

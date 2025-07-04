@@ -1,15 +1,13 @@
+import { defaultConfig } from "@/constants/config";
+import type { Config } from "@/types/config";
 import type { Accessor, Setter } from "ags";
 import { execAsync } from "ags/process";
+import { config } from "@/util/config";
 import { barHeight } from "@/bar/Bar";
 import { sleep } from "@/util/timer";
 import { Gdk, Gtk } from "ags/gtk4";
 import Pango from "gi://Pango";
 import Adw from "gi://Adw";
-import {
-	SESSION_MENU_BUTTON_GAP,
-	SESSION_MENU_BUTTON_HEIGHT,
-	SESSION_MENU_BUTTON_WIDTH,
-} from "@/constants/config";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -33,6 +31,26 @@ export default function SessionMenu({
 		_mod: number,
 	) {
 		if (keyval === Gdk.KEY_Escape) setVisible(false);
+	}
+
+	function transformConfigHeight(cfg: Config) {
+		return (
+			(cfg.sessionMenu?.buttonHeight ??
+				defaultConfig.sessionMenu.buttonHeight) *
+				2 +
+			(cfg.sessionMenu?.buttonGap ?? defaultConfig.sessionMenu.buttonGap)
+		);
+	}
+
+	function transformConfigWidth(cfg: Config) {
+		return (
+			(cfg.sessionMenu?.buttonWidth ??
+				defaultConfig.sessionMenu.buttonWidth) *
+				4 +
+			(cfg.sessionMenu?.buttonGap ??
+				defaultConfig.sessionMenu.buttonGap) *
+				3
+		);
 	}
 
 	return (
@@ -75,8 +93,18 @@ export default function SessionMenu({
 			<Gtk.EventControllerKey onKeyPressed={handleEscKey} />
 
 			<revealer
-				transitionDuration={300}
-				transitionType={Gtk.RevealerTransitionType.CROSSFADE}
+				transitionDuration={config(
+					(cfg) =>
+						cfg.animationsDuration?.sessionMenu ??
+						defaultConfig.animationsDuration.sessionMenu,
+				)}
+				transitionType={config(
+					(cfg) =>
+						Gtk.RevealerTransitionType[
+							cfg.animationsType?.sessionMenu ??
+								defaultConfig.animationsType.sessionMenu
+						],
+				)}
 			>
 				<Gtk.GestureClick
 					button={Gdk.BUTTON_PRIMARY}
@@ -86,28 +114,46 @@ export default function SessionMenu({
 
 				<Adw.Clamp
 					orientation={Gtk.Orientation.VERTICAL}
-					maximumSize={
-						SESSION_MENU_BUTTON_HEIGHT * 2 + SESSION_MENU_BUTTON_GAP
-					}
+					maximumSize={config(transformConfigHeight)}
 					marginTop={barHeight}
 				>
 					<Adw.Clamp
-						maximumSize={
-							SESSION_MENU_BUTTON_WIDTH * 4 +
-							SESSION_MENU_BUTTON_GAP * 3
-						}
+						maximumSize={config(transformConfigWidth)}
 						hexpand
 						vexpand
 					>
 						<box
 							orientation={Gtk.Orientation.VERTICAL}
-							spacing={SESSION_MENU_BUTTON_GAP}
+							spacing={config(
+								(cfg) =>
+									cfg.sessionMenu?.buttonGap ??
+									defaultConfig.sessionMenu.buttonGap,
+							)}
 						>
-							<box spacing={SESSION_MENU_BUTTON_GAP}>
+							<box
+								spacing={config(
+									(cfg) =>
+										cfg.sessionMenu?.buttonGap ??
+										defaultConfig.sessionMenu.buttonGap,
+								)}
+							>
 								<button
-									cursor={Gdk.Cursor.new_from_name("pointer", null)}
-									widthRequest={SESSION_MENU_BUTTON_WIDTH}
-									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
+									cursor={Gdk.Cursor.new_from_name(
+										"pointer",
+										null,
+									)}
+									widthRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonWidth ??
+											defaultConfig.sessionMenu
+												.buttonWidth,
+									)}
+									heightRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonHeight ??
+											defaultConfig.sessionMenu
+												.buttonHeight,
+									)}
 									onClicked={() => {
 										execAsync("loginctl lock-session");
 										setVisible(false);
@@ -131,9 +177,22 @@ export default function SessionMenu({
 								</button>
 
 								<button
-									cursor={Gdk.Cursor.new_from_name("pointer", null)}
-									widthRequest={SESSION_MENU_BUTTON_WIDTH}
-									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
+									cursor={Gdk.Cursor.new_from_name(
+										"pointer",
+										null,
+									)}
+									widthRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonWidth ??
+											defaultConfig.sessionMenu
+												.buttonWidth,
+									)}
+									heightRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonHeight ??
+											defaultConfig.sessionMenu
+												.buttonHeight,
+									)}
 									onClicked={() => {
 										execAsync("systemctl suspend");
 										setVisible(false);
@@ -157,9 +216,22 @@ export default function SessionMenu({
 								</button>
 
 								<button
-									cursor={Gdk.Cursor.new_from_name("pointer", null)}
-									widthRequest={SESSION_MENU_BUTTON_WIDTH}
-									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
+									cursor={Gdk.Cursor.new_from_name(
+										"pointer",
+										null,
+									)}
+									widthRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonWidth ??
+											defaultConfig.sessionMenu
+												.buttonWidth,
+									)}
+									heightRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonHeight ??
+											defaultConfig.sessionMenu
+												.buttonHeight,
+									)}
 									onClicked={() => {
 										execAsync("pkill Hyprland");
 									}}
@@ -182,9 +254,22 @@ export default function SessionMenu({
 								</button>
 
 								<button
-									cursor={Gdk.Cursor.new_from_name("pointer", null)}
-									widthRequest={SESSION_MENU_BUTTON_WIDTH}
-									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
+									cursor={Gdk.Cursor.new_from_name(
+										"pointer",
+										null,
+									)}
+									widthRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonWidth ??
+											defaultConfig.sessionMenu
+												.buttonWidth,
+									)}
+									heightRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonHeight ??
+											defaultConfig.sessionMenu
+												.buttonHeight,
+									)}
 									onClicked={() => {
 										execAsync("kitty btop");
 									}}
@@ -207,11 +292,30 @@ export default function SessionMenu({
 								</button>
 							</box>
 
-							<box spacing={SESSION_MENU_BUTTON_GAP}>
+							<box
+								spacing={config(
+									(cfg) =>
+										cfg.sessionMenu?.buttonGap ??
+										defaultConfig.sessionMenu.buttonGap,
+								)}
+							>
 								<button
-									cursor={Gdk.Cursor.new_from_name("pointer", null)}
-									widthRequest={SESSION_MENU_BUTTON_WIDTH}
-									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
+									cursor={Gdk.Cursor.new_from_name(
+										"pointer",
+										null,
+									)}
+									widthRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonWidth ??
+											defaultConfig.sessionMenu
+												.buttonWidth,
+									)}
+									heightRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonHeight ??
+											defaultConfig.sessionMenu
+												.buttonHeight,
+									)}
 									onClicked={() => {
 										execAsync("systemctl hibernate");
 									}}
@@ -234,9 +338,22 @@ export default function SessionMenu({
 								</button>
 
 								<button
-									cursor={Gdk.Cursor.new_from_name("pointer", null)}
-									widthRequest={SESSION_MENU_BUTTON_WIDTH}
-									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
+									cursor={Gdk.Cursor.new_from_name(
+										"pointer",
+										null,
+									)}
+									widthRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonWidth ??
+											defaultConfig.sessionMenu
+												.buttonWidth,
+									)}
+									heightRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonHeight ??
+											defaultConfig.sessionMenu
+												.buttonHeight,
+									)}
 									onClicked={() => {
 										execAsync("systemctl poweroff");
 									}}
@@ -259,9 +376,22 @@ export default function SessionMenu({
 								</button>
 
 								<button
-									cursor={Gdk.Cursor.new_from_name("pointer", null)}
-									widthRequest={SESSION_MENU_BUTTON_WIDTH}
-									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
+									cursor={Gdk.Cursor.new_from_name(
+										"pointer",
+										null,
+									)}
+									widthRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonWidth ??
+											defaultConfig.sessionMenu
+												.buttonWidth,
+									)}
+									heightRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonHeight ??
+											defaultConfig.sessionMenu
+												.buttonHeight,
+									)}
 									onClicked={() => {
 										execAsync("reboot");
 									}}
@@ -284,9 +414,22 @@ export default function SessionMenu({
 								</button>
 
 								<button
-									cursor={Gdk.Cursor.new_from_name("pointer", null)}
-									widthRequest={SESSION_MENU_BUTTON_WIDTH}
-									heightRequest={SESSION_MENU_BUTTON_HEIGHT}
+									cursor={Gdk.Cursor.new_from_name(
+										"pointer",
+										null,
+									)}
+									widthRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonWidth ??
+											defaultConfig.sessionMenu
+												.buttonWidth,
+									)}
+									heightRequest={config(
+										(cfg) =>
+											cfg.sessionMenu?.buttonHeight ??
+											defaultConfig.sessionMenu
+												.buttonHeight,
+									)}
 									onClicked={() => {
 										execAsync(
 											"systemctl reboot --firmware-setup",

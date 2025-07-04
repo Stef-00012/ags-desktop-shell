@@ -1,7 +1,9 @@
 import { createState, type Accessor, type Setter } from "ags";
 import CalculatorMode from "./modes/calculator/Calculator";
 // import ClipboardMode from "./modes/clipboard/Clipboard";
+import { defaultConfig } from "@/constants/config";
 import { type Gdk, Gtk } from "ags/gtk4";
+import { config } from "@/util/config";
 import AppMode from "./modes/app/App";
 import { barHeight } from "@/bar/Bar";
 import { sleep } from "@/util/timer";
@@ -114,8 +116,18 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 			<Gtk.EventControllerKey onKeyPressed={handleKeyPress} />
 
 			<revealer
-				transitionDuration={300}
-				transitionType={Gtk.RevealerTransitionType.CROSSFADE}
+				transitionDuration={config(
+					(cfg) =>
+						cfg.animationsDuration?.launcher ??
+						defaultConfig.animationsDuration.launcher,
+				)}
+				transitionType={config(
+					(cfg) =>
+						Gtk.RevealerTransitionType[
+							cfg.animationsType?.launcher ??
+								defaultConfig.animationsType.launcher
+						],
+				)}
 			>
 				<Adw.Clamp
 					orientation={Gtk.Orientation.VERTICAL}

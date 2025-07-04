@@ -1,12 +1,14 @@
 import { tooltipCurrentSong, lyricsSourceColor } from "@/constants/colors";
 import { fetch, Headers, URL, URLSearchParams } from "@/util/fetch";
-import { MUSIXMATCH_TOKEN_PATH } from "@/constants/config";
 import { colorText, escapeMarkup } from "@/util/text";
+import { defaultConfig } from "@/constants/config";
 import { readFile, writeFile } from "ags/file";
 import { createState, onCleanup } from "ags";
+import { fileExists } from "@/util/file";
 import type Mpris from "gi://AstalMpris";
-import Soup from "gi://Soup";
+import { config } from "@/util/config";
 import { timeout } from "ags/time";
+import Soup from "gi://Soup";
 import type {
 	MusixmatchSearchResult,
 	UsertokenResponse,
@@ -23,11 +25,26 @@ const sleep = (ms: number) =>
 	new Promise((resolve) => timeout(ms, () => resolve(null)));
 
 function saveMusixmatchToken(token: TokenData): void {
-	writeFile(MUSIXMATCH_TOKEN_PATH, JSON.stringify(token));
+	writeFile(
+		config.get().paths?.musixmatchToken ??
+			defaultConfig.paths.musixmatchToken,
+		JSON.stringify(token),
+	);
 }
 
 function getMusixmatchToken(): TokenData | null {
-	const content = readFile(MUSIXMATCH_TOKEN_PATH);
+	if (
+		!fileExists(
+			config.get().paths?.musixmatchToken ??
+				defaultConfig.paths.musixmatchToken,
+		)
+	)
+		return null;
+
+	const content = readFile(
+		config.get().paths?.musixmatchToken ??
+			defaultConfig.paths.musixmatchToken,
+	);
 
 	if (!content) return null;
 
@@ -717,24 +734,21 @@ export function formatLyricsTooltip(
 export function useSong(player: Mpris.Player) {
 	const [song, setSong] = createState<SongData | null>(null);
 
-	getLyrics(player).then((lyrics) => {
-		setSong({
-			artist: player.artist,
-			track: player.title,
-			album: player.album,
-			trackId: player.trackid,
-			source: lyrics?.source || "Musixmatch",
-			length: player.length,
-			cover: player.artUrl,
-			volume: player.volume,
-			position: player.position,
-			lyrics: lyrics?.lyrics,
-		});
-	});
+	_updateLyrics();
 
 	const id = player.connect("notify::metadata", () => {
 		if (player.trackid === song.get()?.trackId) return;
 
+		_updateLyrics();
+	});
+
+	onCleanup(() => {
+		player.disconnect(id);
+	});
+
+	return song;
+
+	function _updateLyrics() {
 		setSong({
 			artist: player.artist,
 			track: player.title,
@@ -746,6 +760,32 @@ export function useSong(player: Mpris.Player) {
 			volume: player.volume,
 			position: player.position,
 		});
+
+		const lyricsFolder =
+			config.get().paths?.lyricsFolder ??
+			defaultConfig.paths.lyricsFolder;
+		const lyricsFile = `${lyricsFolder}/${player.trackid.split("/").pop()}.lrc`;
+
+		if (fileExists(lyricsFile)) {
+			const lyricsData = readFile(lyricsFile);
+
+			const parsedLyrics = parseLyrics(lyricsData);
+
+			if (parsedLyrics) {
+				setSong({
+					artist: player.artist,
+					track: player.title,
+					album: player.album,
+					trackId: player.trackid,
+					source: "Local File",
+					length: player.length,
+					cover: player.artUrl,
+					volume: player.volume,
+					position: player.position,
+					lyrics: parsedLyrics,
+				});
+			}
+		}
 
 		getLyrics(player).then((lyrics) => {
 			if (lyrics?.trackId !== player.trackid) return;
@@ -763,11 +803,5 @@ export function useSong(player: Mpris.Player) {
 				lyrics: lyrics?.lyrics,
 			});
 		});
-	});
-
-	onCleanup(() => {
-		player.disconnect(id);
-	});
-
-	return song;
+	}
 }

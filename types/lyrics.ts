@@ -1,4 +1,4 @@
-export type Sources = "Musixmatch" | "lrclib.net"; // | "netease";
+export type Sources = "Musixmatch" | "lrclib.net" | "Local File"; // | "netease";
 
 export interface TokenData {
 	cookies: string | undefined;

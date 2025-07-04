@@ -1,5 +1,7 @@
 import { type Accessor, createBinding, For, type Setter } from "ags";
 import Notification from "./components/Notification";
+import { defaultConfig } from "@/constants/config";
+import { config } from "@/util/config";
 import { isIcon } from "@/util/icons";
 import Notifd from "gi://AstalNotifd";
 import { barHeight } from "@/bar/Bar";
@@ -132,8 +134,18 @@ export default function NotificationCenter({
 			<Gtk.EventControllerKey onKeyPressed={handleEscKey} />
 
 			<revealer
-				transitionDuration={500}
-				transitionType={Gtk.RevealerTransitionType.SLIDE_LEFT}
+				transitionDuration={config(
+					(cfg) =>
+						cfg.animationsDuration?.notificationCenter ??
+						defaultConfig.animationsDuration.notificationCenter,
+				)}
+				transitionType={config(
+					(cfg) =>
+						Gtk.RevealerTransitionType[
+							cfg.animationsType?.notificationCenter ??
+								defaultConfig.animationsType.notificationCenter
+						],
+				)}
 			>
 				<Gtk.GestureClick
 					button={Gdk.BUTTON_PRIMARY}
@@ -172,7 +184,10 @@ export default function NotificationCenter({
 							<button
 								label="Clear All"
 								class="dismiss-all"
-								cursor={Gdk.Cursor.new_from_name("pointer", null)}
+								cursor={Gdk.Cursor.new_from_name(
+									"pointer",
+									null,
+								)}
 								onClicked={() => {
 									for (const category of notificationCategories.get()) {
 										for (const notif of category.notifications) {
@@ -196,7 +211,10 @@ export default function NotificationCenter({
 								onStateSet={handleDndSwitch}
 								state={doNotDisturb}
 								active={doNotDisturb}
-								cursor={Gdk.Cursor.new_from_name("pointer", null)}
+								cursor={Gdk.Cursor.new_from_name(
+									"pointer",
+									null,
+								)}
 							/>
 						</box>
 					</box>
@@ -246,7 +264,10 @@ export default function NotificationCenter({
 											<button
 												class="dismiss-category"
 												label="X"
-												cursor={Gdk.Cursor.new_from_name("pointer", null)}
+												cursor={Gdk.Cursor.new_from_name(
+													"pointer",
+													null,
+												)}
 												onClicked={() => {
 													for (const notif of notificationCategory.notifications) {
 														notif.dismiss();

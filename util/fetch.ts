@@ -387,12 +387,15 @@ export async function fetch(url: string | URL, { method, headers, body, flags }:
     if (flags) message.set_flags(flags)
 
     if (headers) {
-        // for (const [name, value] of headers.entries()) {
-        //     message.request_headers.append(name, String(value))
-        // }
-
-        for (const [name, value] of Object.entries(headers)) {
-            message.request_headers.append(name, String(value))
+        // @ts-ignore
+        if (headers instanceof Headers) {
+            for (const [name, value] of headers.entries()) {
+                message.request_headers.append(name, String(value))
+            }
+        } else {
+            for (const [name, value] of Object.entries(headers)) {
+                message.request_headers.append(name, String(value))
+            }
         }
     }
 

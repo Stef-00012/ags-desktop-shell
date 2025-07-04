@@ -1,5 +1,6 @@
 import { createBinding, createComputed, createState, type Accessor } from "ags";
-import { SPEAKER_VOLUME_STEP } from "@/constants/config";
+import { defaultConfig } from "@/constants/config";
+import { config } from "@/util/config";
 import { Gtk } from "ags/gtk4";
 import Wp from "gi://AstalWp";
 
@@ -55,11 +56,15 @@ export default function Speaker({ class: className }: Props) {
 	) {
 		if (deltaY < 0)
 			speaker?.set_volume(
-				Math.min(speaker.volume + SPEAKER_VOLUME_STEP, 1.5),
+				speaker.volume +
+					(config.get().volumeStep?.speaker ??
+						defaultConfig.volumeStep.speaker),
 			);
 		else if (deltaY > 0)
 			speaker?.set_volume(
-				Math.max(speaker.volume - SPEAKER_VOLUME_STEP, 0),
+				speaker.volume -
+					(config.get().volumeStep?.speaker ??
+						defaultConfig.volumeStep.speaker),
 			);
 	}
 

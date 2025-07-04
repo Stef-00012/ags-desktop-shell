@@ -1,5 +1,6 @@
 import { createBinding, createComputed, createState, type Accessor } from "ags";
-import { MICROPHONE_VOLUME_STEP } from "@/constants/config";
+import { defaultConfig } from "@/constants/config";
+import { config } from "@/util/config";
 import { Gtk } from "ags/gtk4";
 import Wp from "gi://AstalWp";
 
@@ -54,9 +55,17 @@ export default function Microphone({ class: className }: Props) {
 		const microphone = wp?.audio.defaultMicrophone;
 
 		if (deltaY < 0) {
-			microphone?.set_volume(microphone.volume + MICROPHONE_VOLUME_STEP);
+			microphone?.set_volume(
+				microphone.volume +
+					(config.get().volumeStep?.microphone ??
+						defaultConfig.volumeStep.microphone),
+			);
 		} else if (deltaY > 0) {
-			microphone?.set_volume(microphone.volume - MICROPHONE_VOLUME_STEP);
+			microphone?.set_volume(
+				microphone.volume -
+					(config.get().volumeStep?.microphone ??
+						defaultConfig.volumeStep.microphone),
+			);
 		}
 	}
 
