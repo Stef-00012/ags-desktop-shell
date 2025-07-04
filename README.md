@@ -138,37 +138,6 @@ For local lyrics to work for a song you must follow these steps:
     `ss` = seconds (padded, so `1` => `01`)
     `ms` = milliseconds (padded, so `1` => `001`)
 
-# TO-DO
-
-- [x] Animations
-
-- [x] Launcher
-    - [x] Launch Programs
-    - [x] Calculator
-    - [ ] Clipboard (not sure)
-- [x] Notification Daemon
-    - [x] Notification Popups
-    - [x] Notification Center
-- [x] OSD
-    - [x] Speaker Volume
-    - [x] Microphone Volume
-    - [x] Brightness
-- [x] Bar
-    - [x] CPU
-    - [x] Disk
-    - [x] RAM
-    - [x] Battery
-    - [x] Clock
-    - [x] Media
-    - [x] Lyrics
-    - [x] Speaker
-    - [x] Microphone
-    - [x] Network
-    - [x] Notifications
-    - [x] Tray
-    - [x] Power Actions
-- [x] Session menu
-
 # Credits
 
 Icons inside the `icons` folder are from [Material Symbols](https://fonts.google.com/icons?icon.size=24&icon.color=%23e3e3e3&icon.set=Material+Symbols&icon.style=Rounded)

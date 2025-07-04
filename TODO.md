@@ -1,0 +1,28 @@
+- [x] Animations
+
+- [x] Launcher
+    - [x] Launch Programs
+    - [x] Calculator
+    - [ ] Clipboard (not sure)
+- [x] Notification Daemon
+    - [x] Notification Popups
+    - [x] Notification Center
+- [x] OSD
+    - [x] Speaker Volume
+    - [x] Microphone Volume
+    - [x] Brightness
+- [x] Bar
+    - [x] CPU
+    - [x] Disk
+    - [x] RAM
+    - [x] Battery
+    - [x] Clock
+    - [x] Media
+    - [x] Lyrics
+    - [x] Speaker
+    - [x] Microphone
+    - [x] Network
+    - [x] Notifications
+    - [x] Tray
+    - [x] Power Actions
+- [x] Session menu
