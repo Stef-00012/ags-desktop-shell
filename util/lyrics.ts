@@ -749,6 +749,8 @@ export function useSong(player: Mpris.Player) {
 	return song;
 
 	function _updateLyrics() {
+		if (!player.trackid || !player.available) return;
+
 		setSong({
 			artist: player.artist,
 			track: player.title,
@@ -764,7 +766,8 @@ export function useSong(player: Mpris.Player) {
 		const lyricsFolder =
 			config.get().paths?.lyricsFolder ??
 			defaultConfig.paths.lyricsFolder;
-		const lyricsFile = `${lyricsFolder}/${player.trackid.split("/").pop()}.lrc`;
+
+		const lyricsFile = `${lyricsFolder}/${player.trackid?.split("/").pop()}.lrc`;
 
 		if (fileExists(lyricsFile)) {
 			const lyricsData = readFile(lyricsFile);

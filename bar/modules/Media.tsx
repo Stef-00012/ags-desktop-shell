@@ -47,6 +47,7 @@ export default function Media({
 	const track = createBinding(spotify, "title");
 	const album = createBinding(spotify, "album");
 	const coverArt = createBinding(spotify, "cover_art");
+	const available = createBinding(spotify, "available");
 
 	const mainMetadata = createComputed([
 		track,
@@ -54,30 +55,39 @@ export default function Media({
 		album,
 		volume,
 		position,
+		available
 	]);
 
 	const lyricsState = createComputed([song, position]);
 
-	function transformMediaLabel([track, artist]: [
+	const coverVisibleState = createComputed([coverArt, available], transformCoverVisible)
+
+	function transformCoverVisible(coverArt: string, available: boolean) {
+		return available && !!coverArt && fileExists(coverArt);
+	}
+
+	function transformMediaLabel([track, artist,,,, isAvailable]: [
 		string,
 		string,
 		string,
 		number,
 		number,
+		boolean,
 	]) {
-		if (!track || !artist) return "No Media Playing";
+		if (!track || !artist || !isAvailable) return "No Media Playing";
 
 		return `${marquee(`${artist} - ${track}`, config.get()?.mediaMaxLength ?? defaultConfig.mediaMaxLength)}`;
 	}
 
-	function transformMediaTooltip([track, artist, album, volume]: [
+	function transformMediaTooltip([track, artist, album, volume,, isAvailable]: [
 		string,
 		string,
 		string,
 		number,
 		number,
+		boolean,
 	]) {
-		if (!track || !artist || !album) return "";
+		if (!track || !artist || !album || !isAvailable) return "";
 
 		return [
 			`Artist: ${escapeMarkup(artist)}`,
@@ -87,14 +97,15 @@ export default function Media({
 		].join("\n");
 	}
 
-	function transformMediaHasTooltip([track, artist, album]: [
+	function transformMediaHasTooltip([track, artist, album,,, isAvailable]: [
 		string,
 		string,
 		string,
 		number,
 		number,
+		boolean,
 	]) {
-		if (!track || !artist || !album) return false;
+		if (!track || !artist || !album || !isAvailable) return false;
 
 		return true;
 	}
@@ -141,14 +152,15 @@ export default function Media({
 		return true;
 	}
 
-	function transformMediaIcon([track, artist]: [
+	function transformMediaIcon([track, artist,,,, isAvailable]: [
 		string,
 		string,
 		string,
 		number,
 		number,
+		boolean,
 	]) {
-		if (!track || !artist) return "mi-music-off-symbolic";
+		if (!track || !artist || !isAvailable) return "mi-music-off-symbolic";
 
 		return "mi-music-note-symbolic";
 	}
@@ -164,7 +176,7 @@ export default function Media({
 	function handleIconMiddleClick() {
 		const cover = coverArt.get();
 
-		if (!cover || !fileExists(cover)) return;
+		if (!cover || !fileExists(cover) || !spotify.available) return;
 
 		if (
 			!fileExists(
@@ -179,7 +191,7 @@ export default function Media({
 			).make_directory_with_parents(null);
 
 		const destFile = Gio.File.new_for_path(
-			`${config.get().paths?.saveFolder ?? defaultConfig.paths.saveFolder}/${spotify.trackid.split("/").pop()}.png`,
+			`${config.get().paths?.saveFolder ?? defaultConfig.paths.saveFolder}/${spotify.trackid?.split("/").pop()}.png`,
 		);
 		Gio.File.new_for_path(cover).copy(
 			destFile,
@@ -194,6 +206,8 @@ export default function Media({
 		_deltaX: number,
 		deltaY: number,
 	) {
+		if (!spotify.available) return;
+
 		if (deltaY < 0) {
 			spotify.set_volume(
 				spotify.volume +
@@ -210,10 +224,14 @@ export default function Media({
 	}
 
 	function handleMediaLeftClick() {
+		if (!spotify.available) return;
+
 		spotify.play_pause();
 	}
 
 	function handleMediaRightClick() {
+		if (!spotify.available) return;
+
 		execAsync(`wl-copy ${spotify.trackid.split("/").pop()}`);
 		execAsync(
 			`notify-send "Stef Shell Media" "The track ID of the song has been copied"`,
@@ -221,6 +239,8 @@ export default function Media({
 	}
 
 	function handleMediaMiddleClick() {
+		if (!spotify.available) return;
+
 		spotify.raise();
 	}
 
@@ -282,7 +302,7 @@ export default function Media({
 				<image
 					class={coverClass}
 					valign={Gtk.Align.CENTER}
-					visible={coverArt((path) => !!path && fileExists(path))}
+					visible={coverVisibleState}
 					file={coverArt}
 					overflow={Gtk.Overflow.HIDDEN}
 				/>
@@ -300,7 +320,11 @@ export default function Media({
 
 			<box
 				class={mediaClass}
-				cursor={Gdk.Cursor.new_from_name("pointer", null)}
+				cursor={available((isAvailable) =>
+					isAvailable
+						? Gdk.Cursor.new_from_name("pointer", null)
+						: Gdk.Cursor.new_from_name("default", null),
+				)}
 				hasTooltip={mainMetadata(transformMediaHasTooltip)}
 				onQueryTooltip={(_label, _x, _y, _keyboardMode, tooltip) => {
 					if (mediaDispose) mediaDispose();
