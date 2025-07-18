@@ -58,7 +58,7 @@ export function parseMarkdown(message: string): string {
 	let output = message;
 
 	const urlRegex =
-		/\[([^\]]+)\]\(((<|&lt;)?(https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:[^\s>&<]*))(>|&gt;)?\))|\b(https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:[^\s<>()]*)\b)/g;
+		/\[([^\]]+)\]\(((<|&lt;)?(https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:[^\s><]*))(>|&gt;)?\))|\b(https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:[^\s<>()]*)\b)/g;
 	const boldRegex = /\*\*(.*?)\*\*/g;
 	const italicRegex = /(\*|_)(.*?)\1/g;
 	const underlineRegex = /__(.*?)__/g;
