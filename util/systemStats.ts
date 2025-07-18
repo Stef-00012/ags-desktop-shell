@@ -159,38 +159,24 @@ let lastInterface: string | null = null;
 
 function getMainNetworkInterface(): string | undefined {
 	const ifconfig = exec("ifconfig");
-	const interfaceBlocks = ifconfig.split(/\n(?=\w+?: flags=)/);
+	const blocks = ifconfig.split(/\n\s*\n/);
 
-	for (const block of interfaceBlocks) {
-		const lines = block.split("\n");
+	for (const block of blocks) {
+		const lines = block
+			.split("\n")
+			.map((line) => line.trim())
+			.filter(Boolean);
+
+		if (lines.length === 0) continue;
+
 		const header = lines[0];
-		const match = header.match(/^(\w+):\s/);
+		const name = header.split(/\s+/)[0];
 
-		if (!match) continue;
+		if (name === "lo") continue; // skip loopback
 
-		const iface = match[1];
+		const hasInet = lines.some((line) => /inet addr:/.test(line));
 
-		let hasRealIp = false;
-
-		for (const line of lines) {
-			const ipv4Match = line.match(/\binet\s+(\d+\.\d+\.\d+\.\d+)/);
-
-			if (ipv4Match && ipv4Match[1] !== "127.0.0.1") {
-				hasRealIp = true;
-
-				break;
-			}
-
-			const ipv6Match = line.match(/\binet6\s+([a-fA-F0-9:]+)/);
-
-			if (ipv6Match && ipv6Match[1] !== "::1") {
-				hasRealIp = true;
-
-				break;
-			}
-		}
-
-		if (hasRealIp) return iface;
+		if (hasInet) return name;
 	}
 
 	return undefined;
