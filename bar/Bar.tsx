@@ -34,7 +34,7 @@ export default function Bar({ gdkmonitor }: Props) {
 			anchor={TOP | LEFT | RIGHT}
 			application={app}
 			$={(self) => {
-				timeout(500, () => {
+				timeout(5000, () => {
 					setBarHeight(self.get_allocated_height());
 				});
 			}}
