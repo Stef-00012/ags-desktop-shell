@@ -46,7 +46,7 @@ https://i.stefdp.com/raw/yxrB0y2qvw74.mp4
 ### Required Libraries
 
 > [!IMPORTANT]
-> [`ags`](https://aylur.github.io/ags/guide/install.html) is required to run the desktop shell
+> [`ags`](https://aylur.github.io/ags/guide/install.html) is required to run the desktop shell.
 
 - `libsoup3`
 - `glib-networking`
@@ -62,6 +62,9 @@ https://i.stefdp.com/raw/yxrB0y2qvw74.mp4
 - [`AstalWp`](https://aylur.github.io/astal/guide/libraries/wireplumber#installation)
 
 ### How to run
+
+> [!IMPORTANT]
+> You must be on Linux with Wayland & have the layer shell protocol enabled.
 
 1. Clone this repository and move its contents to `~/.config/ags`
 2. Install all the [required libraries](#required-libraries)
