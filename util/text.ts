@@ -58,9 +58,9 @@ export function parseMarkdown(message: string): string {
 	let output = message;
 
 	const urlRegex =
-		/\[([^\]]+)\]\(((<|&lt;)?(https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:[^\s><]*))(>|&gt;)?\))|\b(https?:\/\/[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}(?:[^\s<>()]*)\b)/g;
+		/(?:\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)|\[([^\]]+)\]\(<(https?:\/\/[^\s>]+)>\)|\[([^\]]+)\]\(&lt;(https?:\/\/[^&]+)&gt;\)|(https?:\/\/[^\s\[\]<>()]+))/g;
 	const boldRegex = /\*\*(.*?)\*\*/g;
-	const italicRegex = /(\*|_)(.*?)\1/g;
+	const italicRegex = /(?<!\*)\*(?!\*)([^*]+)(?<!\*)\*(?!\*)|(?<!_)_(?!_)([^_]+)(?<!_)_(?!_)/g;
 	const underlineRegex = /__(.*?)__/g;
 	const monocodeRegex = /`([^`]+)`/g;
 	const tripleBacktick = /```/g;
@@ -71,12 +71,23 @@ export function parseMarkdown(message: string): string {
 		.replace(italicRegex, (_match, text) => `<i>${text}</i>`)
 		.replace(tripleBacktick, () => "`")
 		.replace(monocodeRegex, (_match, text) => `<tt>${text}</tt>`)
-		.replace(urlRegex, (match, text, _lt, url) => {
-			if (url)
-				return colorText(
-					`<a href="${url}">${text || url}</a>`,
+		.replace(urlRegex, (match, text1, url1, text2, url2, text3, url3) => {
+            if (url1) {
+                return colorText(
+					`<a href="${url1}">${text1 || url1}</a>`,
 					urlColor,
 				);
+            } else if (url2) {
+                return colorText(
+					`<a href="${url2}">${text2 || url2}</a>`,
+					urlColor,
+				);
+            } else if (url3) {
+                return colorText(
+					`<a href="${url3}">${text3 || url3}</a>`,
+					urlColor,
+				);
+            }
 
 			return colorText(`<a href="${match}">${match}</a>`, urlColor);
 		});
