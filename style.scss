@@ -340,7 +340,7 @@ window.bar {
 
     .tray-popover {
         .tray-item {
-            .tray-popover-menu {
+            popover {
                 modelbutton {
                     background-color: unset;
                     margin-top: 3px;

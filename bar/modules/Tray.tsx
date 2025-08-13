@@ -54,7 +54,6 @@ export default function Tray({ class: className }: Props) {
 			/>
 
 			<popover
-				class="tray-popover"
 				$={(self) => {
 					popover = self as Gtk.Popover;
 				}}
@@ -67,7 +66,7 @@ export default function Tray({ class: className }: Props) {
 					);
 				}}
 			>
-				<box spacing={12}>
+				<box spacing={12} class="tray-popover">
 					<For each={trayItems}>
 						{(trayItem) => {
 							let popovermenu: Gtk.PopoverMenu | null = null;
@@ -147,7 +146,7 @@ export default function Tray({ class: className }: Props) {
 									/>
 
 									<Gtk.PopoverMenu
-										class="tray-popover-menu"
+										// class="tray-popover-menu"
 										menuModel={trayItem.menuModel}
 										onClosed={(self) => {
 											setIsPopoverMenuOpen(false);
