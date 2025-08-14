@@ -158,28 +158,14 @@ let lastNetworkInfo: NetworkStat | null = null;
 let lastInterface: string | null = null;
 
 function getMainNetworkInterface(): string | undefined {
-	const ifconfig = exec("ifconfig");
-	const blocks = ifconfig.split(/\n\s*\n/);
+	const interfaces = exec("ip a show dynamic");
+	const interfaceHeaderRegex = /^\d+: ([^:]+): .*/gm;
 
-	for (const block of blocks) {
-		const lines = block
-			.split("\n")
-			.map((line) => line.trim())
-			.filter(Boolean);
-
-		if (lines.length === 0) continue;
-
-		const header = lines[0];
-		const name = header.split(/\s+/)[0];
-
-		if (name === "lo") continue; // skip loopback
-
-		const hasInet = lines.some((line) => /inet addr:/.test(line));
-
-		if (hasInet) return name;
-	}
-
-	return undefined;
+    const match = interfaceHeaderRegex.exec(interfaces);
+    
+	if (!match) return undefined;
+    
+	return match[1];
 }
 
 const network = Network.get_default();
