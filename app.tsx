@@ -5,6 +5,7 @@ import { createBinding, createComputed, createState, For, onCleanup } from "ags"
 import SessionMenu from "@/sessionMenu/SessionMenu";
 import GObject, { register } from "ags/gobject";
 import Notifd from "gi://AstalNotifd";
+import Apps from "gi://AstalApps";
 import style from "./style.scss";
 import { Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
@@ -117,6 +118,12 @@ app.start({
 
 		if (!argv) return res("argv parse error");
 
+		const apps = new Apps.Apps({
+			nameMultiplier: 2,
+			entryMultiplier: 0,
+			executableMultiplier: 2,
+		});
+
 		switch (argv[0]) {
 			case "clear-notif": {
 				notifd.get_notifications().forEach((notif) => notif.dismiss());
@@ -145,6 +152,8 @@ app.start({
 			case "toggle-launcher-app": {
 				if (isSessionMenuVisible.get())
 					return res("session menu is currently open");
+
+				apps.reload();
 
 				setAppLauncherMode("app");
 				setIsNotificationCenterVisible(false);
