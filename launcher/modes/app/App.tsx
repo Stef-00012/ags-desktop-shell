@@ -29,6 +29,8 @@ export default function AppMode({
 		executableMultiplier: 2,
 	});
 
+	apps.reload();
+
 	const [focusedApp, setFocusedApp] = createState(0);
 
 	closed.subscribe(() => {
