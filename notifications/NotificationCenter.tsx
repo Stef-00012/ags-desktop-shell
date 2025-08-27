@@ -7,6 +7,7 @@ import Notifd from "gi://AstalNotifd";
 import { barHeight } from "@/bar/Bar";
 import { sleep } from "@/util/timer";
 import { Gtk, Gdk } from "ags/gtk4";
+import clearNotifications from "@/util/notifications";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -188,11 +189,9 @@ export default function NotificationCenter({
 									"pointer",
 									null,
 								)}
-								onClicked={() => {
+								onClicked={async () => {
 									for (const category of notificationCategories.get()) {
-										for (const notif of category.notifications) {
-											notif.dismiss();
-										}
+										await clearNotifications(category.notifications)
 									}
 								}}
 							/>
@@ -268,10 +267,8 @@ export default function NotificationCenter({
 													"pointer",
 													null,
 												)}
-												onClicked={() => {
-													for (const notif of notificationCategory.notifications) {
-														notif.dismiss();
-													}
+												onClicked={async () => {
+													await clearNotifications(notificationCategory.notifications)
 												}}
 											/>
 										</box>

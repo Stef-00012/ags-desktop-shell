@@ -59,16 +59,18 @@ export function parseMarkdown(message: string): string {
 
 	const urlRegex =
 		/(?:\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)|\[([^\]]+)\]\(<(https?:\/\/[^\s>]+)>\)|\[([^\]]+)\]\(&lt;(https?:\/\/[^&]+)&gt;\)|(https?:\/\/[^\s\[\]<>()]+))/g;
-	const boldRegex = /\*\*(.*?)\*\*/g;
-	const italicRegex = /(?<!\*)\*(?!\*)([^*]+)(?<!\*)\*(?!\*)|(?<!_)_(?!_)([^_]+)(?<!_)_(?!_)/g;
-	const underlineRegex = /__(.*?)__/g;
+	const boldRegex = /\*\*(.+)\*\*/g;
+	const underlineRegex = /__(.+)__/g;
+	const italicRegexAsterisk = /\*(.+)\*/g
+	const italicRegexUnderline = /_(.+)_/g
 	const monocodeRegex = /`([^`]+)`/g;
 	const tripleBacktick = /```/g;
 
 	output = message
 		.replace(boldRegex, (_match, text) => `<b>${text}</b>`)
 		.replace(underlineRegex, (_match, text) => `<u>${text}</u>`)
-		.replace(italicRegex, (_match, text) => `<i>${text}</i>`)
+		.replace(italicRegexAsterisk, (_match, text) => `<i>${text}</i>`)
+		.replace(italicRegexUnderline, (_match, text) => `<i>${text}</i>`)
 		.replace(tripleBacktick, () => "`")
 		.replace(monocodeRegex, (_match, text) => `<tt>${text}</tt>`)
 		.replace(urlRegex, (match, text1, url1, text2, url2, text3, url3) => {

@@ -12,6 +12,7 @@ import app from "ags/gtk4/app";
 import GLib from "gi://GLib";
 import OSD from "./osd/OSD";
 import Bar from "@/bar/Bar";
+import clearNotifications from "./util/notifications";
 
 @register({ Implements: [Gtk.Buildable] })
 class WindowTracker extends GObject.Object {
@@ -126,7 +127,9 @@ app.start({
 
 		switch (argv[0]) {
 			case "clear-notif": {
-				notifd.get_notifications().forEach((notif) => notif.dismiss());
+				const notifications = notifd.get_notifications()
+
+				clearNotifications(notifications)
 
 				return res("ok");
 			}

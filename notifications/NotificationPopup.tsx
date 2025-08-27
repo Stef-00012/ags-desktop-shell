@@ -83,7 +83,7 @@ export default function NotificationPopups({ gdkmonitor, hidden }: Props) {
 
 			const region = new giCairo.Region();
 
-			// @ts-ignore
+			// @ts-expect-error
 			region.unionRectangle(
 				new giCairo.Rectangle({
 					x,

@@ -2,6 +2,7 @@ import { createBinding, With, type Accessor } from "ags";
 import { setIsNotificationCenterVisible } from "@/app";
 import Notifd from "gi://AstalNotifd";
 import { Gdk, Gtk } from "ags/gtk4";
+import clearNotifications from "@/util/notifications";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -31,12 +32,10 @@ export default function Notifications({ class: className }: Props) {
 		notifd.set_dont_disturb(!notifd.dontDisturb);
 	}
 
-	function handleMiddleClick() {
+	async function handleMiddleClick() {
 		const notifications = notifd.get_notifications();
 
-		for (const notification of notifications) {
-			notification.dismiss();
-		}
+		await clearNotifications(notifications)
 	}
 
 	return (

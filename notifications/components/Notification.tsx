@@ -67,6 +67,7 @@ export default function Notification({
 		if (!defaultAction) return;
 
 		notification.invoke(defaultAction.id);
+		onHide(notification);
 
 		if (!isNotificationCenter) timer.cancel();
 	}
