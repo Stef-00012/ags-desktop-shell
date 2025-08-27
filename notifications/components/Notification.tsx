@@ -230,9 +230,7 @@ export default function Notification({
 								class="summary"
 								halign={Gtk.Align.START}
 								xalign={0}
-								label={parseMarkdown(
-									escapeMarkup(notification.summary),
-								)}
+								label={escapeMarkup(notification.summary)}
 								useMarkup
 								ellipsize={Pango.EllipsizeMode.END}
 								wrapMode={Pango.WrapMode.CHAR}
