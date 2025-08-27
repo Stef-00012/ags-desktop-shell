@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 agsProdPath="$HOME/dots/homes/stef/programs/widgets/ags/config"
 currentPath=$(pwd)
 
