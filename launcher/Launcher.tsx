@@ -5,7 +5,6 @@ import { defaultConfig } from "@/constants/config";
 import { type Gdk, Gtk } from "ags/gtk4";
 import { config } from "@/util/config";
 import AppMode from "./modes/app/App";
-import { barHeight } from "@/bar/Bar";
 import { sleep } from "@/util/timer";
 import Adw from "gi://Adw";
 
@@ -137,10 +136,8 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 						<box
 							widthRequest={maxWidth}
 							heightRequest={maxHeight}
-							hexpand
 							class="launcher-container"
 							orientation={Gtk.Orientation.VERTICAL}
-							marginTop={barHeight}
 						>
 							<entry
 								class="search-entry"
