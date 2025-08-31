@@ -168,6 +168,17 @@ function validateConfig(config: Partial<Config>): boolean {
 	}
 
 	if (
+		config.animationsDuration?.mediaPlayer &&
+		config.animationsDuration.mediaPlayer < 0
+	) {
+		console.error(
+			"Invalid `animationsDuration.mediaPlayer` (must be greater or equal to 0):",
+			config.animationsDuration.mediaPlayer,
+		);
+		return false;
+	}
+
+	if (
 		config.animationsType?.notification &&
 		!animationTypes.includes(config.animationsType.notification)
 	) {
@@ -218,6 +229,33 @@ function validateConfig(config: Partial<Config>): boolean {
 		console.error(
 			`Invalid \`animationsType.sessionMenu\` (must be one of ${animationTypes.map((type) => `"${type}"`).join(", ")}):`,
 			config.animationsType.sessionMenu,
+		);
+		return false;
+	}
+
+	if (
+		config.animationsType?.mediaPlayer &&
+		!animationTypes.includes(config.animationsType.mediaPlayer)
+	) {
+		console.error(
+			`Invalid \`animationsType.mediaPlayer\` (must be one of ${animationTypes.map((type) => `"${type}"`).join(", ")}):`,
+			config.animationsType.mediaPlayer,
+		);
+		return false;
+	}
+
+	if (!Array.isArray(config.players?.blacklisted)) {
+		console.error(
+			"Invalid `players.blacklisted` (must be an array of strings):",
+			config.players?.blacklisted,
+		);
+		return false;
+	}
+
+	if (!Array.isArray(config.players?.preferred)) {
+		console.error(
+			"Invalid `players.preferred` (must be an array of strings):",
+			config.players?.preferred,
 		);
 		return false;
 	}

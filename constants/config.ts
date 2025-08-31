@@ -37,6 +37,7 @@ export const defaultConfig = {
 		notificationCenter: 500, // 0.5 seconds
 		osd: 300, // 0.3 seconds
 		sessionMenu: 300, // 0.3 seconds
+		mediaPlayer: 300, // 0.3 seconds
 	},
 	animationsType: {
 		notification: "SLIDE_LEFT",
@@ -44,6 +45,7 @@ export const defaultConfig = {
 		notificationCenter: "SLIDE_LEFT",
 		osd: "CROSSFADE",
 		sessionMenu: "CROSSFADE",
+		mediaPlayer: "CROSSFADE",
 	},
 	timeouts: {
 		osd: 3000, // 3 seconds
@@ -53,6 +55,10 @@ export const defaultConfig = {
 		buttonWidth: 120, // in px
 		buttonHeight: 120, // in px
 		buttonGap: 50, // in px
+	},
+	players: {
+		blacklisted: [],
+		preferred: ["Spotify"],
 	},
 	mediaMaxLength: 25,
 	systemStatsUpdateInterval: 1000,

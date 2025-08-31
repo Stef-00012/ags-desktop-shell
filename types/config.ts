@@ -3,6 +3,7 @@ type _Config = {
 	volumeStep: ConfigVolumeStep;
 	animationsDuration: ConfigAnimationsDuration;
 	animationsType: ConfigAnimationsTypes;
+	players: ConfigPlayers;
 	timeouts: ConfigTimeouts;
 	sessionMenu: ConfigSessionMenu;
 	mediaMaxLength: number; // in seconds
@@ -36,6 +37,7 @@ type ConfigAnimationsDuration = {
 	notificationCenter: number; // in ms
 	osd: number; // in ms
 	sessionMenu: number; // in ms
+	mediaPlayer: number; // in ms
 };
 
 type ConfigAnimationsTypes = {
@@ -44,7 +46,13 @@ type ConfigAnimationsTypes = {
 	notificationCenter: AnimationType;
 	osd: AnimationType;
 	sessionMenu: AnimationType;
+	mediaPlayer: AnimationType;
 };
+
+type ConfigPlayers = {
+	blacklisted: string[],
+	preferred: string[],
+}
 
 type ConfigTimeouts = {
 	osd: number; // in ms

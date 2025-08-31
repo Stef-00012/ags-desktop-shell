@@ -28,7 +28,7 @@ export function marquee(text: string, width: number): string {
 		});
 	}
 
-	const dividedText = `${text}  `;
+	const dividedText = `${text}   `;
 	const marqueeText =
 		dividedText.slice(marqueeData.index) +
 		dividedText.slice(0, marqueeData.index);

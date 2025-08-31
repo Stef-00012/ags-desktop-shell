@@ -4,7 +4,7 @@ import { defaultConfig } from "@/constants/config";
 import { config } from "@/util/config";
 import { isIcon } from "@/util/icons";
 import Notifd from "gi://AstalNotifd";
-import { barHeight } from "@/bar/Bar";
+import { barHeight } from "@/windows/bar/Bar";
 import { sleep } from "@/util/timer";
 import { Gtk, Gdk } from "ags/gtk4";
 import clearNotifications from "@/util/notifications";

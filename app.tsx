@@ -1,18 +1,18 @@
-import AppLauncher, { type LauncherMode } from "@/launcher/Launcher";
-import NotificationCenter from "@/notifications/NotificationCenter";
-import NotificationPopups from "@/notifications/NotificationPopup";
 import { createBinding, createComputed, createState, For, onCleanup } from "ags";
-import SessionMenu from "@/sessionMenu/SessionMenu";
+import AppLauncher, { type LauncherMode } from "@/windows/launcher/Launcher";
+import NotificationCenter from "@/windows/notifications/NotificationCenter";
+import NotificationPopups from "@/windows/notifications/NotificationPopup";
+import clearNotifications from "@/util/notifications";
+import SessionMenu from "@/windows/sessionMenu/SessionMenu";
 import GObject, { register } from "ags/gobject";
 import Notifd from "gi://AstalNotifd";
 import Apps from "gi://AstalApps";
 import style from "./style.scss";
 import { Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
-import GLib from "gi://GLib";
-import OSD from "./osd/OSD";
-import Bar from "@/bar/Bar";
-import clearNotifications from "./util/notifications";
+import OSD from "./windows/osd/OSD";
+import Bar from "@/windows/bar/Bar";
+import MediaPlayer from "@/windows/mediaPlayer/MediaPlayer";
 
 @register({ Implements: [Gtk.Buildable] })
 class WindowTracker extends GObject.Object {
@@ -25,6 +25,9 @@ export const [isNotificationCenterVisible, setIsNotificationCenterVisible] =
 	createState(false);
 
 export const [isSessionMenuVisible, setIsSessionMenuVisible] =
+	createState(false);
+
+export const [isMediaPlayerVisible, setIsMediaPlayerVisible] =
 	createState(false);
 
 export const [appLauncherMode, setAppLauncherMode] =
@@ -108,6 +111,12 @@ app.start({
 							visible={isSessionMenuVisible}
 							setVisible={setIsSessionMenuVisible}
 						/>
+
+						<MediaPlayer
+							gdkmonitor={monitor}
+							visible={isMediaPlayerVisible}
+							setVisible={setIsMediaPlayerVisible}
+						/>
 					</WindowTracker>
 				)}
 			</For>
@@ -115,9 +124,9 @@ app.start({
 	},
 
 	requestHandler(request, res) {
-		const [, argv] = GLib.shell_parse_argv(request);
+		const requestType = request.shift();
 
-		if (!argv) return res("argv parse error");
+		if (!requestType) return res("requestType is missing");
 
 		const apps = new Apps.Apps({
 			nameMultiplier: 2,
@@ -125,7 +134,7 @@ app.start({
 			executableMultiplier: 2,
 		});
 
-		switch (argv[0]) {
+		switch (requestType) {
 			case "clear-notif": {
 				const notifications = notifd.get_notifications()
 
@@ -170,6 +179,15 @@ app.start({
 
 				setAppLauncherMode("calculator");
 				setIsNotificationCenterVisible(false);
+
+				return res("ok");
+			}
+
+			case "toggle-media-player": {
+				if (isSessionMenuVisible.get())
+					return res("session menu is currently open");
+
+				setIsMediaPlayerVisible((prev) => !prev);
 
 				return res("ok");
 			}

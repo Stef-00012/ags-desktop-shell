@@ -3,7 +3,7 @@ import type { Config } from "@/types/config";
 import type { Accessor, Setter } from "ags";
 import { execAsync } from "ags/process";
 import { config } from "@/util/config";
-import { barHeight } from "@/bar/Bar";
+import { barHeight } from "@/windows/bar/Bar";
 import { sleep } from "@/util/timer";
 import { Gdk, Gtk } from "ags/gtk4";
 import Pango from "gi://Pango";

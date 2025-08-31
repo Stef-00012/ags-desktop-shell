@@ -647,3 +647,20 @@ window.session-menu {
         }
     }
 }
+
+window.media-player {
+    background: $base-color;
+    color: $text-color;
+
+    .cover-art {
+        border-radius: 15px;
+        min-width: 35px;
+        min-height: 35px;
+        background-size: cover;
+        background-position: center;
+    }
+    
+    .controls-left {
+        padding: 10px;
+    }
+}
