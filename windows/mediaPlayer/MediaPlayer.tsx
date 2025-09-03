@@ -1,6 +1,6 @@
 import { sleep } from "@/util/timer";
 import Mpris from "gi://AstalMpris";
-import { type Accessor, createBinding, createState, onCleanup, type Setter, With } from "ags";
+import { type Accessor, createBinding, createState, type Setter, With } from "ags";
 import { Gtk, Gdk } from "ags/gtk4";
 import { config } from "@/util/config";
 import { defaultConfig } from "@/constants/config";
@@ -24,7 +24,6 @@ export default function Launcher({ gdkmonitor, visible: isVisible, setVisible }:
     const volumeSliderWidth = 100;
 
     const players = createBinding(mpris, "players");
-    const mainPlayer = players(getMainPlayer);
 
     function handleEscKey(
 		_e: Gtk.EventControllerKey,
@@ -164,10 +163,6 @@ export default function Launcher({ gdkmonitor, visible: isVisible, setVisible }:
                             const canGoNext = createBinding(mainPlayer, "can_go_next");
                             const canGoPrevious = createBinding(mainPlayer, "can_go_previous");
 
-                            const volumeAdjustement = Gtk.Adjustment.new(volume.get(), 0, 1, 0.1, 0.1, 0)
-
-                            volumeAdjustement.connect("value-changed", handleVolumeChange)
-
                             function togglePlayPause() {
                                 if (!mainPlayer) return;
 
@@ -211,10 +206,10 @@ export default function Launcher({ gdkmonitor, visible: isVisible, setVisible }:
                                 mainPlayer.shuffle();
                             }
 
-                            function handleVolumeChange() {
+                            function handleVolumeChange({ value }: { value: number }) {
                                 if (!mainPlayer) return;
 
-                                mainPlayer.set_volume(volumeAdjustement.value);
+                                mainPlayer.set_volume(value);
                             }
 
                             function transformPlayPauseIcon(playbackStatus: Mpris.PlaybackStatus) {
@@ -445,10 +440,13 @@ export default function Launcher({ gdkmonitor, visible: isVisible, setVisible }:
 
                                             <box hexpand halign={Gtk.Align.END} spacing={buttonSpacing} orientation={Gtk.Orientation.HORIZONTAL} valign={Gtk.Align.CENTER}>
                                                 <box visible={controlsLeftVolumeButtonVisible}>
-                                                    <Gtk.Scale
-                                                        adjustment={volumeAdjustement}
-                                                        orientation={Gtk.Orientation.HORIZONTAL}
+                                                    <slider
+                                                        min={0}
+                                                        max={1}
+                                                        value={volume}
+                                                        step={0.01}
                                                         widthRequest={volumeSliderWidth}
+                                                        onChangeValue={handleVolumeChange}
                                                     />
                                                 </box>
 
