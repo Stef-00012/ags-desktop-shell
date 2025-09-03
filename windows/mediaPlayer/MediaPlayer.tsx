@@ -510,8 +510,8 @@ export default function Launcher({ gdkmonitor, visible: isVisible, setVisible }:
                                         </Adw.BreakpointBin>
                                     </box>
 
-                                    <box visible={metadataLeftBoxVisible} class="debug" hexpand></box>
-                                    <box visible={bottomLayoutBotVisible} class="debug1" hexpand></box>
+                                    <box visible={metadataLeftBoxVisible} class="debug00" hexpand></box>
+                                    <box visible={bottomLayoutBotVisible} class="debug10" hexpand></box>
                                 </box>
                             )
                         }}
