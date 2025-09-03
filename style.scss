@@ -651,6 +651,7 @@ window.session-menu {
 window.media-player {
     background: $base-color;
     color: $text-color;
+    padding: 10px;
 
     .cover-art {
         border-radius: 15px;
@@ -659,8 +660,36 @@ window.media-player {
         background-size: cover;
         background-position: center;
     }
-    
-    .controls-left {
-        padding: 10px;
+
+    .active {
+        color: $blue-color;
+    }
+
+    .disabled {
+        color: $surface2-color;
     }
 }
+
+// .debug00 {
+//     background-color: $red-color;
+// }
+
+// .debug10 {
+//     background-color: $yellow-color;
+// }
+
+// .debug20 {
+//     background-color: $green-color;
+// }
+
+// .debug01 {
+//     color: $red-color;
+// }
+
+// .debug11 {
+//     color: $yellow-color;
+// }
+
+// .debug21 {
+//     color: $green-color;
+// }
