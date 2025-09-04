@@ -653,6 +653,11 @@ window.media-player {
     color: $text-color;
     padding: 10px;
 
+    .no-media-text {
+        font-size: 20px;
+        font-weight: bold;
+    }
+
     .cover-art {
         border-radius: 15px;
         min-width: 35px;
@@ -662,34 +667,30 @@ window.media-player {
     }
 
     .active {
-        color: $blue-color;
+        color: $mauvre-color;
     }
 
     .disabled {
         color: $surface2-color;
     }
-}
 
-.debug00 {
-    background-color: $red-color;
-}
+    // oc
+    scale {
+         // full progress
+        trough {
+            background-color: $surface0-color;
+            min-height: 4px;
 
-.debug10 {
-    background-color: $yellow-color;
-}
+             // active progress
+            highlight {
+                background-color: $text-color;
+                min-height: 4px;
+            }
 
-.debug20 {
-    background-color: $green-color;
-}
-
-.debug01 {
-    color: $red-color;
-}
-
-.debug11 {
-    color: $yellow-color;
-}
-
-.debug21 {
-    color: $green-color;
+            slider {
+                background-color: $mauvre-color;
+                background-image: unset;
+            }
+        }
+    }
 }
