@@ -47,7 +47,6 @@ https://www.youtube.com/watch?v=GHU0RAx88E8
     - Toggle Loop (both track & playlist)
     - Toggle Shuffle
     - Play/Pause
-    - Seek
     - Skip Previous/Next
     - Volume
     - Includes cover art and song title & artist
