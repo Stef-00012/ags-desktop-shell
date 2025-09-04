@@ -2,7 +2,7 @@ This is my linux custom desktop shell.
 
 ### Features
 
-https://i.stefdp.com/raw/yxrB0y2qvw74.mp4
+https://www.youtube.com/watch?v=GHU0RAx88E8
 
 - Bar
     - CPU - See the general load and each core's load (on hover)
