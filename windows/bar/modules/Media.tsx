@@ -21,6 +21,7 @@ import {
 	jsx,
 	type Accessor,
 } from "ags";
+import { setIsMediaPlayerVisible } from "@/app";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -239,9 +240,11 @@ export default function Media({
 	}
 
 	function handleMediaMiddleClick() {
-		if (!spotify.available) return;
+		// if (!spotify.available) return;
 
-		spotify.raise();
+		setIsMediaPlayerVisible((prev) => !prev);
+
+		// spotify.raise();
 	}
 
 	function handleLyricsLeftClick() {

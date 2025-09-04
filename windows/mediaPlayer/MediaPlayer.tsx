@@ -380,35 +380,37 @@ export default function Launcher({ gdkmonitor, visible: isVisible, setVisible }:
                                 <box>
                                     <box visible={controlsLeftBoxVisible} orientation={Gtk.Orientation.HORIZONTAL}>
                                         <box orientation={Gtk.Orientation.HORIZONTAL} spacing={5}>
-                                            <With value={coverArt}>
-                                                {(coverArt) => {
-                                                    if (coverArt) {
+                                            <box>
+                                                <With value={coverArt}>
+                                                    {(coverArt) => {
+                                                        if (coverArt) {
+                                                            return (
+                                                                <image
+                                                                    css={mainColor((color) => `background-color: ${color};`)}
+                                                                    widthRequest={35}
+                                                                    heightRequest={35}
+                                                                    class="cover-art"
+                                                                    file={coverArt}
+                                                                    overflow={Gtk.Overflow.HIDDEN}
+                                                                />
+                                                            )
+                                                        }
+
                                                         return (
                                                             <image
                                                                 css={mainColor((color) => `background-color: ${color};`)}
+                                                                hexpand
+                                                                vexpand
                                                                 widthRequest={35}
                                                                 heightRequest={35}
                                                                 class="cover-art"
-                                                                file={coverArt}
+                                                                iconName="mi-music-note-symbolic"
                                                                 overflow={Gtk.Overflow.HIDDEN}
                                                             />
                                                         )
-                                                    }
-
-                                                    return (
-                                                        <image
-                                                            css={mainColor((color) => `background-color: ${color};`)}
-                                                            hexpand
-                                                            vexpand
-                                                            widthRequest={35}
-                                                            heightRequest={35}
-                                                            class="cover-art"
-                                                            iconName="mi-music-note-symbolic"
-                                                            overflow={Gtk.Overflow.HIDDEN}
-                                                        />
-                                                    )
-                                                }}
-                                            </With>
+                                                    }}
+                                                </With>
+                                            </box>
 
                                             <box orientation={Gtk.Orientation.VERTICAL} spacing={5} class="metadata" valign={Gtk.Align.CENTER}>
                                                 <label
@@ -606,36 +608,38 @@ export default function Launcher({ gdkmonitor, visible: isVisible, setVisible }:
 
                                     <box visible={metadataLeftBoxVisible} orientation={Gtk.Orientation.VERTICAL}>
                                         <box orientation={Gtk.Orientation.HORIZONTAL} halign={Gtk.Align.START} spacing={5}>
-                                            <With value={coverArt}>
-                                                {(coverArt) => {
-                                                    if (coverArt) {
+                                            <box>
+                                                <With value={coverArt}>
+                                                    {(coverArt) => {
+                                                        if (coverArt) {
+                                                            return (
+                                                                <image
+                                                                    css={mainColor((color) => `background-color: ${color};`)}
+                                                                    halign={Gtk.Align.FILL}
+                                                                    hexpand
+                                                                    vexpand
+                                                                    class="cover-art"
+                                                                    file={coverArt}
+                                                                    overflow={Gtk.Overflow.HIDDEN}
+                                                                />
+                                                            )
+                                                        }
+
                                                         return (
                                                             <image
                                                                 css={mainColor((color) => `background-color: ${color};`)}
-                                                                halign={Gtk.Align.FILL}
                                                                 hexpand
                                                                 vexpand
+                                                                widthRequest={35}
+                                                                heightRequest={35}
                                                                 class="cover-art"
-                                                                file={coverArt}
+                                                                iconName="mi-music-note-symbolic"
                                                                 overflow={Gtk.Overflow.HIDDEN}
                                                             />
                                                         )
-                                                    }
-
-                                                    return (
-                                                        <image
-                                                            css={mainColor((color) => `background-color: ${color};`)}
-                                                            hexpand
-                                                            vexpand
-                                                            widthRequest={35}
-                                                            heightRequest={35}
-                                                            class="cover-art"
-                                                            iconName="mi-music-note-symbolic"
-                                                            overflow={Gtk.Overflow.HIDDEN}
-                                                        />
-                                                    )
-                                                }}
-                                            </With>
+                                                    }}
+                                                </With>
+                                            </box>
 
                                             <box orientation={Gtk.Orientation.VERTICAL} spacing={5} class="metadata" valign={Gtk.Align.CENTER}>
                                                 <label
@@ -725,37 +729,39 @@ export default function Launcher({ gdkmonitor, visible: isVisible, setVisible }:
                                     </box>
 
                                     <box visible={bottomLayoutBotVisible} orientation={Gtk.Orientation.VERTICAL} spacing={5}>
-                                        <With value={coverArt}>
-                                            {(coverArt) => {
-                                                if (coverArt) {
+                                        <box>
+                                            <With value={coverArt}>
+                                                {(coverArt) => {
+                                                    if (coverArt) {
+                                                        return (
+                                                            <image
+                                                                css={mainColor((color) => `background-color: ${color};`)}
+                                                                widthRequest={35}
+                                                                heightRequest={35}
+                                                                hexpand
+                                                                vexpand
+                                                                class="cover-art"
+                                                                file={coverArt}
+                                                                overflow={Gtk.Overflow.HIDDEN}
+                                                            />
+                                                        )
+                                                    }
+
                                                     return (
                                                         <image
                                                             css={mainColor((color) => `background-color: ${color};`)}
-                                                            widthRequest={35}
-                                                            heightRequest={35}
                                                             hexpand
                                                             vexpand
+                                                            widthRequest={35}
+                                                            heightRequest={35}
                                                             class="cover-art"
-                                                            file={coverArt}
+                                                            iconName="mi-music-note-symbolic"
                                                             overflow={Gtk.Overflow.HIDDEN}
                                                         />
                                                     )
-                                                }
-
-                                                return (
-                                                    <image
-                                                        css={mainColor((color) => `background-color: ${color};`)}
-                                                        hexpand
-                                                        vexpand
-                                                        widthRequest={35}
-                                                        heightRequest={35}
-                                                        class="cover-art"
-                                                        iconName="mi-music-note-symbolic"
-                                                        overflow={Gtk.Overflow.HIDDEN}
-                                                    />
-                                                )
-                                            }}
-                                        </With>
+                                                }}
+                                            </With>
+                                        </box>
                                         
                                         <box orientation={Gtk.Orientation.HORIZONTAL} spacing={5}>
                                             <box orientation={Gtk.Orientation.VERTICAL} spacing={5} class="metadata" valign={Gtk.Align.CENTER}>
