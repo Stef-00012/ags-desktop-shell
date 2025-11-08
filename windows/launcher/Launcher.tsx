@@ -1,12 +1,13 @@
-import { createState, type Accessor, type Setter } from "ags";
-import CalculatorMode from "./modes/calculator/Calculator";
+import { type Accessor, createState, type Setter } from "ags";
+import { type Gdk, Gtk } from "ags/gtk4";
+import Adw from "gi://Adw";
 // import ClipboardMode from "./modes/clipboard/Clipboard";
 import { defaultConfig } from "@/constants/config";
-import { type Gdk, Gtk } from "ags/gtk4";
 import { config } from "@/util/config";
-import AppMode from "./modes/app/App";
 import { sleep } from "@/util/timer";
-import Adw from "gi://Adw";
+import AppMode from "./modes/app/App";
+import CalculatorMode from "./modes/calculator/Calculator";
+import ClipboardMode from "./modes/clipboard/Clipboard";
 
 export type LauncherMode = "closed" | "calculator" | "app" | "clipboard";
 export interface PressedKey {
@@ -182,7 +183,7 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 										closed={closed}
 									/>
 
-									{/* <ClipboardMode
+									<ClipboardMode
 										close={close}
 										searchValue={searchValue}
 										enterPressed={enterPressed}
@@ -191,7 +192,7 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 											(currentMode) =>
 												currentMode === "clipboard",
 										)}
-									/> */}
+									/>
 								</box>
 							</scrolledwindow>
 						</box>

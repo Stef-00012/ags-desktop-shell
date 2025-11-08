@@ -1,7 +1,13 @@
-import { createState, For, type Accessor } from "ags";
-import type { PressedKey } from "../../Launcher";
+import {
+	type ClipboardEntry,
+	clipboardEntries,
+	copyClipboardEntry,
+	fuzzySearch,
+	updateClipboardEntries,
+} from "@/util/clipboard";
+import { type Accessor, createState, For } from "ags";
 import { Gdk, Gtk } from "ags/gtk4";
-import { exec } from "ags/process";
+import type { PressedKey } from "../../Launcher";
 
 interface Props {
 	close: () => void;
@@ -18,19 +24,31 @@ export default function ClipboardMode({
 	pressedKey,
 	visible,
 }: Props) {
-	const [clipboard, setClipboard] = createState<string[]>([]);
-	const [filteredClipboard, setFilteredClipboard] = createState<string[]>([]);
+	updateClipboardEntries();
+
+	const [filteredClipboard, setFilteredClipboard] = createState<
+		ClipboardEntry[]
+	>(clipboardEntries.get());
 
 	visible.subscribe(() => {
 		if (!visible.get()) return;
 
-		const clipboardData = exec("cliphist list");
-		const data = clipboardData
-			.split("\n")
-			.filter((line) => line.trim() !== "");
+		const value = searchValue.get();
+		console.log(value, !value);
+		if (!value) return setFilteredClipboard(clipboardEntries.get());
+	});
 
-		setClipboard(data);
-		setFilteredClipboard(data);
+	clipboardEntries.subscribe(() => {
+		if (!visible.get()) return;
+
+		const clipboardData = clipboardEntries.get();
+
+		const value = searchValue.get();
+		if (!value) return setFilteredClipboard(clipboardData);
+
+		const filtered = fuzzySearch(clipboardData, value);
+
+		setFilteredClipboard(filtered);
 	});
 
 	pressedKey.subscribe(() => {
@@ -50,56 +68,27 @@ export default function ClipboardMode({
 	enterPressed.subscribe(() => {
 		if (!enterPressed.get() || !visible.get()) return;
 
-		const clipboarData = clipboard.get();
+		const clipboarData = filteredClipboard.get();
 
 		if (clipboarData.length <= 0) return close();
 
-		const text = clipboarData[0];
+		const entry = clipboarData[0];
 
-		copyText(text);
+		copyClipboardEntry(entry);
 	});
 
 	searchValue.subscribe(() => {
 		if (!visible.get()) return;
 
-		const value = searchValue.get();
-		if (!value) return setFilteredClipboard(clipboard.get());
+		const clipboardData = clipboardEntries.get();
 
-		const clipboardData = clipboard.get();
+		const value = searchValue.get();
+		if (!value) return setFilteredClipboard(clipboardData);
 
 		const filtered = fuzzySearch(clipboardData, value);
 
 		setFilteredClipboard(filtered);
 	});
-
-	function fuzzySearch(arr: string[], query: string): string[] {
-		return arr.filter((e) => {
-			e = e.toLowerCase();
-			query = query.toLowerCase();
-
-			let i = 0,
-				lastSearched = -1,
-				current = query[i];
-
-			while (current) {
-				lastSearched = e.indexOf(current, lastSearched + 1);
-
-				if (lastSearched === -1) {
-					return false;
-				}
-
-				current = query[++i];
-			}
-
-			return true;
-		});
-	}
-
-	function copyText(text: string) {
-		const id = parseInt(text);
-
-		exec(`cliphist decode ${id} | wl-copy`);
-	}
 
 	return (
 		<box
@@ -112,12 +101,12 @@ export default function ClipboardMode({
 					<box>
 						<Gtk.GestureClick
 							button={Gdk.BUTTON_PRIMARY}
-							onPressed={() => copyText(clipboardEntry)}
+							onPressed={() => copyClipboardEntry(clipboardEntry)}
 						/>
 
 						<label
 							halign={Gtk.Align.START}
-							label={clipboardEntry}
+							label={clipboardEntry.value}
 						/>
 					</box>
 				)}

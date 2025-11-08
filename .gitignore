@@ -5,3 +5,5 @@ __devlog.txt
 __ignore/
 
 *.*.txt
+
+core.gjs.1000.*

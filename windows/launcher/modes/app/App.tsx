@@ -2,7 +2,8 @@ import { createComputed, createState, For, type Accessor } from "ags";
 import type { PressedKey } from "../../Launcher";
 import { Gdk, Gtk } from "ags/gtk4";
 import App from "./components/App";
-import Apps from "gi://AstalApps";
+import type Apps from "gi://AstalApps";
+import { apps } from "@/app";
 
 interface Props {
 	close: () => void;
@@ -23,11 +24,11 @@ export default function AppMode({
 	closed,
 	entry,
 }: Props) {
-	const apps = new Apps.Apps({
-		nameMultiplier: 2,
-		entryMultiplier: 0,
-		executableMultiplier: 2,
-	});
+	// const apps = new Apps.Apps({
+	// 	nameMultiplier: 2,
+	// 	entryMultiplier: 0,
+	// 	executableMultiplier: 2,
+	// });
 
 	const [focusedApp, setFocusedApp] = createState(0);
 
@@ -35,7 +36,7 @@ export default function AppMode({
 		if (!closed.get() || !visible.get()) return;
 
 		close();
-		setAppList(apps.get_list());
+		setAppList(apps.get().get_list());
 	});
 
 	enterPressed.subscribe(() => {
@@ -70,7 +71,7 @@ export default function AppMode({
 
 		if (keyData.keyval === Gdk.KEY_Escape) {
 			close();
-			setAppList(apps.get_list());
+			setAppList(apps.get().get_list());
 			return;
 		}
 
@@ -94,13 +95,13 @@ export default function AppMode({
 
 			if (index === -1 || index >= appList.get().length) {
 				close();
-				setAppList(apps.get_list());
+				setAppList(apps.get().get_list());
 				return;
 			}
 
 			appList.get()[index].launch();
 			close();
-			setAppList(apps.get_list());
+			setAppList(apps.get().get_list());
 			return;
 		}
 
@@ -235,13 +236,13 @@ export default function AppMode({
 	});
 
 	const [appList, setAppList] = createState<Apps.Application[]>(
-		apps.get_list(),
+		apps.get().get_list(),
 	);
 
 	searchValue.subscribe(() => {
 		if (!visible.get()) return;
 
-		setAppList(apps.fuzzy_query(searchValue.get()));
+		setAppList(apps.get().fuzzy_query(searchValue.get()));
 		setFocusedApp(0);
 	});
 
@@ -251,13 +252,13 @@ export default function AppMode({
 
 		if (list.length <= appIndex) {
 			close();
-			setAppList(apps.get_list());
+			setAppList(apps.get().get_list());
 			return;
 		}
 
 		list[appIndex].launch();
 		close();
-		setAppList(apps.get_list());
+		setAppList(apps.get().get_list());
 	}
 
 	return (
@@ -277,7 +278,7 @@ export default function AppMode({
 						onOpen={() => {
 							app.launch();
 							close();
-							setAppList(apps.get_list());
+							setAppList(apps.get().get_list());
 						}}
 					/>
 				)}
