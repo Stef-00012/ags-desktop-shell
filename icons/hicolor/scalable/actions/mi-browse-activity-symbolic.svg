@@ -1,1 +1,38 @@
-<svg xmlns="http://www.w3.org/2000/svg" height="24px" viewBox="0 -960 960 960" width="24px" fill="#e3e3e3"><path d="M80-120q-17 0-28.5-11.5T40-160q0-17 11.5-28.5T80-200h800q17 0 28.5 11.5T920-160q0 17-11.5 28.5T880-120H80Zm80-120q-33 0-56.5-23.5T80-320v-200h215l69 138q5 10 14.5 16t20.5 6q11 0 21-5t15-15l123-215 26 53q5 11 15 16.5t21 5.5h260v200q0 33-23.5 56.5T800-240H160Zm243-245-47-93q-5-10-15-16t-21-6H80v-160q0-33 23.5-56.5T160-840h640q33 0 56.5 23.5T880-760v160H645l-49-98q-5-11-15-16.5t-21-5.5q-11 0-20 5.5T526-700L403-485Z"/></svg>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<svg
+   height="24px"
+   viewBox="0 -960 960 960"
+   width="24px"
+   fill="#e3e3e3"
+   version="1.1"
+   id="svg1"
+   sodipodi:docname="mi-browse-activity-symbolic.svg"
+   inkscape:version="1.4.2 (ebf0e940d0, 2025-05-08)"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns="http://www.w3.org/2000/svg"
+   xmlns:svg="http://www.w3.org/2000/svg">
+  <defs
+     id="defs1" />
+  <sodipodi:namedview
+     id="namedview1"
+     pagecolor="#505050"
+     bordercolor="#ffffff"
+     borderopacity="1"
+     inkscape:showpageshadow="0"
+     inkscape:pageopacity="0"
+     inkscape:pagecheckerboard="1"
+     inkscape:deskcolor="#505050"
+     inkscape:zoom="37.041667"
+     inkscape:cx="12.013498"
+     inkscape:cy="11.986502"
+     inkscape:window-width="990"
+     inkscape:window-height="1137"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="svg1" />
+  <path
+     d="M80-120q-17 0-28.5-11.5T40-160q0-17 11.5-28.5T80-200h800q17 0 28.5 11.5T920-160q0 17-11.5 28.5T880-120H80Zm80-120q-33 0-56.5-23.5T80-320v-200h215l69 138q5 10 14.5 16t20.5 6q11 0 21-5t15-15l123-215 26 53q5 11 15 16.5t21 5.5h260v200q0 33-23.5 56.5T800-240H160Zm243-245-47-93q-5-10-15-16t-21-6H80v-160q0-33 23.5-56.5T160-840h640q33 0 56.5 23.5T880-760v160H645l-49-98q-5-11-15-16.5t-21-5.5q-11 0-20 5.5T526-700L403-485Z"
+     id="path1" />
+</svg>

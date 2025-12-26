@@ -1,6 +1,12 @@
-import { createBinding, createComputed, createState, type Accessor } from "ags";
 import { defaultConfig } from "@/constants/config";
 import { config } from "@/util/config";
+import {
+	type Accessor,
+	createBinding,
+	createComputed,
+	createEffect,
+	createState,
+} from "ags";
 import { Gtk } from "ags/gtk4";
 import Wp from "gi://AstalWp";
 
@@ -27,9 +33,18 @@ export default function Microphone({ class: className }: Props) {
 		microphone.get_pw_property("device.api") === "bluez5",
 	);
 
-	const icon = createComputed([iconName, volume], transformIcon);
+	// const icon = createComputed([iconName, volume], transformIcon);
+	const icon = createComputed(() => transformIcon(iconName(), volume()));
 
-	device.subscribe(() => {
+	// device.subscribe(() => {
+	// 	setIsBluetooth(microphone.get_pw_property("device.api") === "bluez5");
+	// });
+
+	createEffect(() => {
+		const _device = setIsBluetooth(
+			microphone.get_pw_property("device.api") === "bluez5",
+		);
+
 		setIsBluetooth(microphone.get_pw_property("device.api") === "bluez5");
 	});
 
@@ -57,13 +72,13 @@ export default function Microphone({ class: className }: Props) {
 		if (deltaY < 0) {
 			microphone?.set_volume(
 				microphone.volume +
-					(config.get().volumeStep?.microphone ??
+					(config.peek().volumeStep?.microphone ??
 						defaultConfig.volumeStep.microphone),
 			);
 		} else if (deltaY > 0) {
 			microphone?.set_volume(
 				microphone.volume -
-					(config.get().volumeStep?.microphone ??
+					(config.peek().volumeStep?.microphone ??
 						defaultConfig.volumeStep.microphone),
 			);
 		}

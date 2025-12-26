@@ -8,6 +8,7 @@ import SessionMenu from "@/windows/sessionMenu/SessionMenu";
 import {
 	createBinding,
 	createComputed,
+	createEffect,
 	createState,
 	For,
 	onCleanup,
@@ -18,7 +19,7 @@ import app from "ags/gtk4/app";
 import Apps from "gi://AstalApps";
 import Notifd from "gi://AstalNotifd";
 import style from "./style.scss";
-import { watchForClipboardUpdates } from "./util/clipboard";
+// import { watchForClipboardUpdates } from "./util/clipboard";
 import OSD from "./windows/osd/OSD";
 
 @register({ Implements: [Gtk.Buildable] })
@@ -52,36 +53,71 @@ export const [appLauncherMode, setAppLauncherMode] =
 
 export const [apps, setApps] = createState<Apps.Apps>(_apps);
 
-const isNotificationPopupHidden = createComputed(
-	[isNotificationCenterVisible, isSessionMenuVisible],
-	transformIsNotificationPopupHidden,
+// const isNotificationPopupHidden = createComputed(
+// 	[isNotificationCenterVisible, isSessionMenuVisible],
+// 	transformIsNotificationPopupHidden,
+// );
+
+const isNotificationPopupHidden = createComputed(() =>
+	transformIsNotificationPopupHidden(
+		isNotificationCenterVisible(),
+		isSessionMenuVisible(),
+	),
 );
 
 const notifd = Notifd.get_default();
 
-isNotificationCenterVisible.subscribe(() => {
-	if (isNotificationCenterVisible.get()) {
-		if (isSessionMenuVisible.get())
-			return setIsNotificationCenterVisible(false);
+// isNotificationCenterVisible.subscribe(() => {
+// 	if (isNotificationCenterVisible.peek()) {
+// 		if (isSessionMenuVisible.peek())
+// 			return setIsNotificationCenterVisible(false);
 
-		setAppLauncherMode("closed");
+// 		setAppLauncherMode("closed");
+// 	}
+// });
+
+createEffect(() => {
+	switch (true) {
+		case isNotificationCenterVisible(): {
+			if (isSessionMenuVisible())
+				return setIsNotificationCenterVisible(false);
+
+			setAppLauncherMode("closed");
+
+			break;
+		}
+
+		case isSessionMenuVisible(): {
+			setIsNotificationCenterVisible(false);
+			setAppLauncherMode("closed");
+
+			break;
+		}
+
+		case appLauncherMode() !== "closed": {
+			if (isSessionMenuVisible()) return setAppLauncherMode("closed");
+
+			setIsNotificationCenterVisible(false);
+
+			break;
+		}
 	}
 });
 
-isSessionMenuVisible.subscribe(() => {
-	if (isSessionMenuVisible.get()) {
-		setIsNotificationCenterVisible(false);
-		setAppLauncherMode("closed");
-	}
-});
+// isSessionMenuVisible.subscribe(() => {
+// 	if (isSessionMenuVisible.peek()) {
+// 		setIsNotificationCenterVisible(false);
+// 		setAppLauncherMode("closed");
+// 	}
+// });
 
-appLauncherMode.subscribe(() => {
-	if (appLauncherMode.get() !== "closed") {
-		if (isSessionMenuVisible.get()) return setAppLauncherMode("closed");
+// appLauncherMode.subscribe(() => {
+// 	if (appLauncherMode.peek() !== "closed") {
+// 		if (isSessionMenuVisible.peek()) return setAppLauncherMode("closed");
 
-		setIsNotificationCenterVisible(false);
-	}
-});
+// 		setIsNotificationCenterVisible(false);
+// 	}
+// });
 
 function transformIsNotificationPopupHidden(
 	isNotificationCenterVisible: boolean,
@@ -103,7 +139,7 @@ app.start({
 	main() {
 		const monitors = createBinding(app, "monitors");
 
-		watchForClipboardUpdates();
+		// watchForClipboardUpdates();
 
 		return (
 			<For each={monitors}>
@@ -165,7 +201,7 @@ app.start({
 			}
 
 			case "toggle-notif": {
-				if (isSessionMenuVisible.get())
+				if (isSessionMenuVisible.peek())
 					return res("session menu is currently open");
 
 				setIsNotificationCenterVisible((prev) => !prev);
@@ -183,7 +219,7 @@ app.start({
 			}
 
 			case "toggle-launcher-app": {
-				if (isSessionMenuVisible.get())
+				if (isSessionMenuVisible.peek())
 					return res("session menu is currently open");
 
 				_apps.reload();
@@ -203,7 +239,7 @@ app.start({
 			}
 
 			case "toggle-launcher-calculator": {
-				if (isSessionMenuVisible.get())
+				if (isSessionMenuVisible.peek())
 					return res("session menu is currently open");
 
 				setAppLauncherMode("calculator");
@@ -213,7 +249,7 @@ app.start({
 			}
 
 			case "toggle-media-player": {
-				if (isSessionMenuVisible.get())
+				if (isSessionMenuVisible.peek())
 					return res("session menu is currently open");
 
 				setIsMediaPlayerVisible((prev) => !prev);

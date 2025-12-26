@@ -1,9 +1,9 @@
-import { createState, createComputed, createBinding } from "ags";
 import { formatSeconds } from "@/util/formatTime";
-import AstalBattery from "gi://AstalBattery";
-import { execAsync } from "ags/process";
 import type { Accessor } from "ags";
+import { createBinding, createComputed, createEffect, createState } from "ags";
 import { Gdk, Gtk } from "ags/gtk4";
+import { execAsync } from "ags/process";
+import AstalBattery from "gi://AstalBattery";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -21,19 +21,61 @@ export default function Battery({ class: className }: Props) {
 
 	const [showAlt, setShowAlt] = createState<boolean>(false);
 
-	const label = createComputed(
-		[showAlt, percentage, isCharging, timeToEmpty, timeToFull],
-		transformLabel,
+	// const label = createComputed(
+	// 	[showAlt, percentage, isCharging, timeToEmpty, timeToFull],
+	// 	transformLabel,
+	// );
+	const label = createComputed(() =>
+		transformLabel(
+			showAlt(),
+			percentage(),
+			isCharging(),
+			timeToEmpty(),
+			timeToFull(),
+		),
 	);
-	const tooltip = createComputed(
-		[percentage, isCharging, timeToEmpty, timeToFull, energyRate],
-		transformTooltip,
+	// const tooltip = createComputed(
+	// 	[percentage, isCharging, timeToEmpty, timeToFull, energyRate],
+	// 	transformTooltip,
+	// );
+	const tooltip = createComputed(() =>
+		transformTooltip(
+			percentage(),
+			isCharging(),
+			timeToEmpty(),
+			timeToFull(),
+			energyRate(),
+		),
 	);
 
-	percentage.subscribe(() => {
-		const perc = Math.round(percentage.get() * 100);
-		const charging = isCharging.get();
-		const icon = iconName.get();
+	// percentage.subscribe(() => {
+	// 	const perc = Math.round(percentage.peek() * 100);
+	// 	const charging = isCharging.peek();
+	// 	const icon = iconName.peek();
+
+	// 	const baseCommand = `notify-send -a 'Battery Manager' -i ${icon}`;
+
+	// 	if (charging && perc === 100)
+	// 		return execAsync(
+	// 			`${baseCommand} 'Charge Completed' 'Battery is at 100%.\nUnplug the charger.'`,
+	// 		);
+
+	// 	if (charging) return;
+
+	// 	if (perc === 15 || perc === 10)
+	// 		return execAsync(
+	// 			`${baseCommand} 'Battery Low' 'Battery is at ${perc}%.\nPlug the charger.'`,
+	// 		);
+	// 	if (perc <= 5)
+	// 		return execAsync(
+	// 			`${baseCommand} 'Battery Critical' 'Battery is at ${perc}%.\nPlug the charger.'`,
+	// 		);
+	// });
+
+	createEffect(() => {
+		const perc = Math.round(percentage() * 100);
+		const charging = isCharging();
+		const icon = iconName();
 
 		const baseCommand = `notify-send -a 'Battery Manager' -i ${icon}`;
 

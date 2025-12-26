@@ -1,27 +1,27 @@
-import { escapeMarkup, marquee } from "@/util/text";
+import { setIsMediaPlayerVisible } from "@/app";
 import { defaultConfig } from "@/constants/config";
 import type { SongData } from "@/types/lyrics";
-import { fileExists } from "@/util/file";
-import { execAsync } from "ags/process";
 import { config } from "@/util/config";
-import { writeFile } from "ags/file";
-import { Gdk, Gtk } from "ags/gtk4";
-import Mpris from "gi://AstalMpris";
-import Gio from "gi://Gio";
+import { fileExists } from "@/util/file";
 import {
 	convertToLrc,
 	formatLyricsTooltip,
 	parseLyricsData,
 	useSong,
 } from "@/util/lyrics";
+import { escapeMarkup, marquee } from "@/util/text";
 import {
+	type Accessor,
 	createBinding,
 	createComputed,
 	createRoot,
 	jsx,
-	type Accessor,
 } from "ags";
-import { setIsMediaPlayerVisible } from "@/app";
+import { writeFile } from "ags/file";
+import { Gdk, Gtk } from "ags/gtk4";
+import { execAsync } from "ags/process";
+import Mpris from "gi://AstalMpris";
+import Gio from "gi://Gio";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -50,24 +50,43 @@ export default function Media({
 	const coverArt = createBinding(spotify, "cover_art");
 	const available = createBinding(spotify, "available");
 
-	const mainMetadata = createComputed([
-		track,
-		artist,
-		album,
-		volume,
-		position,
-		available
+	// const mainMetadata = createComputed([
+	// 	track,
+	// 	artist,
+	// 	album,
+	// 	volume,
+	// 	position,
+	// 	available,
+	// ]);
+	const mainMetadata: Accessor<
+		[string, string, string, number, number, boolean]
+	> = createComputed(() => [
+		track(),
+		artist(),
+		album(),
+		volume(),
+		position(),
+		available(),
 	]);
 
-	const lyricsState = createComputed([song, position]);
+	// const lyricsState = createComputed([song, position]);
+	const lyricsState: Accessor<[SongData | null, number]> = createComputed(
+		() => [song(), position()],
+	);
 
-	const coverVisibleState = createComputed([coverArt, available], transformCoverVisible)
+	// const coverVisibleState = createComputed(
+	// 	[coverArt, available],
+	// 	transformCoverVisible,
+	// );
+	const coverVisibleState = createComputed(() =>
+		transformCoverVisible(coverArt(), available()),
+	);
 
 	function transformCoverVisible(coverArt: string, available: boolean) {
 		return available && !!coverArt && fileExists(coverArt);
 	}
 
-	function transformMediaLabel([track, artist,,,, isAvailable]: [
+	function transformMediaLabel([track, artist, , , , isAvailable]: [
 		string,
 		string,
 		string,
@@ -77,17 +96,17 @@ export default function Media({
 	]) {
 		if (!track || !artist || !isAvailable) return "No Media Playing";
 
-		return `${marquee(`${artist} - ${track}`, config.get()?.mediaMaxLength ?? defaultConfig.mediaMaxLength)}`;
+		return `${marquee(`${artist} - ${track}`, config.peek()?.mediaMaxLength ?? defaultConfig.mediaMaxLength)}`;
 	}
 
-	function transformMediaTooltip([track, artist, album, volume,, isAvailable]: [
-		string,
-		string,
-		string,
-		number,
-		number,
-		boolean,
-	]) {
+	function transformMediaTooltip([
+		track,
+		artist,
+		album,
+		volume,
+		,
+		isAvailable,
+	]: [string, string, string, number, number, boolean]) {
 		if (!track || !artist || !album || !isAvailable) return "";
 
 		return [
@@ -98,7 +117,7 @@ export default function Media({
 		].join("\n");
 	}
 
-	function transformMediaHasTooltip([track, artist, album,,, isAvailable]: [
+	function transformMediaHasTooltip([track, artist, album, , , isAvailable]: [
 		string,
 		string,
 		string,
@@ -153,7 +172,7 @@ export default function Media({
 		return true;
 	}
 
-	function transformMediaIcon([track, artist,,,, isAvailable]: [
+	function transformMediaIcon([track, artist, , , , isAvailable]: [
 		string,
 		string,
 		string,
@@ -167,7 +186,7 @@ export default function Media({
 	}
 
 	function handleIconLeftClick() {
-		const cover = coverArt.get();
+		const cover = coverArt.peek();
 
 		if (!cover || !fileExists(cover)) return;
 
@@ -175,24 +194,24 @@ export default function Media({
 	}
 
 	function handleIconMiddleClick() {
-		const cover = coverArt.get();
+		const cover = coverArt.peek();
 
 		if (!cover || !fileExists(cover) || !spotify.available) return;
 
 		if (
 			!fileExists(
-				config.get().paths?.saveFolder ??
+				config.peek().paths?.saveFolder ??
 					defaultConfig.paths.saveFolder,
 				true,
 			)
 		)
 			Gio.File.new_for_path(
-				config.get().paths?.saveFolder ??
+				config.peek().paths?.saveFolder ??
 					defaultConfig.paths.saveFolder,
 			).make_directory_with_parents(null);
 
 		const destFile = Gio.File.new_for_path(
-			`${config.get().paths?.saveFolder ?? defaultConfig.paths.saveFolder}/${spotify.trackid?.split("/").pop()}.png`,
+			`${config.peek().paths?.saveFolder ?? defaultConfig.paths.saveFolder}/${spotify.trackid?.split("/").pop()}.png`,
 		);
 		Gio.File.new_for_path(cover).copy(
 			destFile,
@@ -212,13 +231,13 @@ export default function Media({
 		if (deltaY < 0) {
 			spotify.set_volume(
 				spotify.volume +
-					(config.get().volumeStep?.media ??
+					(config.peek().volumeStep?.media ??
 						defaultConfig.volumeStep.media),
 			);
 		} else if (deltaY > 0) {
 			spotify?.set_volume(
 				spotify.volume -
-					(config.get().volumeStep?.media ??
+					(config.peek().volumeStep?.media ??
 						defaultConfig.volumeStep.media),
 			);
 		}
@@ -248,7 +267,7 @@ export default function Media({
 	}
 
 	function handleLyricsLeftClick() {
-		const songData = song.get();
+		const songData = song.peek();
 
 		if (!songData) return;
 
@@ -268,7 +287,7 @@ export default function Media({
 	}
 
 	function handleLyricsMiddleClick() {
-		const songData = song.get();
+		const songData = song.peek();
 
 		if (!songData) return;
 
@@ -276,17 +295,17 @@ export default function Media({
 
 		if (!lyrics) return;
 
-		const path = `${config.get().paths?.saveFolder ?? defaultConfig.paths.saveFolder}/${songData.trackId.split("/").pop()}.lrc`;
+		const path = `${config.peek().paths?.saveFolder ?? defaultConfig.paths.saveFolder}/${songData.trackId.split("/").pop()}.lrc`;
 
 		if (
 			!fileExists(
-				config.get().paths?.saveFolder ??
+				config.peek().paths?.saveFolder ??
 					defaultConfig.paths.saveFolder,
 				true,
 			)
 		)
 			Gio.File.new_for_path(
-				config.get().paths?.saveFolder ??
+				config.peek().paths?.saveFolder ??
 					defaultConfig.paths.saveFolder,
 			).make_directory_with_parents(null);
 

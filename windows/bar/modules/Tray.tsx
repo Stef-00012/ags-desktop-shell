@@ -1,6 +1,6 @@
 import { type Accessor, createBinding, createState, For } from "ags";
-import AstalTray from "gi://AstalTray";
 import { Gdk, Gtk } from "ags/gtk4";
+import AstalTray from "gi://AstalTray";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -16,7 +16,7 @@ export default function Tray({ class: className }: Props) {
 
 	function handleLeftClick() {
 		if (popover) {
-			if (isPopoverOpen.get()) {
+			if (isPopoverOpen.peek()) {
 				setIsPopoverOpen(false);
 				popover.popdown();
 				popover.set_css_classes(
@@ -111,7 +111,7 @@ export default function Tray({ class: className }: Props) {
 										}}
 										onReleased={() => {
 											if (popovermenu) {
-												if (isPopoverMenuOpen.get()) {
+												if (isPopoverMenuOpen.peek()) {
 													setIsPopoverMenuOpen(false);
 													popovermenu.popdown();
 													popovermenu.set_css_classes(

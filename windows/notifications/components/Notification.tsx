@@ -1,17 +1,17 @@
-import { escapeMarkup, parseMarkdown } from "@/util/text";
 import { defaultConfig } from "@/constants/config";
-import { sleep, Timer } from "@/util/timer";
-import type Notifd from "gi://AstalNotifd";
+import { config } from "@/util/config";
 import { fileExists } from "@/util/file";
 import { time } from "@/util/formatTime";
-import { urgency } from "@/util/notif";
-import { config } from "@/util/config";
 import { isIcon } from "@/util/icons";
-import { createState } from "ags";
-import Pango from "gi://Pango";
+import { urgency } from "@/util/notif";
+import { escapeMarkup, parseMarkdown } from "@/util/text";
+import { sleep, Timer } from "@/util/timer";
+import { createState, onCleanup } from "ags";
 import { Gdk } from "ags/gtk4";
-import Gtk from "gi://Gtk";
 import Adw from "gi://Adw";
+import type Notifd from "gi://AstalNotifd";
+import Gtk from "gi://Gtk";
+import Pango from "gi://Pango";
 
 export default function Notification({
 	notification,
@@ -31,7 +31,7 @@ export default function Notification({
 
 	const expireTimeout =
 		notification.expireTimeout === -1
-			? (config.get().timeouts?.defaultNotificationExpire ??
+			? (config.peek().timeouts?.defaultNotificationExpire ??
 				defaultConfig.timeouts.defaultNotificationExpire)
 			: notification.expireTimeout;
 
@@ -48,9 +48,9 @@ export default function Notification({
 			setIsHidden(true);
 
 			await sleep(
-				(config.get().animationsDuration?.notification ??
+				(config.peek().animationsDuration?.notification ??
 					defaultConfig.animationsDuration.notification) -
-					(config.get().animationsDuration?.notification ??
+					(config.peek().animationsDuration?.notification ??
 						defaultConfig.animationsDuration.notification) *
 						0.6,
 			);
@@ -125,15 +125,16 @@ export default function Notification({
 				if (isNotificationCenter) self.set_reveal_child(true);
 				else {
 					await sleep(100);
-					self.set_reveal_child(!isHidden.get());
+					self.set_reveal_child(!isHidden.peek());
 				}
 
 				const unsubscribe = isHidden.subscribe(() => {
-					const hidden = isHidden.get();
+					const hidden = isHidden.peek();
 
 					if (hidden) {
 						self.set_reveal_child(false);
 						unsubscribe();
+						onCleanup(() => unsubscribe());
 					}
 				});
 			}}
@@ -230,7 +231,9 @@ export default function Notification({
 								class="summary"
 								halign={Gtk.Align.START}
 								xalign={0}
-								label={parseMarkdown(escapeMarkup(notification.summary))}
+								label={parseMarkdown(
+									escapeMarkup(notification.summary),
+								)}
 								useMarkup
 								ellipsize={Pango.EllipsizeMode.END}
 								wrapMode={Pango.WrapMode.CHAR}

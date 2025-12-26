@@ -12,7 +12,7 @@ import type {
 	NetworkStat,
 } from "@/types/systemStats";
 import { config } from "@/util/config";
-import { createState } from "ags";
+import { createEffect, createState } from "ags";
 import { readFileAsync } from "ags/file";
 import { execAsync } from "ags/process";
 import { interval } from "ags/time";
@@ -333,12 +333,25 @@ function handleInterval() {
 }
 
 let currentInterval =
-	config.get()?.systemStatsUpdateInterval ||
+	config.peek()?.systemStatsUpdateInterval ||
 	defaultConfig.systemStatsUpdateInterval;
 let systemStatsInterval = interval(currentInterval, handleInterval);
 
-config.subscribe(() => {
-	const newConfig = config.get();
+// config.subscribe(() => {
+// 	const newConfig = config.peek();
+
+// 	if (newConfig.systemStatsUpdateInterval !== currentInterval) {
+// 		systemStatsInterval.cancel();
+
+// 		currentInterval =
+// 			newConfig?.systemStatsUpdateInterval ||
+// 			defaultConfig.systemStatsUpdateInterval;
+// 		systemStatsInterval = interval(currentInterval, handleInterval);
+// 	}
+// });
+
+createEffect(() => {
+	const newConfig = config();
 
 	if (newConfig.systemStatsUpdateInterval !== currentInterval) {
 		systemStatsInterval.cancel();

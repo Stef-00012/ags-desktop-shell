@@ -1,32 +1,32 @@
-import { tooltipCurrentSong, lyricsSourceColor } from "@/constants/colors";
-import { fetch, Headers, URL, URLSearchParams } from "@/util/fetch";
-import { colorText, escapeMarkup } from "@/util/text";
+import { lyricsSourceColor, tooltipCurrentSong } from "@/constants/colors";
 import { defaultConfig } from "@/constants/config";
-import { readFile, writeFile } from "ags/file";
-import { createState, onCleanup } from "ags";
-import { fileExists } from "@/util/file";
-import type Mpris from "gi://AstalMpris";
-import { config } from "@/util/config";
-import { timeout } from "ags/time";
-import Soup from "gi://Soup";
 import type {
-	MusixmatchSearchResult,
-	UsertokenResponse,
-	FormattedLyrics,
 	FormattedLyric,
+	FormattedLyrics,
 	LyricsOutput,
+	MusixmatchSearchResult,
 	ParsedLyrics,
-	TokenData,
 	SongData,
 	Sources,
+	TokenData,
+	UsertokenResponse,
 } from "@/types/lyrics";
+import { config } from "@/util/config";
+import { fetch, Headers, URL, URLSearchParams } from "@/util/fetch";
+import { fileExists } from "@/util/file";
+import { colorText, escapeMarkup } from "@/util/text";
+import { createState, onCleanup } from "ags";
+import { readFile, writeFile } from "ags/file";
+import { timeout } from "ags/time";
+import type Mpris from "gi://AstalMpris";
+import Soup from "gi://Soup?version=3.0";
 
 const sleep = (ms: number) =>
 	new Promise((resolve) => timeout(ms, () => resolve(null)));
 
 function saveMusixmatchToken(token: TokenData): void {
 	writeFile(
-		config.get().paths?.musixmatchToken ??
+		config.peek().paths?.musixmatchToken ??
 			defaultConfig.paths.musixmatchToken,
 		JSON.stringify(token),
 	);
@@ -35,14 +35,14 @@ function saveMusixmatchToken(token: TokenData): void {
 function getMusixmatchToken(): TokenData | null {
 	if (
 		!fileExists(
-			config.get().paths?.musixmatchToken ??
+			config.peek().paths?.musixmatchToken ??
 				defaultConfig.paths.musixmatchToken,
 		)
 	)
 		return null;
 
 	const content = readFile(
-		config.get().paths?.musixmatchToken ??
+		config.peek().paths?.musixmatchToken ??
 			defaultConfig.paths.musixmatchToken,
 	);
 
@@ -553,8 +553,8 @@ function parseLyrics(
 	for (const index in lyricsSplit) {
 		const lyricText = lyricsSplit[index].split(" ");
 
-		// @ts-ignore
-		const time = lyricText.shift().replace(/[\[\]]/g, "");
+		// @ts-expect-error
+		const time = lyricText.shift().replace(/[[\]]/g, "");
 		const text = lyricText.join(" ");
 
 		const minutes = time.split(":")[0];
@@ -583,7 +583,7 @@ function parseLyrics(
 
 		if (
 			instrumentalLyricIndicator &&
-			// @ts-ignore
+			// @ts-expect-error
 			(!lastTime || totalSeconds - lastTime > 3)
 		) {
 			lastTime = totalSeconds;
@@ -737,7 +737,7 @@ export function useSong(player: Mpris.Player) {
 	_updateLyrics();
 
 	const id = player.connect("notify::metadata", () => {
-		if (player.trackid === song.get()?.trackId) return;
+		if (player.trackid === song.peek()?.trackId) return;
 
 		_updateLyrics();
 	});
@@ -764,7 +764,7 @@ export function useSong(player: Mpris.Player) {
 		});
 
 		const lyricsFolder =
-			config.get().paths?.lyricsFolder ??
+			config.peek().paths?.lyricsFolder ??
 			defaultConfig.paths.lyricsFolder;
 
 		const lyricsFile = `${lyricsFolder}/${player.trackid?.split("/").pop()}.lrc`;

@@ -1,7 +1,7 @@
-import { type Accessor, createState } from "ags";
 import { setIsSessionMenuVisible } from "@/app";
-import { execAsync } from "ags/process";
+import { type Accessor, createState } from "ags";
 import { Gdk, Gtk } from "ags/gtk4";
+import { execAsync } from "ags/process";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -17,7 +17,7 @@ export default function Power({ class: className }: Props) {
 
 	function handleRightClick() {
 		if (popover) {
-			if (isPopoverOpen.get()) {
+			if (isPopoverOpen.peek()) {
 				setIsPopoverOpen(false);
 				popover.popdown();
 				popover.set_css_classes(

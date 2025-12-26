@@ -1,6 +1,6 @@
-import { createState, With, type Accessor } from "ags";
-import { createPoll } from "ags/time";
+import { type Accessor, createState, With } from "ags";
 import { Gdk, Gtk } from "ags/gtk4";
+import { createPoll } from "ags/time";
 
 interface Props {
 	class?: string | Accessor<string>;
@@ -34,7 +34,7 @@ export default function Time({ class: className }: Props) {
 
 	function rightClickHandler() {
 		if (popover) {
-			if (isPopoverOpen.get()) {
+			if (isPopoverOpen.peek()) {
 				setIsPopoverOpen(false);
 				popover.popdown();
 				popover.set_css_classes(

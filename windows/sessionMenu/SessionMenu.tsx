@@ -1,13 +1,13 @@
 import { defaultConfig } from "@/constants/config";
 import type { Config } from "@/types/config";
-import type { Accessor, Setter } from "ags";
-import { execAsync } from "ags/process";
 import { config } from "@/util/config";
-import { barHeight } from "@/windows/bar/Bar";
 import { sleep } from "@/util/timer";
+import { barHeight } from "@/windows/bar/Bar";
+import { type Accessor, createEffect, type Setter } from "ags";
 import { Gdk, Gtk } from "ags/gtk4";
-import Pango from "gi://Pango";
+import { execAsync } from "ags/process";
 import Adw from "gi://Adw";
+import Pango from "gi://Pango";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -68,9 +68,30 @@ export default function SessionMenu({
 				const revealer = self.child as Gtk.Revealer;
 				const transitionDuration = revealer.get_transition_duration();
 
-				isVisible.subscribe(async () => {
+				// isVisible.subscribe(async () => {
+				// 	const classes = self.cssClasses;
+				// 	const visible = isVisible.peek();
+
+				// 	if (!visible) {
+				// 		revealer.set_reveal_child(visible);
+				// 		self.set_css_classes(
+				// 			classes.filter((className) => className !== "open"),
+				// 		);
+
+				// 		await sleep(transitionDuration);
+				// 	}
+
+				// 	self.set_visible(visible);
+
+				// 	if (visible) {
+				// 		revealer.set_reveal_child(visible);
+				// 		self.set_css_classes([...classes, "open"]);
+				// 	}
+				// });
+
+				createEffect(async () => {
 					const classes = self.cssClasses;
-					const visible = isVisible.get();
+					const visible = isVisible();
 
 					if (!visible) {
 						revealer.set_reveal_child(visible);

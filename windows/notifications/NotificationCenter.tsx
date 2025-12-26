@@ -1,13 +1,19 @@
-import { type Accessor, createBinding, For, type Setter } from "ags";
-import Notification from "./components/Notification";
 import { defaultConfig } from "@/constants/config";
 import { config } from "@/util/config";
 import { isIcon } from "@/util/icons";
-import Notifd from "gi://AstalNotifd";
-import { barHeight } from "@/windows/bar/Bar";
-import { sleep } from "@/util/timer";
-import { Gtk, Gdk } from "ags/gtk4";
 import clearNotifications from "@/util/notifications";
+import { sleep } from "@/util/timer";
+import { barHeight } from "@/windows/bar/Bar";
+import {
+	type Accessor,
+	createBinding,
+	createEffect,
+	For,
+	type Setter,
+} from "ags";
+import { Gdk, Gtk } from "ags/gtk4";
+import Notifd from "gi://AstalNotifd";
+import Notification from "./components/Notification";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -110,9 +116,30 @@ export default function NotificationCenter({
 				const revealer = self.child as Gtk.Revealer;
 				const transitionDuration = revealer.get_transition_duration();
 
-				isVisible.subscribe(async () => {
+				// isVisible.subscribe(async () => {
+				// 	const classes = self.cssClasses;
+				// 	const visible = isVisible.peek();
+
+				// 	if (!visible) {
+				// 		revealer.set_reveal_child(visible);
+				// 		self.set_css_classes(
+				// 			classes.filter((className) => className !== "open"),
+				// 		);
+
+				// 		await sleep(transitionDuration);
+				// 	}
+
+				// 	self.set_visible(visible);
+
+				// 	if (visible) {
+				// 		revealer.set_reveal_child(visible);
+				// 		self.set_css_classes([...classes, "open"]);
+				// 	}
+				// });
+
+				createEffect(async () => {
 					const classes = self.cssClasses;
-					const visible = isVisible.get();
+					const visible = isVisible();
 
 					if (!visible) {
 						revealer.set_reveal_child(visible);
@@ -190,8 +217,10 @@ export default function NotificationCenter({
 									null,
 								)}
 								onClicked={async () => {
-									for (const category of notificationCategories.get()) {
-										await clearNotifications(category.notifications)
+									for (const category of notificationCategories.peek()) {
+										await clearNotifications(
+											category.notifications,
+										);
 									}
 								}}
 							/>
@@ -268,7 +297,9 @@ export default function NotificationCenter({
 													null,
 												)}
 												onClicked={async () => {
-													await clearNotifications(notificationCategory.notifications)
+													await clearNotifications(
+														notificationCategory.notifications,
+													);
 												}}
 											/>
 										</box>
@@ -285,8 +316,8 @@ export default function NotificationCenter({
 											),
 										)}
 
-										{index.get() !==
-											notificationCategories.get()
+										{index.peek() !==
+											notificationCategories.peek()
 												.length -
 												1 && (
 											<Gtk.Separator

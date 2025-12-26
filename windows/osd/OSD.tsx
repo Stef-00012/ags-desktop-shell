@@ -1,13 +1,13 @@
-import { type Accessor, createComputed, createState } from "ags";
-import { monitorFile, readFileAsync } from "ags/file";
 import { defaultConfig } from "@/constants/config";
-import { type Gdk, Gtk } from "ags/gtk4";
-import type AstalIO from "gi://AstalIO";
 import { config } from "@/util/config";
 import { sleep } from "@/util/timer";
+import { type Accessor, createComputed, createEffect, createState } from "ags";
+import { monitorFile, readFileAsync } from "ags/file";
+import { type Gdk, Gtk } from "ags/gtk4";
 import { timeout } from "ags/time";
-import giCairo from "gi://cairo";
+import type AstalIO from "gi://AstalIO";
 import Wp from "gi://AstalWp";
+import giCairo from "gi://cairo";
 import GLib from "gi://GLib";
 
 interface Props {
@@ -26,9 +26,12 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 	const defaultMicrophone = wp?.audio.defaultMicrophone;
 
 	const [isVisible, setIsVisible] = createState(false);
-	const visibleState = createComputed(
-		[isVisible, hidden],
-		transformVisibleState,
+	// const visibleState = createComputed(
+	// 	[isVisible, hidden],
+	// 	transformVisibleState,
+	// );
+	const visibleState = createComputed(() =>
+		transformVisibleState(isVisible(), hidden()),
 	);
 
 	let lastTimeout: AstalIO.Time;
@@ -57,15 +60,15 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 	defaultMicrophone?.connect("notify::mute", updateMicrophoneState);
 
 	const dir = GLib.Dir.open(
-		config.get().paths?.backlightBaseDir ??
+		config.peek().paths?.backlightBaseDir ??
 			defaultConfig.paths.backlightBaseDir,
 		0,
 	);
 	const backlightDirName = dir.read_name();
 
 	if (backlightDirName) {
-		const backlightCurrentPath = `${config.get().paths?.backlightBaseDir ?? defaultConfig.paths.backlightBaseDir}/${backlightDirName}/brightness`;
-		const backlightMaxPath = `${config.get().paths?.backlightBaseDir ?? defaultConfig.paths.backlightBaseDir}/${backlightDirName}/max_brightness`;
+		const backlightCurrentPath = `${config.peek().paths?.backlightBaseDir ?? defaultConfig.paths.backlightBaseDir}/${backlightDirName}/brightness`;
+		const backlightMaxPath = `${config.peek().paths?.backlightBaseDir ?? defaultConfig.paths.backlightBaseDir}/${backlightDirName}/max_brightness`;
 
 		monitorFile(backlightCurrentPath, async () => {
 			const [currentString, maxString] = await Promise.all([
@@ -86,7 +89,7 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 
 			if (lastTimeout) lastTimeout.cancel();
 			lastTimeout = timeout(
-				config.get().timeouts?.osd ?? defaultConfig.timeouts.osd,
+				config.peek().timeouts?.osd ?? defaultConfig.timeouts.osd,
 				() => {
 					setIsVisible(false);
 				},
@@ -118,7 +121,7 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 
 		if (lastTimeout) lastTimeout.cancel();
 		lastTimeout = timeout(
-			config.get().timeouts?.osd ?? defaultConfig.timeouts.osd,
+			config.peek().timeouts?.osd ?? defaultConfig.timeouts.osd,
 			() => {
 				setIsVisible(false);
 			},
@@ -144,7 +147,7 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 
 		if (lastTimeout) lastTimeout.cancel();
 		lastTimeout = timeout(
-			config.get().timeouts?.osd ?? defaultConfig.timeouts.osd,
+			config.peek().timeouts?.osd ?? defaultConfig.timeouts.osd,
 			() => {
 				setIsVisible(false);
 			},
@@ -167,8 +170,24 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 				const revealer = self.child as Gtk.Revealer;
 				const transitionDuration = revealer.get_transition_duration();
 
-				visibleState.subscribe(async () => {
-					const visible = visibleState.get();
+				// visibleState.subscribe(async () => {
+				// 	const visible = visibleState.peek();
+
+				// 	if (!visible) {
+				// 		revealer.set_reveal_child(visible);
+
+				// 		await sleep(transitionDuration);
+				// 	}
+
+				// 	self.set_visible(visible);
+
+				// 	if (visible) {
+				// 		revealer.set_reveal_child(visible);
+				// 	}
+				// });
+
+				createEffect(async () => {
+					const visible = visibleState();
 
 					if (!visible) {
 						revealer.set_reveal_child(visible);

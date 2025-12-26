@@ -1,6 +1,12 @@
-import { createBinding, createComputed, createState, type Accessor } from "ags";
 import { defaultConfig } from "@/constants/config";
 import { config } from "@/util/config";
+import {
+	type Accessor,
+	createBinding,
+	createComputed,
+	createEffect,
+	createState,
+} from "ags";
 import { Gtk } from "ags/gtk4";
 import Wp from "gi://AstalWp";
 
@@ -28,9 +34,18 @@ export default function Speaker({ class: className }: Props) {
 		speaker.get_pw_property("device.api") === "bluez5",
 	);
 
-	const icon = createComputed([iconName, volume, isMuted], transformIcon);
+	// const icon = createComputed([iconName, volume, isMuted], transformIcon);
+	const icon = createComputed(() =>
+		transformIcon(iconName(), volume(), isMuted()),
+	);
 
-	device.subscribe(() => {
+	// device.subscribe(() => {
+	// 	setIsBluetooth(speaker.get_pw_property("device.api") === "bluez5");
+	// });
+
+	createEffect(() => {
+		const _device = device();
+
 		setIsBluetooth(speaker.get_pw_property("device.api") === "bluez5");
 	});
 
@@ -57,13 +72,13 @@ export default function Speaker({ class: className }: Props) {
 		if (deltaY < 0)
 			speaker?.set_volume(
 				speaker.volume +
-					(config.get().volumeStep?.speaker ??
+					(config.peek().volumeStep?.speaker ??
 						defaultConfig.volumeStep.speaker),
 			);
 		else if (deltaY > 0)
 			speaker?.set_volume(
 				speaker.volume -
-					(config.get().volumeStep?.speaker ??
+					(config.peek().volumeStep?.speaker ??
 						defaultConfig.volumeStep.speaker),
 			);
 	}

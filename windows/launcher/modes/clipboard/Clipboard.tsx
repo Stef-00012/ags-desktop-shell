@@ -5,7 +5,7 @@ import {
 	fuzzySearch,
 	updateClipboardEntries,
 } from "@/util/clipboard";
-import { type Accessor, createState, For } from "ags";
+import { type Accessor, createEffect, createState, For } from "ags";
 import { Gdk, Gtk } from "ags/gtk4";
 import type { PressedKey } from "../../Launcher";
 
@@ -28,67 +28,112 @@ export default function ClipboardMode({
 
 	const [filteredClipboard, setFilteredClipboard] = createState<
 		ClipboardEntry[]
-	>(clipboardEntries.get());
+	>(clipboardEntries.peek());
 
-	visible.subscribe(() => {
-		if (!visible.get()) return;
+	createEffect(() => {
+		if (searchValue() && visible()) {
+			const value = searchValue();
 
-		const value = searchValue.get();
-		console.log(value, !value);
-		if (!value) return setFilteredClipboard(clipboardEntries.get());
-	});
+			const clipboardData = clipboardEntries();
 
-	clipboardEntries.subscribe(() => {
-		if (!visible.get()) return;
+			if (!value) setFilteredClipboard(clipboardData);
+			else {
+				const filtered = fuzzySearch(clipboardData, value);
 
-		const clipboardData = clipboardEntries.get();
+				setFilteredClipboard(filtered);
+			}
+		}
 
-		const value = searchValue.get();
-		if (!value) return setFilteredClipboard(clipboardData);
+		if (pressedKey() && visible()) {
+			const keyData = pressedKey();
 
-		const filtered = fuzzySearch(clipboardData, value);
+			if (keyData && keyData.keyval === Gdk.KEY_Escape) {
+				close();
+			}
+		}
 
-		setFilteredClipboard(filtered);
-	});
+		if (enterPressed() && visible()) {
+			const clipboarData = filteredClipboard();
 
-	pressedKey.subscribe(() => {
-		if (!visible.get()) return;
+			if (clipboarData.length <= 0) close();
+			else {
+				const entry = clipboarData[0];
 
-		const keyData = pressedKey.get();
+				copyClipboardEntry(entry);
+			}
+		}
 
-		if (!keyData) return;
+		if (searchValue() && visible()) {
+			const clipboardData = clipboardEntries();
 
-		if (keyData.keyval === Gdk.KEY_Escape) {
-			close();
+			const value = searchValue();
+			if (!value) return setFilteredClipboard(clipboardData);
 
-			return;
+			const filtered = fuzzySearch(clipboardData, value);
+
+			setFilteredClipboard(filtered);
 		}
 	});
 
-	enterPressed.subscribe(() => {
-		if (!enterPressed.get() || !visible.get()) return;
+	// visible.subscribe(() => {
+	// 	if (!visible.peek()) return;
 
-		const clipboarData = filteredClipboard.get();
+	// 	const value = searchValue.peek();
+	// 	console.log(value, !value);
+	// 	if (!value) return setFilteredClipboard(clipboardEntries.peek());
+	// });
 
-		if (clipboarData.length <= 0) return close();
+	// clipboardEntries.subscribe(() => {
+	// 	if (!visible.peek()) return;
 
-		const entry = clipboarData[0];
+	// 	const clipboardData = clipboardEntries.peek();
 
-		copyClipboardEntry(entry);
-	});
+	// 	const value = searchValue.peek();
+	// 	if (!value) return setFilteredClipboard(clipboardData);
 
-	searchValue.subscribe(() => {
-		if (!visible.get()) return;
+	// 	const filtered = fuzzySearch(clipboardData, value);
 
-		const clipboardData = clipboardEntries.get();
+	// 	setFilteredClipboard(filtered);
+	// });
 
-		const value = searchValue.get();
-		if (!value) return setFilteredClipboard(clipboardData);
+	// pressedKey.subscribe(() => {
+	// 	if (!visible.peek()) return;
 
-		const filtered = fuzzySearch(clipboardData, value);
+	// 	const keyData = pressedKey.peek();
 
-		setFilteredClipboard(filtered);
-	});
+	// 	if (!keyData) return;
+
+	// 	if (keyData.keyval === Gdk.KEY_Escape) {
+	// 		close();
+
+	// 		return;
+	// 	}
+	// });
+
+	// enterPressed.subscribe(() => {
+	// 	if (!enterPressed.peek() || !visible.peek()) return;
+
+	// 	const clipboarData = filteredClipboard.peek();
+
+	// 	if (clipboarData.length <= 0) return close();
+
+	// 	const entry = clipboarData[0];
+
+	// 	copyClipboardEntry(entry);
+	// });
+
+	// searchValue.subscribe(() => {
+	// 	if (!visible.peek()) return;
+
+	// 	const clipboardData = clipboardEntries.peek();
+
+	// 	const value = searchValue.peek();
+	// 	if (!value) return setFilteredClipboard(clipboardData);
+
+	// 	const filtered = fuzzySearch(clipboardData, value);
+
+	// 	setFilteredClipboard(filtered);
+	// });
 
 	return (
 		<box

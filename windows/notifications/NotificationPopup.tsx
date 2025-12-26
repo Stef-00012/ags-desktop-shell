@@ -1,16 +1,17 @@
-import Notification from "./components/Notification";
-import { Astal, type Gdk, Gtk } from "ags/gtk4";
-import Notifd from "gi://AstalNotifd";
-import { timeout } from "ags/time";
-import giCairo from "gi://cairo";
 import {
-	For,
 	type Accessor,
 	createBinding,
 	createComputed,
+	createEffect,
 	createState,
+	For,
 	onCleanup,
 } from "ags";
+import { Astal, type Gdk, Gtk } from "ags/gtk4";
+import { timeout } from "ags/time";
+import Notifd from "gi://AstalNotifd";
+import giCairo from "gi://cairo";
+import Notification from "./components/Notification";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
@@ -32,6 +33,8 @@ export default function NotificationPopups({ gdkmonitor, hidden }: Props) {
 
 	const notifiedHandler = notifd.connect("notified", (_, id, replaced) => {
 		const notification = notifd.get_notification(id);
+
+		if (!notification) return;
 
 		if (replaced) {
 			setNotifications((notifs) => {
@@ -67,7 +70,9 @@ export default function NotificationPopups({ gdkmonitor, hidden }: Props) {
 	let notificationContainer: Gtk.Box | null;
 	let window: Gtk.Window | null;
 
-	notifications.subscribe(() => {
+	createEffect(() => {
+		const _notifs = notifications();
+
 		timeout(400, () => {
 			if (!window || !notificationContainer) return;
 
@@ -97,11 +102,44 @@ export default function NotificationPopups({ gdkmonitor, hidden }: Props) {
 		});
 	});
 
+	// notifications.subscribe(() => {
+	// 	timeout(400, () => {
+	// 		if (!window || !notificationContainer) return;
+
+	// 		const [_success, bounds] =
+	// 			notificationContainer.compute_bounds(window);
+
+	// 		const height = bounds.get_height();
+	// 		const width = bounds.get_width();
+	// 		const x = bounds.get_x();
+	// 		const y = bounds.get_y();
+
+	// 		const surface = window.get_surface();
+
+	// 		const region = new giCairo.Region();
+
+	// 		// @ts-expect-error
+	// 		region.unionRectangle(
+	// 			new giCairo.Rectangle({
+	// 				x,
+	// 				y,
+	// 				height,
+	// 				width,
+	// 			}),
+	// 		);
+
+	// 		surface?.set_input_region(region);
+	// 	});
+	// });
+
+	// const windowVisibility = createComputed(
+	// 	[hidden, notifications, doNotDisturb],
+	// 	(hidden, notifications, doNotDisturb) => {
+	// 		return !hidden && !doNotDisturb && notifications.length > 0;
+	// 	},
+	// );
 	const windowVisibility = createComputed(
-		[hidden, notifications, doNotDisturb],
-		(hidden, notifications, doNotDisturb) => {
-			return !hidden && !doNotDisturb && notifications.length > 0;
-		},
+		() => !hidden() && !doNotDisturb() && notifications().length > 0,
 	);
 
 	return (

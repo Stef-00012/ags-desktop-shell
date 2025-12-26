@@ -12,7 +12,7 @@ const [currentMarquee, setCurrentMarquee] = createState<{
 export function marquee(text: string, width: number): string {
 	if (text.length <= width) return text;
 
-	const marqueeData = currentMarquee.get();
+	const marqueeData = currentMarquee.peek();
 
 	if (marqueeData.text !== text) {
 		setCurrentMarquee({
@@ -73,7 +73,10 @@ export function escapeMarkup(text: string): string {
 	// Pattern for closing </a> tags
 	const aClosePattern = `<\\/a\\s*>`;
 
-	const tagRegex = new RegExp(`(${aOpenWithHrefPattern}|${aClosePattern}|${nonATagsPattern})`, 'gi');
+	const tagRegex = new RegExp(
+		`(${aOpenWithHrefPattern}|${aClosePattern}|${nonATagsPattern})`,
+		"gi",
+	);
 	const protectedText = text.replace(tagRegex, replaceTagWithPlaceholder);
 
 	// Escape remaining markup
@@ -83,22 +86,26 @@ export function escapeMarkup(text: string): string {
 		.replace(/>/g, "&gt;");
 
 	// Restore placeholders back to original allowed tags
-	const restored = escaped.replace(/__ALLOWED_TAG_\d+__/g, (ph) => placeholders[ph] || ph);
+	const restored = escaped.replace(
+		/__ALLOWED_TAG_\d+__/g,
+		(ph) => placeholders[ph] || ph,
+	);
 
 	return restored;
 }
 
 export function parseMarkdown(message: string): string {
 	let output = message;
-	const urlRegex = /(?:\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)|\[([^\]]+)\]\(<(https?:\/\/[^\s>]+)>\)|\[([^\]]+)\]\(&lt;(https?:\/\/[^&]+)&gt;\))/g;
-		// /(https?:\/\/[^\s\)]+)|<(https?:\/\/[^\s>]+)>|&lt;(https?:\/\/[^&]+)&gt;|(https?:\/\/[^\s\[\]<g>()]+)/g
-		// /(?:\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)|\[([^\]]+)\]\(<(https?:\/\/[^\s>]+)>\)|\[([^\]]+)\]\(&lt;(https?:\/\/[^&]+)&gt;\)|(https?:\/\/[^\s\[\]<g>()]+))/g;
-	const rawUrlRegex = /(?<!href=")(https?:\/\/[^\s\[\]<>()"]+)/g;
-	const htmlUrlRegex = /<a href="(.*)">(.*)<\/a>/g
+	const urlRegex =
+		/(?:\[([^\]]+)\]\((https?:\/\/[^\s)]+)\)|\[([^\]]+)\]\(<(https?:\/\/[^\s>]+)>\)|\[([^\]]+)\]\(&lt;(https?:\/\/[^&]+)&gt;\))/g;
+	// /(https?:\/\/[^\s\)]+)|<(https?:\/\/[^\s>]+)>|&lt;(https?:\/\/[^&]+)&gt;|(https?:\/\/[^\s\[\]<g>()]+)/g
+	// /(?:\[([^\]]+)\]\((https?:\/\/[^\s\)]+)\)|\[([^\]]+)\]\(<(https?:\/\/[^\s>]+)>\)|\[([^\]]+)\]\(&lt;(https?:\/\/[^&]+)&gt;\)|(https?:\/\/[^\s\[\]<g>()]+))/g;
+	const rawUrlRegex = /(?<!href=")(https?:\/\/[^\s[\]<>()"]+)/g;
+	const htmlUrlRegex = /<a href="(.*)">(.*)<\/a>/g;
 	const boldRegex = /\*\*(.+)\*\*/g;
 	const underlineRegex = /__(.+)__/g;
-	const italicRegexAsterisk = /\*(.+)\*/g
-	const italicRegexUnderline = /_(.+)_/g
+	const italicRegexAsterisk = /\*(.+)\*/g;
+	const italicRegexUnderline = /_(.+)_/g;
 	const monocodeRegex = /`([^`]+)`/g;
 	const strikethroughRegex = /~~(.+)~~/g;
 	const tripleBacktick = /```/g;
@@ -112,37 +119,31 @@ export function parseMarkdown(message: string): string {
 		.replace(tripleBacktick, () => "`")
 		.replace(monocodeRegex, (_match, text) => `<tt>${text}</tt>`)
 		.replace(urlRegex, (match, text1, url1, text2, url2, text3, url3) => {
-            if (url1) {
-                return colorText(
+			if (url1) {
+				return colorText(
 					`<a href="${url1}">${text1 || url1}</a>`,
 					urlColor,
 				);
-            } else if (url2) {
-                return colorText(
+			} else if (url2) {
+				return colorText(
 					`<a href="${url2}">${text2 || url2}</a>`,
 					urlColor,
 				);
-            } else if (url3) {
-                return colorText(
+			} else if (url3) {
+				return colorText(
 					`<a href="${url3}">${text3 || url3}</a>`,
 					urlColor,
 				);
-            }
+			}
 
 			// return `<a href="${match}">${match}</a>`
 			return match;
 		})
 		.replace(rawUrlRegex, (match) => {
-			return colorText(
-				`<a href="${match}">${match}</a>`,
-				urlColor,
-			);
+			return colorText(`<a href="${match}">${match}</a>`, urlColor);
 		})
 		.replace(htmlUrlRegex, (_match, url, text) => {
-			return colorText(
-				`<a href="${url}">${text}</a>`,
-				urlColor,
-			);
+			return colorText(`<a href="${url}">${text}</a>`, urlColor);
 		});
 
 	return output;

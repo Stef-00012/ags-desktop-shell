@@ -20,7 +20,7 @@ export function updateClipboardEntries() {
 			console.error(error);
 		})
 		.then((value) => {
-			console.log(value);
+			// console.log(value);
 			if (typeof value !== "string") {
 				return;
 			}
@@ -38,7 +38,7 @@ export function updateClipboardEntries() {
 					value: textParts.join("\t").trim(),
 				};
 			});
-			console.log(entries);
+			// console.log(entries);
 			setClipboardEntries(entries);
 		});
 }
