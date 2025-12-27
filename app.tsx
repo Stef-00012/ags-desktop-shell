@@ -239,6 +239,7 @@ app.start({
 			}
 
 			case "toggle-launcher-calculator": {
+				console.log("a", isSessionMenuVisible.peek());
 				if (isSessionMenuVisible.peek())
 					return res("session menu is currently open");
 

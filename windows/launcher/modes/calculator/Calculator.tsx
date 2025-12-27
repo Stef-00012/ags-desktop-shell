@@ -34,13 +34,15 @@ export default function CalculatorMode({
 	// });
 
 	createEffect(() => {
-		if (closed() && visible()) {
+		if (!visible()) return;
+
+		if (closed()) {
 			setHistory([]);
 			setResult(null);
 			close();
 		}
 
-		if (enterPressed() && visible()) {
+		if (enterPressed()) {
 			if (!enterPressed() || !visible()) return;
 
 			const res = result();
@@ -53,7 +55,7 @@ export default function CalculatorMode({
 			setResult(null);
 		}
 
-		if (pressedKey() && visible()) {
+		if (pressedKey()) {
 			const keyData = pressedKey();
 
 			if (!keyData) return;
@@ -67,7 +69,7 @@ export default function CalculatorMode({
 			}
 		}
 
-		if (searchValue() && visible()) {
+		if (searchValue()) {
 			const value = searchValue();
 			if (!value) return;
 

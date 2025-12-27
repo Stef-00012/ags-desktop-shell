@@ -31,7 +31,9 @@ export default function ClipboardMode({
 	>(clipboardEntries.peek());
 
 	createEffect(() => {
-		if (searchValue() && visible()) {
+		if (!visible()) return;
+
+		if (searchValue()) {
 			const value = searchValue();
 
 			const clipboardData = clipboardEntries();
@@ -44,7 +46,7 @@ export default function ClipboardMode({
 			}
 		}
 
-		if (pressedKey() && visible()) {
+		if (pressedKey()) {
 			const keyData = pressedKey();
 
 			if (keyData && keyData.keyval === Gdk.KEY_Escape) {
@@ -52,7 +54,7 @@ export default function ClipboardMode({
 			}
 		}
 
-		if (enterPressed() && visible()) {
+		if (enterPressed()) {
 			const clipboarData = filteredClipboard();
 
 			if (clipboarData.length <= 0) close();
@@ -63,7 +65,7 @@ export default function ClipboardMode({
 			}
 		}
 
-		if (searchValue() && visible()) {
+		if (searchValue()) {
 			const clipboardData = clipboardEntries();
 
 			const value = searchValue();
