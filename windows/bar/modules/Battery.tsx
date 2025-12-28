@@ -1,3 +1,4 @@
+import { defaultConfig } from "@/constants/config";
 import { config } from "@/util/config";
 import { formatSeconds } from "@/util/formatTime";
 import type { Accessor } from "ags";
@@ -79,7 +80,9 @@ export default function Battery({ class: className }: Props) {
 		const icon = iconName();
 
 		const baseCommand = `notify-send -a 'Battery Manager' -i ${icon}`;
-		const batteryFullPercentage = config.peek().batteryFullPercentage;
+		const batteryFullPercentage =
+			config.peek().batteryFullPercentage ??
+			defaultConfig.batteryFullPercentage;
 
 		if (charging && perc === batteryFullPercentage)
 			return execAsync(
