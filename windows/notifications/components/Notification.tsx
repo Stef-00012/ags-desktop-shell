@@ -10,6 +10,7 @@ import { createState, onCleanup } from "ags";
 import { Gdk } from "ags/gtk4";
 import Adw from "gi://Adw";
 import type Notifd from "gi://AstalNotifd";
+import Gio from "gi://Gio";
 import Gtk from "gi://Gtk";
 import Pango from "gi://Pango";
 
@@ -209,11 +210,20 @@ export default function Notification({
 
 						{notification.image &&
 							fileExists(notification.image) && (
-								<image
+								<Adw.Clamp
 									valign={Gtk.Align.START}
-									class="image"
-									file={notification.image}
-								/>
+									maximumSize={100}
+									widthRequest={100}
+									heightRequest={100}
+								>
+									<Gtk.Picture
+										valign={Gtk.Align.START}
+										class="image"
+										file={Gio.file_new_for_path(
+											notification.image,
+										)}
+									/>
+								</Adw.Clamp>
 							)}
 
 						{notification.image && isIcon(notification.image) && (

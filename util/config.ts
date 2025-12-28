@@ -1,13 +1,13 @@
-import { monitorFile, readFile } from "ags/file";
-import type { Config } from "@/types/config";
-import { fileExists } from "@/util/file";
-import { createState } from "ags";
-import Gio from "gi://Gio";
 import {
 	animationTypes,
 	configFilePath,
 	defaultConfig,
 } from "@/constants/config";
+import type { Config } from "@/types/config";
+import { fileExists } from "@/util/file";
+import { createState } from "ags";
+import { monitorFile, readFile } from "ags/file";
+import Gio from "gi://Gio";
 
 export const [config, setConfig] = createState<Config>(defaultConfig);
 
@@ -327,6 +327,18 @@ function validateConfig(config: Partial<Config>): boolean {
 		console.error(
 			"Invalid `systemStatsUpdateInterval` (must be greater or equal to 100):",
 			config.systemStatsUpdateInterval,
+		);
+		return false;
+	}
+
+	if (
+		config.batteryFullPercentage &&
+		(config.batteryFullPercentage > 100 ||
+			config.batteryFullPercentage < 10)
+	) {
+		console.error(
+			"Invalid `batteryFullPercentage` (must be between 10 and 100):",
+			config.batteryFullPercentage,
 		);
 		return false;
 	}

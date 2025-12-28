@@ -8,6 +8,7 @@ type _Config = {
 	sessionMenu: ConfigSessionMenu;
 	mediaMaxLength: number; // in seconds
 	systemStatsUpdateInterval: number; // in ms
+	batteryFullPercentage: number;
 };
 
 export type Config = Partial<_Config>;
