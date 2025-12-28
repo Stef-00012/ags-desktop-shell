@@ -18,7 +18,9 @@ import { Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
 import Apps from "gi://AstalApps";
 import Notifd from "gi://AstalNotifd";
+import { defaultConfig } from "./constants/config";
 import style from "./style.scss";
+import { config } from "./util/config";
 // import { watchForClipboardUpdates } from "./util/clipboard";
 import OSD from "./windows/osd/OSD";
 
@@ -239,7 +241,6 @@ app.start({
 			}
 
 			case "toggle-launcher-calculator": {
-				console.log("a", isSessionMenuVisible.peek());
 				if (isSessionMenuVisible.peek())
 					return res("session menu is currently open");
 
@@ -270,6 +271,21 @@ app.start({
 				// updateClipboardEntries();
 
 				return res("ok");
+			}
+
+			case "print-config": {
+				const outputConfig = {
+					...defaultConfig,
+					...config.peek(),
+				};
+
+				const outputConfigString = JSON.stringify(
+					outputConfig,
+					null,
+					4,
+				);
+
+				return res(outputConfigString);
 			}
 
 			default: {

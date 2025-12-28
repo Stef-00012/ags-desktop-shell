@@ -244,7 +244,10 @@ function validateConfig(config: Partial<Config>): boolean {
 		return false;
 	}
 
-	if (!Array.isArray(config.players?.blacklisted)) {
+	if (
+		config.players?.blacklisted &&
+		!Array.isArray(config.players?.blacklisted)
+	) {
 		console.error(
 			"Invalid `players.blacklisted` (must be an array of strings):",
 			config.players?.blacklisted,
@@ -252,7 +255,10 @@ function validateConfig(config: Partial<Config>): boolean {
 		return false;
 	}
 
-	if (!Array.isArray(config.players?.preferred)) {
+	if (
+		config.players?.preferred &&
+		!Array.isArray(config.players?.preferred)
+	) {
 		console.error(
 			"Invalid `players.preferred` (must be an array of strings):",
 			config.players?.preferred,
