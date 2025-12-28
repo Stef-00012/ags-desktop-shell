@@ -16,10 +16,12 @@ import {
 	createComputed,
 	createRoot,
 	jsx,
+	With,
 } from "ags";
 import { writeFile } from "ags/file";
 import { Gdk, Gtk } from "ags/gtk4";
 import { execAsync } from "ags/process";
+import Adw from "gi://Adw?version=1";
 import Mpris from "gi://AstalMpris";
 import Gio from "gi://Gio";
 
@@ -321,13 +323,25 @@ export default function Media({
 	return (
 		<box class={className}>
 			<box cursor={Gdk.Cursor.new_from_name("pointer", null)}>
-				<image
-					class={coverClass}
-					valign={Gtk.Align.CENTER}
-					visible={coverVisibleState}
-					file={coverArt}
-					overflow={Gtk.Overflow.HIDDEN}
-				/>
+				<box>
+					<With value={coverArt}>
+						{(value) => (
+							<Adw.Clamp
+								maximumSize={35}
+								widthRequest={35}
+								heightRequest={35}
+							>
+								<Gtk.Picture
+									class={coverClass}
+									valign={Gtk.Align.CENTER}
+									visible={coverVisibleState}
+									file={Gio.file_new_for_path(value)}
+									overflow={Gtk.Overflow.HIDDEN}
+								/>
+							</Adw.Clamp>
+						)}
+					</With>
+				</box>
 
 				<Gtk.GestureClick
 					button={Gdk.BUTTON_PRIMARY}
