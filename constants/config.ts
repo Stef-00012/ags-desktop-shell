@@ -62,4 +62,5 @@ export const defaultConfig = {
 	},
 	mediaMaxLength: 25,
 	systemStatsUpdateInterval: 1000,
+	batteryFullPercentage: 100,
 } satisfies Config;
