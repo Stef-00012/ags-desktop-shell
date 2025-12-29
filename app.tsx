@@ -1,14 +1,10 @@
 import clearNotifications from "@/util/notifications";
 import Bar from "@/windows/bar/Bar";
-import AppLauncher, { type LauncherMode } from "@/windows/launcher/Launcher";
-import MediaPlayer from "@/windows/mediaPlayer/MediaPlayer";
-import NotificationCenter from "@/windows/notifications/NotificationCenter";
-import NotificationPopups from "@/windows/notifications/NotificationPopup";
-import SessionMenu from "@/windows/sessionMenu/SessionMenu";
 import {
 	createBinding,
 	createComputed,
 	createEffect,
+	createRoot,
 	createState,
 	For,
 	onCleanup,
@@ -18,9 +14,17 @@ import { Gtk } from "ags/gtk4";
 import app from "ags/gtk4/app";
 import Apps from "gi://AstalApps";
 import Notifd from "gi://AstalNotifd";
+// import AppLauncher, { type LauncherMode } from "@/windows/launcher/Launcher";
+import MediaPlayer from "@/windows/mediaPlayer/MediaPlayer";
+import NotificationCenter from "@/windows/notifications/NotificationCenter";
+import NotificationPopups from "@/windows/notifications/NotificationPopup";
+import SessionMenu from "@/windows/sessionMenu/SessionMenu";
 import { defaultConfig } from "./constants/config";
 import style from "./style.scss";
 import { config } from "./util/config";
+import AppLauncher from "./windows/appLauncher/AppLauncher";
+import Calculator from "./windows/calculator/Calculator";
+import Clipboard from "./windows/clipboard/Clipboard";
 // import { watchForClipboardUpdates } from "./util/clipboard";
 import OSD from "./windows/osd/OSD";
 
@@ -46,12 +50,12 @@ export const [isSessionMenuVisible, setIsSessionMenuVisible] =
 export const [isMediaPlayerVisible, setIsMediaPlayerVisible] =
 	createState(false);
 
-export const [appLauncherMode, setAppLauncherMode] =
-	createState<LauncherMode>("closed");
+export const [isAppLauncherVisible, setIsAppLauncherVisible] =
+	createState(false);
 
-// export const [appList, setAppList] = createState<Apps.Application[]>(
-// 	apps.get_list(),
-// );
+export const [isCalculatorVisible, setIsCalculatorVisible] = createState(false);
+
+export const [isClipboardVisible, setIsClipboardVisible] = createState(false);
 
 export const [apps, setApps] = createState<Apps.Apps>(_apps);
 
@@ -64,32 +68,54 @@ const isNotificationPopupHidden = createComputed(() =>
 
 const notifd = Notifd.get_default();
 
-createEffect(() => {
-	switch (true) {
-		case isNotificationCenterVisible(): {
-			if (isSessionMenuVisible())
-				return setIsNotificationCenterVisible(false);
+createRoot((dispose) => {
+	app.connect("shutdown", dispose);
 
-			setAppLauncherMode("closed");
+	createEffect(() => {
+		switch (true) {
+			case isNotificationCenterVisible(): {
+				if (isSessionMenuVisible())
+					return setIsNotificationCenterVisible(false);
 
-			break;
+				closeLaunchers();
+
+				break;
+			}
+
+			case isSessionMenuVisible(): {
+				setIsNotificationCenterVisible(false);
+				closeLaunchers();
+
+				break;
+			}
+
+			case isAppLauncherVisible(): {
+				if (isSessionMenuVisible())
+					return setIsAppLauncherVisible(false);
+
+				setIsNotificationCenterVisible(false);
+
+				break;
+			}
+
+			case isCalculatorVisible(): {
+				if (isSessionMenuVisible())
+					return setIsCalculatorVisible(false);
+
+				setIsNotificationCenterVisible(false);
+
+				break;
+			}
+
+			case isClipboardVisible(): {
+				if (isSessionMenuVisible()) return setIsClipboardVisible(false);
+
+				setIsNotificationCenterVisible(false);
+
+				break;
+			}
 		}
-
-		case isSessionMenuVisible(): {
-			setIsNotificationCenterVisible(false);
-			setAppLauncherMode("closed");
-
-			break;
-		}
-
-		case appLauncherMode() !== "closed": {
-			if (isSessionMenuVisible()) return setAppLauncherMode("closed");
-
-			setIsNotificationCenterVisible(false);
-
-			break;
-		}
-	}
+	});
 });
 
 function transformIsNotificationPopupHidden(
@@ -97,6 +123,12 @@ function transformIsNotificationPopupHidden(
 	isSessionMenuVisible: boolean,
 ) {
 	return isNotificationCenterVisible || isSessionMenuVisible;
+}
+
+function closeLaunchers() {
+	setIsClipboardVisible(false);
+	setIsAppLauncherVisible(false);
+	setIsCalculatorVisible(false);
 }
 
 const instanceName = SRC.includes("desktop-shell")
@@ -133,8 +165,20 @@ app.start({
 
 						<AppLauncher
 							gdkmonitor={monitor}
-							mode={appLauncherMode}
-							setMode={setAppLauncherMode}
+							visible={isAppLauncherVisible}
+							setVisible={setIsAppLauncherVisible}
+						/>
+
+						<Calculator
+							gdkmonitor={monitor}
+							visible={isCalculatorVisible}
+							setVisible={setIsCalculatorVisible}
+						/>
+
+						<Clipboard
+							gdkmonitor={monitor}
+							visible={isClipboardVisible}
+							setVisible={setIsClipboardVisible}
 						/>
 
 						<OSD
@@ -178,7 +222,7 @@ app.start({
 					return res("session menu is currently open");
 
 				setIsNotificationCenterVisible((prev) => !prev);
-				setAppLauncherMode("closed");
+				closeLaunchers();
 
 				return res("ok");
 			}
@@ -186,7 +230,7 @@ app.start({
 			case "toggle-session-menu": {
 				setIsSessionMenuVisible((prev) => !prev);
 				setIsNotificationCenterVisible(false);
-				setAppLauncherMode("closed");
+				closeLaunchers();
 
 				return res("ok");
 			}
@@ -197,15 +241,9 @@ app.start({
 
 				_apps.reload();
 
-				// const apps = new Apps.Apps({
-				// 	nameMultiplier: 2,
-				// 	entryMultiplier: 0,
-				// 	executableMultiplier: 2,
-				// });
-
 				setApps(_apps);
 
-				setAppLauncherMode("app");
+				setIsAppLauncherVisible(true);
 				setIsNotificationCenterVisible(false);
 
 				return res("ok");
@@ -215,7 +253,7 @@ app.start({
 				if (isSessionMenuVisible.peek())
 					return res("session menu is currently open");
 
-				setAppLauncherMode("calculator");
+				setIsCalculatorVisible(true);
 				setIsNotificationCenterVisible(false);
 
 				return res("ok");
@@ -236,7 +274,7 @@ app.start({
 			*/
 
 			case "toggle-launcher-clipboard": {
-				setAppLauncherMode("clipboard");
+				// setAppLauncherMode("clipboard");
 				setIsNotificationCenterVisible(false);
 
 				// updateClipboardEntries();

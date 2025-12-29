@@ -12,8 +12,9 @@ import type {
 	NetworkStat,
 } from "@/types/systemStats";
 import { config } from "@/util/config";
-import { createEffect, createState } from "ags";
+import { createEffect, createRoot, createState } from "ags";
 import { readFileAsync } from "ags/file";
+import app from "ags/gtk4/app";
 import { execAsync } from "ags/process";
 import { interval } from "ags/time";
 import Network from "gi://AstalNetwork";
@@ -337,15 +338,19 @@ let currentInterval =
 	defaultConfig.systemStatsUpdateInterval;
 let systemStatsInterval = interval(currentInterval, handleInterval);
 
-createEffect(() => {
-	const newConfig = config();
+createRoot((dispose) => {
+	app.connect("shutdown", dispose);
 
-	if (newConfig.systemStatsUpdateInterval !== currentInterval) {
-		systemStatsInterval.cancel();
+	createEffect(() => {
+		const newConfig = config();
 
-		currentInterval =
-			newConfig?.systemStatsUpdateInterval ||
-			defaultConfig.systemStatsUpdateInterval;
-		systemStatsInterval = interval(currentInterval, handleInterval);
-	}
+		if (newConfig.systemStatsUpdateInterval !== currentInterval) {
+			systemStatsInterval.cancel();
+
+			currentInterval =
+				newConfig?.systemStatsUpdateInterval ||
+				defaultConfig.systemStatsUpdateInterval;
+			systemStatsInterval = interval(currentInterval, handleInterval);
+		}
+	});
 });

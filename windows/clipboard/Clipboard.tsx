@@ -1,51 +1,69 @@
-import { type Accessor, createEffect, createState, type Setter } from "ags";
-import { type Gdk, Gtk } from "ags/gtk4";
-import Adw from "gi://Adw";
-// import ClipboardMode from "./modes/clipboard/Clipboard";
 import { defaultConfig } from "@/constants/config";
+import {
+    clipboardEntries,
+    type ClipboardEntry,
+    copyClipboardEntry,
+    fuzzySearch,
+    updateClipboardEntries,
+} from "@/util/clipboard";
 import { config } from "@/util/config";
 import { sleep } from "@/util/timer";
-import AppMode from "./modes/app/App";
-import CalculatorMode from "./modes/calculator/Calculator";
-import ClipboardMode from "./modes/clipboard/Clipboard";
-
-export type LauncherMode = "closed" | "calculator" | "app" | "clipboard";
-export interface PressedKey {
-	keyval: number;
-	modifier: number;
-}
+import {
+    type Accessor,
+    createEffect,
+    createState,
+    For,
+    type Setter,
+} from "ags";
+import { Gdk, Gtk } from "ags/gtk4";
+import Adw from "gi://Adw";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
-	mode: Accessor<LauncherMode>;
-	setMode: Setter<LauncherMode>;
+	visible: Accessor<boolean>;
+	setVisible: Setter<boolean>;
 }
 
-export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
+export default function Clipboard({
+	gdkmonitor,
+	visible: isVisible,
+	setVisible,
+}: Props) {
+	updateClipboardEntries();
+
+	const [filteredClipboard, setFilteredClipboard] = createState<
+		ClipboardEntry[]
+	>(clipboardEntries.peek());
+
 	const [searchValue, setSearchValue] = createState<string | null>(null);
-	const [pressedKey, setPressedKey] = createState<PressedKey | null>(null);
-	const [closed, setClosed] = createState(false);
 
 	let entry: Gtk.Entry | null = null;
 
 	createEffect(() => {
-		if (mode() !== "closed" && entry) entry.grab_focus();
+		if (isVisible() && entry) entry.grab_focus();
 	});
 
-	const [enterPressed, setEnterPressed] = createState(false);
+	createEffect(() => {
+		const value = searchValue();
+
+		if (value) {
+			const clipboardData = clipboardEntries();
+
+			if (!value) setFilteredClipboard(clipboardData);
+			else {
+				const filtered = fuzzySearch(clipboardData, value);
+
+				setFilteredClipboard(filtered);
+			}
+		}
+	});
 
 	const maxWidth = gdkmonitor.geometry.width * 0.5;
 	const maxHeight = gdkmonitor.geometry.height * 0.5;
 
 	function close() {
-		setMode("closed");
 		setSearchValue(null);
-
-		if (entry) entry.set_text("");
-	}
-
-	function emptySearch() {
-		setSearchValue(null);
+		setVisible(false);
 
 		if (entry) entry.set_text("");
 	}
@@ -54,12 +72,11 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 		_e: Gtk.EventControllerKey,
 		keyval: number,
 		_keycode: number,
-		modifier: number,
+		_modifier: number,
 	) {
-		setPressedKey({
-			keyval,
-			modifier,
-		});
+		if (keyval === Gdk.KEY_Escape) {
+			close();
+		}
 	}
 
 	function handleInputChange() {
@@ -71,21 +88,26 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 	}
 
 	function handleInputEnter() {
-		setEnterPressed(true);
-		setEnterPressed(false);
+		const clipboarData = filteredClipboard.peek();
+
+		if (clipboarData.length <= 0) close();
+		else {
+			const entry = clipboarData[0];
+
+			copyClipboardEntry(entry);
+
+			close();
+		}
 	}
 
 	return (
 		<Gtk.Window
 			class="launcher"
-			title="AGS Launcher"
+			title="AGS Clipboard Launcher"
 			display={gdkmonitor.display}
 			resizable={false}
 			onCloseRequest={() => {
 				close();
-
-				setClosed(true);
-				setClosed(false);
 			}}
 			$={(self) => {
 				const revealer = self.child as Gtk.Revealer;
@@ -93,7 +115,7 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 
 				createEffect(async () => {
 					const classes = self.cssClasses;
-					const visible = mode() !== "closed";
+					const visible = isVisible();
 
 					if (!visible) {
 						revealer.set_reveal_child(visible);
@@ -157,42 +179,34 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 								hscrollbarPolicy={Gtk.PolicyType.NEVER}
 							>
 								<box orientation={Gtk.Orientation.VERTICAL}>
-									<AppMode
-										close={close}
-										searchValue={searchValue}
-										enterPressed={enterPressed}
-										pressedKey={pressedKey}
-										entry={entry}
-										visible={mode(
-											(currentMode) =>
-												currentMode === "app",
-										)}
-										closed={closed}
-									/>
+									<box
+										orientation={Gtk.Orientation.VERTICAL}
+										class="clipboard-container"
+									>
+										<For each={filteredClipboard}>
+											{(clipboardEntry) => (
+												<box>
+													<Gtk.GestureClick
+														button={
+															Gdk.BUTTON_PRIMARY
+														}
+														onPressed={() =>
+															copyClipboardEntry(
+																clipboardEntry,
+															)
+														}
+													/>
 
-									<CalculatorMode
-										close={close}
-										searchValue={searchValue}
-										emptySearch={emptySearch}
-										enterPressed={enterPressed}
-										pressedKey={pressedKey}
-										visible={mode(
-											(currentMode) =>
-												currentMode === "calculator",
-										)}
-										closed={closed}
-									/>
-
-									<ClipboardMode
-										close={close}
-										searchValue={searchValue}
-										enterPressed={enterPressed}
-										pressedKey={pressedKey}
-										visible={mode(
-											(currentMode) =>
-												currentMode === "clipboard",
-										)}
-									/>
+													<label
+														halign={Gtk.Align.START}
+														label={
+															clipboardEntry.value
+														}
+													/>
+												</box>
+											)}
+										</For>
+									</box>
 								</box>
 							</scrolledwindow>
 						</box>
