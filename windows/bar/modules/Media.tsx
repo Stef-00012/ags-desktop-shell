@@ -9,7 +9,7 @@ import {
 	parseLyricsData,
 	useSong,
 } from "@/util/lyrics";
-import { escapeMarkup, marquee } from "@/util/text";
+import { escapeTextForPango, marquee } from "@/util/text";
 import {
 	type Accessor,
 	createBinding,
@@ -99,9 +99,9 @@ export default function Media({
 		if (!track || !artist || !album || !isAvailable) return "";
 
 		return [
-			`Artist: ${escapeMarkup(artist)}`,
-			`Track: ${escapeMarkup(track)}`,
-			`Album: ${escapeMarkup(album)}`,
+			`Artist: ${escapeTextForPango(artist)}`,
+			`Track: ${escapeTextForPango(track)}`,
+			`Album: ${escapeTextForPango(album)}`,
 			`Volume: ${Math.round(volume * 100)}%`,
 		].join("\n");
 	}

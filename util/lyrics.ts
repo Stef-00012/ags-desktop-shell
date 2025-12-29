@@ -14,7 +14,7 @@ import type {
 import { config } from "@/util/config";
 import { fetch, Headers, URL, URLSearchParams } from "@/util/fetch";
 import { fileExists } from "@/util/file";
-import { colorText, escapeMarkup } from "@/util/text";
+import { colorText, escapeTextForPango } from "@/util/text";
 import { createState, onCleanup } from "ags";
 import { readFile, writeFile } from "ags/file";
 import { timeout } from "ags/time";
@@ -720,13 +720,15 @@ export function formatLyricsTooltip(
 
 	const previousLyrics =
 		data.previous.length > 0
-			? `${escapeMarkup(data.previous.join("\n"))}\n`
+			? `${escapeTextForPango(data.previous.join("\n"))}\n`
 			: "";
 
 	const nextLyrics =
-		data.next.length > 0 ? `\n${escapeMarkup(data.next.join("\n"))}` : "";
+		data.next.length > 0
+			? `\n${escapeTextForPango(data.next.join("\n"))}`
+			: "";
 
-	const tooltip = `${previousLyrics}${colorText(`<i>${escapeMarkup(data.current)}</i>`, tooltipCurrentSong)}${nextLyrics}\n\n${colorText(`[Source: ${song.source}]`, lyricsSourceColor)}`;
+	const tooltip = `${previousLyrics}${colorText(`<i>${escapeTextForPango(data.current)}</i>`, tooltipCurrentSong)}${nextLyrics}\n\n${colorText(`[Source: ${song.source}]`, lyricsSourceColor)}`;
 
 	return tooltip;
 }

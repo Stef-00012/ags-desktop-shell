@@ -4,10 +4,11 @@ import { fileExists } from "@/util/file";
 import { time } from "@/util/formatTime";
 import { isIcon } from "@/util/icons";
 import { urgency } from "@/util/notif";
-import { escapeMarkup, parseMarkdown } from "@/util/text";
+import { parseMarkdownToPango } from "@/util/text";
 import { sleep, Timer } from "@/util/timer";
-import { createState, onCleanup } from "ags";
+import { createEffect, createRoot, createState } from "ags";
 import { Gdk } from "ags/gtk4";
+import app from "ags/gtk4/app";
 import Adw from "gi://Adw";
 import type Notifd from "gi://AstalNotifd";
 import Gio from "gi://Gio";
@@ -129,14 +130,17 @@ export default function Notification({
 					self.set_reveal_child(!isHidden.peek());
 				}
 
-				const unsubscribe = isHidden.subscribe(() => {
-					const hidden = isHidden.peek();
+				createRoot((dispose) => {
+					app.connect("shutdown", dispose);
 
-					if (hidden) {
-						self.set_reveal_child(false);
-						unsubscribe();
-						onCleanup(() => unsubscribe());
-					}
+					createEffect(() => {
+						const hidden = isHidden();
+
+						if (hidden) {
+							self.set_reveal_child(false);
+							dispose();
+						}
+					});
 				});
 			}}
 		>
@@ -241,8 +245,8 @@ export default function Notification({
 								class="summary"
 								halign={Gtk.Align.START}
 								xalign={0}
-								label={parseMarkdown(
-									escapeMarkup(notification.summary),
+								label={parseMarkdownToPango(
+									notification.summary,
 								)}
 								useMarkup
 								ellipsize={Pango.EllipsizeMode.END}
@@ -257,8 +261,8 @@ export default function Notification({
 									halign={Gtk.Align.START}
 									wrapMode={Pango.WrapMode.CHAR}
 									xalign={0}
-									label={parseMarkdown(
-										escapeMarkup(notification.body),
+									label={parseMarkdownToPango(
+										notification.body,
 									)}
 								/>
 							)}
