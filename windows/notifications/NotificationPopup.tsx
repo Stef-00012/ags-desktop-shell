@@ -102,42 +102,6 @@ export default function NotificationPopups({ gdkmonitor, hidden }: Props) {
 		});
 	});
 
-	// notifications.subscribe(() => {
-	// 	timeout(400, () => {
-	// 		if (!window || !notificationContainer) return;
-
-	// 		const [_success, bounds] =
-	// 			notificationContainer.compute_bounds(window);
-
-	// 		const height = bounds.get_height();
-	// 		const width = bounds.get_width();
-	// 		const x = bounds.get_x();
-	// 		const y = bounds.get_y();
-
-	// 		const surface = window.get_surface();
-
-	// 		const region = new giCairo.Region();
-
-	// 		// @ts-expect-error
-	// 		region.unionRectangle(
-	// 			new giCairo.Rectangle({
-	// 				x,
-	// 				y,
-	// 				height,
-	// 				width,
-	// 			}),
-	// 		);
-
-	// 		surface?.set_input_region(region);
-	// 	});
-	// });
-
-	// const windowVisibility = createComputed(
-	// 	[hidden, notifications, doNotDisturb],
-	// 	(hidden, notifications, doNotDisturb) => {
-	// 		return !hidden && !doNotDisturb && notifications.length > 0;
-	// 	},
-	// );
 	const windowVisibility = createComputed(
 		() => !hidden() && !doNotDisturb() && notifications().length > 0,
 	);

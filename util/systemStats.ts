@@ -337,19 +337,6 @@ let currentInterval =
 	defaultConfig.systemStatsUpdateInterval;
 let systemStatsInterval = interval(currentInterval, handleInterval);
 
-// config.subscribe(() => {
-// 	const newConfig = config.peek();
-
-// 	if (newConfig.systemStatsUpdateInterval !== currentInterval) {
-// 		systemStatsInterval.cancel();
-
-// 		currentInterval =
-// 			newConfig?.systemStatsUpdateInterval ||
-// 			defaultConfig.systemStatsUpdateInterval;
-// 		systemStatsInterval = interval(currentInterval, handleInterval);
-// 	}
-// });
-
 createEffect(() => {
 	const newConfig = config();
 

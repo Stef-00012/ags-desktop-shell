@@ -34,14 +34,9 @@ export default function Speaker({ class: className }: Props) {
 		speaker.get_pw_property("device.api") === "bluez5",
 	);
 
-	// const icon = createComputed([iconName, volume, isMuted], transformIcon);
 	const icon = createComputed(() =>
 		transformIcon(iconName(), volume(), isMuted()),
 	);
-
-	// device.subscribe(() => {
-	// 	setIsBluetooth(speaker.get_pw_property("device.api") === "bluez5");
-	// });
 
 	createEffect(() => {
 		const _device = device();

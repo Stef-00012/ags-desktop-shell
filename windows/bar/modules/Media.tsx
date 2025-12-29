@@ -52,14 +52,6 @@ export default function Media({
 	const coverArt = createBinding(spotify, "cover_art");
 	const available = createBinding(spotify, "available");
 
-	// const mainMetadata = createComputed([
-	// 	track,
-	// 	artist,
-	// 	album,
-	// 	volume,
-	// 	position,
-	// 	available,
-	// ]);
 	const mainMetadata: Accessor<
 		[string, string, string, number, number, boolean]
 	> = createComputed(() => [
@@ -71,15 +63,10 @@ export default function Media({
 		available(),
 	]);
 
-	// const lyricsState = createComputed([song, position]);
 	const lyricsState: Accessor<[SongData | null, number]> = createComputed(
 		() => [song(), position()],
 	);
 
-	// const coverVisibleState = createComputed(
-	// 	[coverArt, available],
-	// 	transformCoverVisible,
-	// );
 	const coverVisibleState = createComputed(() =>
 		transformCoverVisible(coverArt(), available()),
 	);

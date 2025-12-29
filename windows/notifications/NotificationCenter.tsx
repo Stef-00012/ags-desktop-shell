@@ -116,27 +116,6 @@ export default function NotificationCenter({
 				const revealer = self.child as Gtk.Revealer;
 				const transitionDuration = revealer.get_transition_duration();
 
-				// isVisible.subscribe(async () => {
-				// 	const classes = self.cssClasses;
-				// 	const visible = isVisible.peek();
-
-				// 	if (!visible) {
-				// 		revealer.set_reveal_child(visible);
-				// 		self.set_css_classes(
-				// 			classes.filter((className) => className !== "open"),
-				// 		);
-
-				// 		await sleep(transitionDuration);
-				// 	}
-
-				// 	self.set_visible(visible);
-
-				// 	if (visible) {
-				// 		revealer.set_reveal_child(visible);
-				// 		self.set_css_classes([...classes, "open"]);
-				// 	}
-				// });
-
 				createEffect(async () => {
 					const classes = self.cssClasses;
 					const visible = isVisible();

@@ -38,13 +38,6 @@ export default function AppMode({
 
 	const [focusedApp, setFocusedApp] = createState(0);
 
-	// closed.subscribe(() => {
-	// 	if (!closed.peek() || !visible.peek()) return;
-
-	// 	close();
-	// 	setAppList(apps.peek().get_list());
-	// });
-
 	createEffect(() => {
 		if (!visible()) return;
 
@@ -257,13 +250,6 @@ export default function AppMode({
 		apps.peek().get_list(),
 	);
 
-	// searchValue.subscribe(() => {
-	// 	if (!visible.peek()) return;
-
-	// 	setAppList(apps.peek().fuzzy_query(searchValue.peek()));
-	// 	setFocusedApp(0);
-	// });
-
 	function handleInputEnter() {
 		const list = appList.peek();
 		const appIndex = focusedApp.peek();
@@ -289,10 +275,6 @@ export default function AppMode({
 				{(app, index) => (
 					<App
 						app={app}
-						// focused={createComputed(
-						// 	[focusedApp, index],
-						// 	(focusedApp, index) => focusedApp === index,
-						// )}
 						focused={createComputed(() => focusedApp() === index())}
 						onOpen={() => {
 							app.launch();

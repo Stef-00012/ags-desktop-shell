@@ -28,10 +28,6 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 
 	let entry: Gtk.Entry | null = null;
 
-	// mode.subscribe(() => {
-	// 	if (mode.peek() !== "closed" && entry) entry.grab_focus();
-	// });
-
 	createEffect(() => {
 		if (mode() !== "closed" && entry) entry.grab_focus();
 	});
@@ -94,27 +90,6 @@ export default function Launcher({ gdkmonitor, mode, setMode }: Props) {
 			$={(self) => {
 				const revealer = self.child as Gtk.Revealer;
 				const transitionDuration = revealer.get_transition_duration();
-
-				// mode.subscribe(async () => {
-				// 	const classes = self.cssClasses;
-				// 	const visible = mode.peek() !== "closed";
-
-				// 	if (!visible) {
-				// 		revealer.set_reveal_child(visible);
-				// 		self.set_css_classes(
-				// 			classes.filter((className) => className !== "open"),
-				// 		);
-
-				// 		await sleep(transitionDuration);
-				// 	}
-
-				// 	self.set_visible(visible);
-
-				// 	if (visible) {
-				// 		revealer.set_reveal_child(visible);
-				// 		self.set_css_classes([...classes, "open"]);
-				// 	}
-				// });
 
 				createEffect(async () => {
 					const classes = self.cssClasses;

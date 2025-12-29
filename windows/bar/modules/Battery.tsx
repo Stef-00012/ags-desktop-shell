@@ -23,10 +23,6 @@ export default function Battery({ class: className }: Props) {
 
 	const [showAlt, setShowAlt] = createState<boolean>(false);
 
-	// const label = createComputed(
-	// 	[showAlt, percentage, isCharging, timeToEmpty, timeToFull],
-	// 	transformLabel,
-	// );
 	const label = createComputed(() =>
 		transformLabel(
 			showAlt(),
@@ -36,10 +32,6 @@ export default function Battery({ class: className }: Props) {
 			timeToFull(),
 		),
 	);
-	// const tooltip = createComputed(
-	// 	[percentage, isCharging, timeToEmpty, timeToFull, energyRate],
-	// 	transformTooltip,
-	// );
 	const tooltip = createComputed(() =>
 		transformTooltip(
 			percentage(),
@@ -49,30 +41,6 @@ export default function Battery({ class: className }: Props) {
 			energyRate(),
 		),
 	);
-
-	// percentage.subscribe(() => {
-	// 	const perc = Math.round(percentage.peek() * 100);
-	// 	const charging = isCharging.peek();
-	// 	const icon = iconName.peek();
-
-	// 	const baseCommand = `notify-send -a 'Battery Manager' -i ${icon}`;
-
-	// 	if (charging && perc === 100)
-	// 		return execAsync(
-	// 			`${baseCommand} 'Charge Completed' 'Battery is at 100%.\nUnplug the charger.'`,
-	// 		);
-
-	// 	if (charging) return;
-
-	// 	if (perc === 15 || perc === 10)
-	// 		return execAsync(
-	// 			`${baseCommand} 'Battery Low' 'Battery is at ${perc}%.\nPlug the charger.'`,
-	// 		);
-	// 	if (perc <= 5)
-	// 		return execAsync(
-	// 			`${baseCommand} 'Battery Critical' 'Battery is at ${perc}%.\nPlug the charger.'`,
-	// 		);
-	// });
 
 	createEffect(() => {
 		const perc = Math.round(percentage() * 100);

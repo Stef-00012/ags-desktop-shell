@@ -55,11 +55,6 @@ export const [appLauncherMode, setAppLauncherMode] =
 
 export const [apps, setApps] = createState<Apps.Apps>(_apps);
 
-// const isNotificationPopupHidden = createComputed(
-// 	[isNotificationCenterVisible, isSessionMenuVisible],
-// 	transformIsNotificationPopupHidden,
-// );
-
 const isNotificationPopupHidden = createComputed(() =>
 	transformIsNotificationPopupHidden(
 		isNotificationCenterVisible(),
@@ -68,15 +63,6 @@ const isNotificationPopupHidden = createComputed(() =>
 );
 
 const notifd = Notifd.get_default();
-
-// isNotificationCenterVisible.subscribe(() => {
-// 	if (isNotificationCenterVisible.peek()) {
-// 		if (isSessionMenuVisible.peek())
-// 			return setIsNotificationCenterVisible(false);
-
-// 		setAppLauncherMode("closed");
-// 	}
-// });
 
 createEffect(() => {
 	switch (true) {
@@ -105,21 +91,6 @@ createEffect(() => {
 		}
 	}
 });
-
-// isSessionMenuVisible.subscribe(() => {
-// 	if (isSessionMenuVisible.peek()) {
-// 		setIsNotificationCenterVisible(false);
-// 		setAppLauncherMode("closed");
-// 	}
-// });
-
-// appLauncherMode.subscribe(() => {
-// 	if (appLauncherMode.peek() !== "closed") {
-// 		if (isSessionMenuVisible.peek()) return setAppLauncherMode("closed");
-
-// 		setIsNotificationCenterVisible(false);
-// 	}
-// });
 
 function transformIsNotificationPopupHidden(
 	isNotificationCenterVisible: boolean,

@@ -33,12 +33,7 @@ export default function Microphone({ class: className }: Props) {
 		microphone.get_pw_property("device.api") === "bluez5",
 	);
 
-	// const icon = createComputed([iconName, volume], transformIcon);
 	const icon = createComputed(() => transformIcon(iconName(), volume()));
-
-	// device.subscribe(() => {
-	// 	setIsBluetooth(microphone.get_pw_property("device.api") === "bluez5");
-	// });
 
 	createEffect(() => {
 		const _device = setIsBluetooth(

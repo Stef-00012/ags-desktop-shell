@@ -77,66 +77,6 @@ export default function ClipboardMode({
 		}
 	});
 
-	// visible.subscribe(() => {
-	// 	if (!visible.peek()) return;
-
-	// 	const value = searchValue.peek();
-	// 	console.log(value, !value);
-	// 	if (!value) return setFilteredClipboard(clipboardEntries.peek());
-	// });
-
-	// clipboardEntries.subscribe(() => {
-	// 	if (!visible.peek()) return;
-
-	// 	const clipboardData = clipboardEntries.peek();
-
-	// 	const value = searchValue.peek();
-	// 	if (!value) return setFilteredClipboard(clipboardData);
-
-	// 	const filtered = fuzzySearch(clipboardData, value);
-
-	// 	setFilteredClipboard(filtered);
-	// });
-
-	// pressedKey.subscribe(() => {
-	// 	if (!visible.peek()) return;
-
-	// 	const keyData = pressedKey.peek();
-
-	// 	if (!keyData) return;
-
-	// 	if (keyData.keyval === Gdk.KEY_Escape) {
-	// 		close();
-
-	// 		return;
-	// 	}
-	// });
-
-	// enterPressed.subscribe(() => {
-	// 	if (!enterPressed.peek() || !visible.peek()) return;
-
-	// 	const clipboarData = filteredClipboard.peek();
-
-	// 	if (clipboarData.length <= 0) return close();
-
-	// 	const entry = clipboarData[0];
-
-	// 	copyClipboardEntry(entry);
-	// });
-
-	// searchValue.subscribe(() => {
-	// 	if (!visible.peek()) return;
-
-	// 	const clipboardData = clipboardEntries.peek();
-
-	// 	const value = searchValue.peek();
-	// 	if (!value) return setFilteredClipboard(clipboardData);
-
-	// 	const filtered = fuzzySearch(clipboardData, value);
-
-	// 	setFilteredClipboard(filtered);
-	// });
-
 	return (
 		<box
 			orientation={Gtk.Orientation.VERTICAL}

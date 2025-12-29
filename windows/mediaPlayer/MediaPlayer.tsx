@@ -14,6 +14,7 @@ import {
 import { Gdk, Gtk } from "ags/gtk4";
 import Adw from "gi://Adw";
 import Mpris from "gi://AstalMpris";
+import Gio from "gi://Gio";
 import Pango from "gi://Pango";
 
 interface Props {
@@ -187,27 +188,6 @@ export default function Launcher({
 			$={(self) => {
 				const revealer = self.child as Gtk.Revealer;
 				const transitionDuration = revealer.get_transition_duration();
-
-				// isVisible.subscribe(async () => {
-				// 	const classes = self.cssClasses;
-				// 	const visible = isVisible.peek();
-
-				// 	if (!visible) {
-				// 		revealer.set_reveal_child(visible);
-				// 		self.set_css_classes(
-				// 			classes.filter((className) => className !== "open"),
-				// 		);
-
-				// 		await sleep(transitionDuration);
-				// 	}
-
-				// 	self.set_visible(visible);
-
-				// 	if (visible) {
-				// 		revealer.set_reveal_child(visible);
-				// 		self.set_css_classes([...classes, "open"]);
-				// 	}
-				// });
 
 				createEffect(async () => {
 					const classes = self.cssClasses;
@@ -618,29 +598,35 @@ export default function Launcher({
 													{(coverArt) => {
 														if (coverArt) {
 															return (
-																<image
-																	css={mainColor(
-																		(
-																			color,
-																		) =>
-																			`background-color: ${color};`,
-																	)}
+																<Adw.Clamp
+																	maximumSize={
+																		35
+																	}
 																	widthRequest={
 																		35
 																	}
 																	heightRequest={
 																		35
 																	}
-																	class="cover-art"
-																	file={
-																		coverArt
-																	}
-																	overflow={
-																		Gtk
-																			.Overflow
-																			.HIDDEN
-																	}
-																/>
+																>
+																	<Gtk.Picture
+																		css={mainColor(
+																			(
+																				color,
+																			) =>
+																				`background-color: ${color};`,
+																		)}
+																		class="cover-art"
+																		file={Gio.file_new_for_path(
+																			coverArt,
+																		)}
+																		overflow={
+																			Gtk
+																				.Overflow
+																				.HIDDEN
+																		}
+																	/>
+																</Adw.Clamp>
 															);
 														}
 
@@ -1163,30 +1149,32 @@ export default function Launcher({
 													{(coverArt) => {
 														if (coverArt) {
 															return (
-																<image
-																	css={mainColor(
-																		(
-																			color,
-																		) =>
-																			`background-color: ${color};`,
-																	)}
-																	halign={
-																		Gtk
-																			.Align
-																			.FILL
-																	}
-																	hexpand
-																	vexpand
-																	class="cover-art"
-																	file={
-																		coverArt
-																	}
-																	overflow={
-																		Gtk
-																			.Overflow
-																			.HIDDEN
-																	}
-																/>
+																<Adw.Clamp>
+																	<Gtk.Picture
+																		css={mainColor(
+																			(
+																				color,
+																			) =>
+																				`background-color: ${color};`,
+																		)}
+																		halign={
+																			Gtk
+																				.Align
+																				.FILL
+																		}
+																		hexpand
+																		vexpand
+																		class="cover-art"
+																		file={Gio.file_new_for_path(
+																			coverArt,
+																		)}
+																		overflow={
+																			Gtk
+																				.Overflow
+																				.HIDDEN
+																		}
+																	/>
+																</Adw.Clamp>
 															);
 														}
 
@@ -1399,21 +1387,17 @@ export default function Launcher({
 												{(coverArt) => {
 													if (coverArt) {
 														return (
-															<image
+															<Gtk.Picture
 																css={mainColor(
 																	(color) =>
 																		`background-color: ${color};`,
 																)}
-																widthRequest={
-																	35
-																}
-																heightRequest={
-																	35
-																}
 																hexpand
 																vexpand
 																class="cover-art"
-																file={coverArt}
+																file={Gio.file_new_for_path(
+																	coverArt,
+																)}
 																overflow={
 																	Gtk.Overflow
 																		.HIDDEN

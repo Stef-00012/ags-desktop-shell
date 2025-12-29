@@ -26,10 +26,6 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 	const defaultMicrophone = wp?.audio.defaultMicrophone;
 
 	const [isVisible, setIsVisible] = createState(false);
-	// const visibleState = createComputed(
-	// 	[isVisible, hidden],
-	// 	transformVisibleState,
-	// );
 	const visibleState = createComputed(() =>
 		transformVisibleState(isVisible(), hidden()),
 	);
@@ -169,22 +165,6 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 
 				const revealer = self.child as Gtk.Revealer;
 				const transitionDuration = revealer.get_transition_duration();
-
-				// visibleState.subscribe(async () => {
-				// 	const visible = visibleState.peek();
-
-				// 	if (!visible) {
-				// 		revealer.set_reveal_child(visible);
-
-				// 		await sleep(transitionDuration);
-				// 	}
-
-				// 	self.set_visible(visible);
-
-				// 	if (visible) {
-				// 		revealer.set_reveal_child(visible);
-				// 	}
-				// });
 
 				createEffect(async () => {
 					const visible = visibleState();
