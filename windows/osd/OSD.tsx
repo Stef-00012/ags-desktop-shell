@@ -1,154 +1,19 @@
 import { defaultConfig } from "@/constants/config";
 import { config } from "@/util/config";
+import { OSDState, OSDVisibleState } from "@/util/osd";
 import { sleep } from "@/util/timer";
-import { type Accessor, createComputed, createEffect, createState } from "ags";
-import { monitorFile, readFileAsync } from "ags/file";
+import { createEffect } from "ags";
 import { type Gdk, Gtk } from "ags/gtk4";
-import { timeout } from "ags/time";
-import type AstalIO from "gi://AstalIO";
-import Wp from "gi://AstalWp";
 import giCairo from "gi://cairo";
-import GLib from "gi://GLib";
 
 interface Props {
 	gdkmonitor: Gdk.Monitor;
-	hidden: Accessor<boolean>;
 }
 
-export default function OSD({ gdkmonitor, hidden }: Props) {
-	const wp = Wp.get_default();
-
+export default function OSD({ gdkmonitor }: Props) {
 	const maxWidth = gdkmonitor.geometry.width * 0.125;
 	const maxHeight = gdkmonitor.geometry.height * 0.04;
 	const marginTop = gdkmonitor.geometry.height * 0.6;
-
-	const defaultSpeaker = wp?.audio.defaultSpeaker;
-	const defaultMicrophone = wp?.audio.defaultMicrophone;
-
-	const [isVisible, setIsVisible] = createState(false);
-	const visibleState = createComputed(() =>
-		transformVisibleState(isVisible(), hidden()),
-	);
-
-	let lastTimeout: AstalIO.Time;
-	let isStartup = true;
-
-	timeout(300, () => {
-		isStartup = false;
-	});
-
-	const [osdState, setOsdState] = createState<{
-		type: "speaker" | "microphone" | "brightness";
-		percentage: number;
-		mute: boolean;
-		icon: string;
-	}>({
-		type: "speaker",
-		percentage: defaultSpeaker?.volume || 0,
-		mute: defaultSpeaker?.mute || true,
-		icon: defaultSpeaker?.icon || "audio-volume-muted-symbolic",
-	});
-
-	defaultSpeaker?.connect("notify::volume", updateSpeakerState);
-	defaultSpeaker?.connect("notify::mute", updateSpeakerState);
-
-	defaultMicrophone?.connect("notify::volume", updateMicrophoneState);
-	defaultMicrophone?.connect("notify::mute", updateMicrophoneState);
-
-	const dir = GLib.Dir.open(
-		config.peek().paths?.backlightBaseDir ??
-			defaultConfig.paths.backlightBaseDir,
-		0,
-	);
-	const backlightDirName = dir.read_name();
-
-	if (backlightDirName) {
-		const backlightCurrentPath = `${config.peek().paths?.backlightBaseDir ?? defaultConfig.paths.backlightBaseDir}/${backlightDirName}/brightness`;
-		const backlightMaxPath = `${config.peek().paths?.backlightBaseDir ?? defaultConfig.paths.backlightBaseDir}/${backlightDirName}/max_brightness`;
-
-		monitorFile(backlightCurrentPath, async () => {
-			const [currentString, maxString] = await Promise.all([
-				readFileAsync(backlightCurrentPath),
-				readFileAsync(backlightMaxPath),
-			]);
-
-			if (isStartup) return;
-
-			setOsdState({
-				type: "brightness",
-				percentage: parseInt(currentString) / parseInt(maxString),
-				mute: false,
-				icon: "display-brightness-symbolic",
-			});
-
-			setIsVisible(true);
-
-			if (lastTimeout) lastTimeout.cancel();
-			lastTimeout = timeout(
-				config.peek().timeouts?.osd ?? defaultConfig.timeouts.osd,
-				() => {
-					setIsVisible(false);
-				},
-			);
-		});
-	}
-
-	function transformVisibleState(isVisible: boolean, hidden: boolean) {
-		return isVisible && !hidden;
-	}
-
-	function updateSpeakerState(speaker: Wp.Endpoint) {
-		if (isStartup) return;
-
-		let icon = speaker.volumeIcon;
-
-		if (speaker.volume === 0) icon = "audio-volume-muted-symbolic";
-		else if (Math.round(speaker.volume * 100) === 100)
-			icon = "audio-volume-high-symbolic";
-
-		setOsdState({
-			type: "speaker",
-			percentage: speaker.volume,
-			mute: speaker.mute,
-			icon: icon,
-		});
-
-		setIsVisible(true);
-
-		if (lastTimeout) lastTimeout.cancel();
-		lastTimeout = timeout(
-			config.peek().timeouts?.osd ?? defaultConfig.timeouts.osd,
-			() => {
-				setIsVisible(false);
-			},
-		);
-	}
-
-	function updateMicrophoneState(microphone: Wp.Endpoint) {
-		if (isStartup) return;
-
-		let icon = microphone.volumeIcon;
-
-		if (microphone.volume === 0)
-			icon = "microphone-sensitivity-muted-symbolic";
-
-		setOsdState({
-			type: "microphone",
-			percentage: microphone.volume,
-			mute: microphone.mute,
-			icon: icon,
-		});
-
-		setIsVisible(true);
-
-		if (lastTimeout) lastTimeout.cancel();
-		lastTimeout = timeout(
-			config.peek().timeouts?.osd ?? defaultConfig.timeouts.osd,
-			() => {
-				setIsVisible(false);
-			},
-		);
-	}
 
 	return (
 		<window
@@ -167,7 +32,7 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 				const transitionDuration = revealer.get_transition_duration();
 
 				createEffect(async () => {
-					const visible = visibleState();
+					const visible = OSDVisibleState();
 
 					if (!visible) {
 						revealer.set_reveal_child(visible);
@@ -203,23 +68,23 @@ export default function OSD({ gdkmonitor, hidden }: Props) {
 					class="osd-container"
 				>
 					<image
-						iconName={osdState((state) => state.icon)}
+						iconName={OSDState((state) => state.icon)}
 						class="icon"
 					/>
 
 					<Gtk.ProgressBar
 						hexpand
 						valign={Gtk.Align.CENTER}
-						class={osdState((state) =>
+						class={OSDState((state) =>
 							Math.round(state.percentage * 100) > 100
 								? "progress overfilled"
 								: "progress",
 						)}
-						fraction={osdState((state) => state.percentage)}
+						fraction={OSDState((state) => state.percentage)}
 					/>
 
 					<label
-						label={osdState(
+						label={OSDState(
 							(state) => `${Math.round(state.percentage * 100)}%`,
 						)}
 					/>

@@ -29,6 +29,7 @@ import Clipboard from "./windows/clipboard/Clipboard";
 import OSD from "./windows/osd/OSD";
 
 import "./util/battery";
+import "./util/osd";
 
 @register({ Implements: [Gtk.Buildable] })
 class WindowTracker extends GObject.Object {
@@ -208,7 +209,13 @@ app.start({
 		return (
 			<WindowTracker>
 				<For each={monitors}>
-					{(monitor) => <Bar gdkmonitor={monitor} />}
+					{(monitor) => (
+						<WindowTracker>
+							<Bar gdkmonitor={monitor} />
+
+							<OSD gdkmonitor={monitor} />
+						</WindowTracker>
+					)}
 				</For>
 
 				<NotificationPopups
@@ -240,18 +247,16 @@ app.start({
 					setVisible={setIsClipboardVisible}
 				/>
 
-				<OSD gdkmonitor={mainMonitor} hidden={isSessionMenuVisible} />
+				<MediaPlayer
+					gdkmonitor={mainMonitor}
+					visible={isMediaPlayerVisible}
+					setVisible={setIsMediaPlayerVisible}
+				/>
 
 				<SessionMenu
 					gdkmonitor={mainMonitor}
 					visible={isSessionMenuVisible}
 					setVisible={setIsSessionMenuVisible}
-				/>
-
-				<MediaPlayer
-					gdkmonitor={mainMonitor}
-					visible={isMediaPlayerVisible}
-					setVisible={setIsMediaPlayerVisible}
 				/>
 			</WindowTracker>
 		);
