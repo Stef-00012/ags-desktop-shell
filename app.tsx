@@ -143,63 +143,115 @@ app.start({
 
 	main() {
 		const monitors = createBinding(app, "monitors");
+		const mainMonitor = monitors()[0];
 
 		// watchForClipboardUpdates();
 
+		// return (
+		// 	<For each={monitors}>
+		// 		{(monitor) => (
+		// 			<WindowTracker>
+		// 				<Bar gdkmonitor={monitor} />
+
+		// 				<NotificationPopups
+		// 					gdkmonitor={monitor}
+		// 					hidden={isNotificationPopupHidden}
+		// 				/>
+
+		// 				<NotificationCenter
+		// 					gdkmonitor={monitor}
+		// 					visible={isNotificationCenterVisible}
+		// 					setVisible={setIsNotificationCenterVisible}
+		// 				/>
+
+		// 				<AppLauncher
+		// 					gdkmonitor={monitor}
+		// 					visible={isAppLauncherVisible}
+		// 					setVisible={setIsAppLauncherVisible}
+		// 				/>
+
+		// 				<Calculator
+		// 					gdkmonitor={monitor}
+		// 					visible={isCalculatorVisible}
+		// 					setVisible={setIsCalculatorVisible}
+		// 				/>
+
+		// 				<Clipboard
+		// 					gdkmonitor={monitor}
+		// 					visible={isClipboardVisible}
+		// 					setVisible={setIsClipboardVisible}
+		// 				/>
+
+		// 				<OSD
+		// 					gdkmonitor={monitor}
+		// 					hidden={isSessionMenuVisible}
+		// 				/>
+
+		// 				<SessionMenu
+		// 					gdkmonitor={monitor}
+		// 					visible={isSessionMenuVisible}
+		// 					setVisible={setIsSessionMenuVisible}
+		// 				/>
+
+		// 				<MediaPlayer
+		// 					gdkmonitor={monitor}
+		// 					visible={isMediaPlayerVisible}
+		// 					setVisible={setIsMediaPlayerVisible}
+		// 				/>
+		// 			</WindowTracker>
+		// 		)}
+		// 	</For>
+		// );
+
 		return (
-			<For each={monitors}>
-				{(monitor) => (
-					<WindowTracker>
-						<Bar gdkmonitor={monitor} />
+			<WindowTracker>
+				<For each={monitors}>
+					{(monitor) => <Bar gdkmonitor={monitor} />}
+				</For>
 
-						<NotificationPopups
-							gdkmonitor={monitor}
-							hidden={isNotificationPopupHidden}
-						/>
+				<NotificationPopups
+					gdkmonitor={mainMonitor}
+					hidden={isNotificationPopupHidden}
+				/>
 
-						<NotificationCenter
-							gdkmonitor={monitor}
-							visible={isNotificationCenterVisible}
-							setVisible={setIsNotificationCenterVisible}
-						/>
+				<NotificationCenter
+					gdkmonitor={mainMonitor}
+					visible={isNotificationCenterVisible}
+					setVisible={setIsNotificationCenterVisible}
+				/>
 
-						<AppLauncher
-							gdkmonitor={monitor}
-							visible={isAppLauncherVisible}
-							setVisible={setIsAppLauncherVisible}
-						/>
+				<AppLauncher
+					gdkmonitor={mainMonitor}
+					visible={isAppLauncherVisible}
+					setVisible={setIsAppLauncherVisible}
+				/>
 
-						<Calculator
-							gdkmonitor={monitor}
-							visible={isCalculatorVisible}
-							setVisible={setIsCalculatorVisible}
-						/>
+				<Calculator
+					gdkmonitor={mainMonitor}
+					visible={isCalculatorVisible}
+					setVisible={setIsCalculatorVisible}
+				/>
 
-						<Clipboard
-							gdkmonitor={monitor}
-							visible={isClipboardVisible}
-							setVisible={setIsClipboardVisible}
-						/>
+				<Clipboard
+					gdkmonitor={mainMonitor}
+					visible={isClipboardVisible}
+					setVisible={setIsClipboardVisible}
+				/>
 
-						<OSD
-							gdkmonitor={monitor}
-							hidden={isSessionMenuVisible}
-						/>
+				<OSD gdkmonitor={mainMonitor} hidden={isSessionMenuVisible} />
 
-						<SessionMenu
-							gdkmonitor={monitor}
-							visible={isSessionMenuVisible}
-							setVisible={setIsSessionMenuVisible}
-						/>
+				<SessionMenu
+					gdkmonitor={mainMonitor}
+					visible={isSessionMenuVisible}
+					setVisible={setIsSessionMenuVisible}
+				/>
 
-						<MediaPlayer
-							gdkmonitor={monitor}
-							visible={isMediaPlayerVisible}
-							setVisible={setIsMediaPlayerVisible}
-						/>
-					</WindowTracker>
-				)}
-			</For>
+				<MediaPlayer
+					gdkmonitor={mainMonitor}
+					visible={isMediaPlayerVisible}
+					setVisible={setIsMediaPlayerVisible}
+				/>
+			</WindowTracker>
 		);
 	},
 
