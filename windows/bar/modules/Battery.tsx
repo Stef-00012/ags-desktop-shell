@@ -1,10 +1,7 @@
-import { defaultConfig } from "@/constants/config";
-import { config } from "@/util/config";
 import { formatSeconds } from "@/util/formatTime";
 import type { Accessor } from "ags";
-import { createBinding, createComputed, createEffect, createState } from "ags";
+import { createBinding, createComputed, createState } from "ags";
 import { Gdk, Gtk } from "ags/gtk4";
-import { execAsync } from "ags/process";
 import AstalBattery from "gi://AstalBattery";
 
 interface Props {
@@ -42,32 +39,32 @@ export default function Battery({ class: className }: Props) {
 		),
 	);
 
-	createEffect(() => {
-		const perc = Math.round(percentage() * 100);
-		const charging = isCharging();
-		const icon = iconName();
+	// createEffect(() => {
+	// 	const perc = Math.round(percentage() * 100);
+	// 	const charging = isCharging();
+	// 	const icon = iconName();
 
-		const baseCommand = `notify-send -a 'Battery Manager' -i ${icon}`;
-		const batteryFullPercentage =
-			config.peek().batteryFullPercentage ??
-			defaultConfig.batteryFullPercentage;
+	// 	const baseCommand = `notify-send -a 'Battery Manager' -i ${icon}`;
+	// 	const batteryFullPercentage =
+	// 		config.peek().batteryFullPercentage ??
+	// 		defaultConfig.batteryFullPercentage;
 
-		if (charging && perc === batteryFullPercentage)
-			return execAsync(
-				`${baseCommand} 'Charge Completed' 'Battery is at ${batteryFullPercentage}%.\nUnplug the charger.'`,
-			);
+	// 	if (charging && perc === batteryFullPercentage)
+	// 		return execAsync(
+	// 			`${baseCommand} 'Charge Completed' 'Battery is at ${batteryFullPercentage}%.\nUnplug the charger.'`,
+	// 		);
 
-		if (charging) return;
+	// 	if (charging) return;
 
-		if (perc === 15 || perc === 10)
-			return execAsync(
-				`${baseCommand} 'Battery Low' 'Battery is at ${perc}%.\nPlug the charger.'`,
-			);
-		if (perc <= 5)
-			return execAsync(
-				`${baseCommand} 'Battery Critical' 'Battery is at ${perc}%.\nPlug the charger.'`,
-			);
-	});
+	// 	if (perc === 15 || perc === 10)
+	// 		return execAsync(
+	// 			`${baseCommand} 'Battery Low' 'Battery is at ${perc}%.\nPlug the charger.'`,
+	// 		);
+	// 	if (perc <= 5)
+	// 		return execAsync(
+	// 			`${baseCommand} 'Battery Critical' 'Battery is at ${perc}%.\nPlug the charger.'`,
+	// 		);
+	// });
 
 	function transformLabel(
 		showAlt: boolean,

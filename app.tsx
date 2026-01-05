@@ -28,6 +28,8 @@ import Clipboard from "./windows/clipboard/Clipboard";
 // import { watchForClipboardUpdates } from "./util/clipboard";
 import OSD from "./windows/osd/OSD";
 
+import "./util/battery";
+
 @register({ Implements: [Gtk.Buildable] })
 class WindowTracker extends GObject.Object {
 	vfunc_add_child(_: Gtk.Builder, child: Gtk.Window): void {
