@@ -1,7 +1,8 @@
-import type Apps from "gi://AstalApps";
+import { fileExists } from "@/util/file";
 import { isIcon } from "@/util/icons";
-import { Gdk, Gtk } from "ags/gtk4";
 import type { Accessor } from "ags";
+import { Gdk, Gtk } from "ags/gtk4";
+import type Apps from "gi://AstalApps";
 
 interface Props {
 	app: Apps.Application;
@@ -27,14 +28,22 @@ export default function App({ app, focused, onOpen }: Props) {
 				onPressed={handleLeftClick}
 			/>
 
-			{(app.iconName || isIcon(app.entry)) && (
-				<image
-					class="app-icon"
-					visible={Boolean(app.iconName || app.entry)}
-					iconName={app.iconName || app.entry}
-					pixelSize={36}
-				/>
-			)}
+			{(app.iconName || isIcon(app.entry)) &&
+				(fileExists(app.iconName) ? (
+					<image
+						class="app-icon"
+						visible={Boolean(app.iconName || app.entry)}
+						file={app.iconName}
+						pixelSize={36}
+					/>
+				) : (
+					<image
+						class="app-icon"
+						visible={Boolean(app.iconName || app.entry)}
+						iconName={app.iconName || app.entry}
+						pixelSize={36}
+					/>
+				))}
 
 			<box
 				orientation={Gtk.Orientation.VERTICAL}
